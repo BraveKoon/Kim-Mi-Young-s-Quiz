@@ -48,7 +48,7 @@ export function registerAdminHandlers(_io: Server, socket: AppSocket, ctx: AppCo
     if (p.classId === null) return {};
     const classId = classOf(p);
     socket.join(rooms.adminClass(classId));
-    return { state: ctx.sessions.getClassState(classId, 'admin') };
+    return { state: ctx.sessions.getClassState(classId, 'admin'), participants: ctx.sessions.participantsPayload(classId, 'admin') };
   });
   handle(EVENTS.ADMIN_START, (p) => ctx.sessions.startQuiz(classOf(p)));
   handle(EVENTS.ADMIN_PAUSE, (p) => ctx.sessions.pauseQuiz(classOf(p)));

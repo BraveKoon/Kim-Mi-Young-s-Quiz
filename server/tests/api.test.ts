@@ -225,4 +225,21 @@ describe('대회 관리', () => {
     const after = await request(ts.url).get('/api/classes/2-11/session');
     expect(after.body.session.status).toBe('NO_SESSION');
   });
+  it('같은 문제 세트면 일부 학급만 시작해도 비교 가능, 다른 세트가 섞이면 공정성 경고', async () => {
+    const same = await request(ts.url).post('/api/competitions').set(auth()).send({ title: '공정 대회', quizSetId: 1, classIds: ['2-9', '2-10'] });
+    const sameId = same.body.competition.id;
+    ts.server.ctx.sessions.startQuiz('2-9');
+    let r = await request(ts.url).get('/api/leaderboard').query({ scope: 'classes', competitionId: sameId }).set(auth());
+    expect(r.body.comparable).toBe(true);
+    expect(r.body.fairnessWarning).toBeNull();
+    ts.server.ctx.sessions.finishQuiz('2-9');
+
+    const q = await request(ts.url).post('/api/questions').set(auth()).send({ questionText: '다른 문제', options: ['a', 'b', 'c', 'd'], correctIndex: 0 });
+    const set2 = await request(ts.url).post('/api/quiz-sets').set(auth()).send({ title: '다른 세트', questionIds: [q.body.question.id] });
+    const mixed = await request(ts.url).post('/api/competitions').set(auth()).send({ title: '혼합 대회', quizSetId: 1, classIds: ['2-9'] });
+    await request(ts.url).post('/api/classes/2-10/session').set(auth()).send({ competitionId: mixed.body.competition.id, quizSetId: set2.body.quizSet.id });
+    r = await request(ts.url).get('/api/leaderboard').query({ scope: 'classes', competitionId: mixed.body.competition.id }).set(auth());
+    expect(r.body.comparable).toBe(false);
+    expect(r.body.fairnessWarning).toContain('공정한 비교가 아닐 수 있습니다');
+  });
 });

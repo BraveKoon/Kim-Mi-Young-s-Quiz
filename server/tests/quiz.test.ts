@@ -187,7 +187,7 @@ describe('최초 완성 시나리오: 2학년 1반 5명 전체 퀴즈 흐름', (
     expect((xlsx.body as Buffer).subarray(0, 2).toString()).toBe('PK');
     const ExcelJS = (await import('exceljs')).default;
     const wb = new ExcelJS.Workbook();
-    await wb.xlsx.load(xlsx.body as Buffer);
+    await wb.xlsx.load(xlsx.body as any);
     expect(wb.worksheets.map((w) => w.name)).toEqual(['대회 정보', '개인 순위', '학급 순위', '문항별 통계', '접속 기록']);
     expect(wb.getWorksheet('개인 순위')!.getRow(2).getCell(3).value).toBe(lb[0].nickname);
 

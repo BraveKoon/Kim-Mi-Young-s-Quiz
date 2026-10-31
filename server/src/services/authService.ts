@@ -16,7 +16,7 @@ export interface AdminTokenPayload {
 }
 
 // 존재하지 않는 계정으로 로그인 시에도 비슷한 시간이 걸리도록 하는 더미 해시
-const DUMMY_HASH = bcrypt.hashSync('dummy-password-for-timing', 10);
+const DUMMY_HASH = bcrypt.hashSync('dummy-password-for-timing', 12);
 
 export class AuthService {
   constructor(private repos: Repositories, private config: AppConfig, private clock: Clock, private logger: ActivityLogger) {}

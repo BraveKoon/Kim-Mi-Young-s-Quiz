@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "db:reset": "tsx scripts/resetDb.ts",
+    "db:backup": "tsx scripts/backupDb.ts",
     "loadtest": "tsx scripts/loadtest.ts"
   },
   "dependencies": {

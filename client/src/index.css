@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-display: "Jua", "Noto Sans KR", system-ui, sans-serif;
+  --color-ink-950: #0b0620;
+  --color-ink-900: #140b33;
+  --color-ink-800: #1e1048;
+  --color-ink-700: #2b1863;
+  --color-neon-pink: #ff3dbb;
+  --color-neon-cyan: #22e3ff;
+  --color-neon-lime: #a3ff3d;
+  --color-neon-yellow: #ffd53d;
+  --color-opt-red: #e5304d;
+  --color-opt-blue: #2d6cf0;
+  --color-opt-yellow: #f2b705;
+  --color-opt-green: #1fa45a;
+}
+
+html, body, #root { min-height: 100%; }
+body {
+  @apply bg-ink-950 text-white font-sans antialiased;
+  background-image:
+    radial-gradient(1200px 600px at 10% -10%, rgba(168, 85, 247, 0.35), transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, rgba(34, 227, 255, 0.18), transparent 60%),
+    radial-gradient(800px 600px at 50% 120%, rgba(255, 61, 187, 0.18), transparent 60%),
+    linear-gradient(160deg, #140b33 0%, #1e1048 45%, #0b0620 100%);
+  background-attachment: fixed;
+}
+
+@utility glass {
+  @apply rounded-3xl border border-white/10 bg-white/[0.06] shadow-[0_8px_40px_rgba(0,0,0,0.35)] backdrop-blur-xl;
+}
+
+@utility glass-strong {
+  @apply rounded-3xl border border-white/15 bg-white/[0.10] shadow-[0_8px_40px_rgba(0,0,0,0.45)] backdrop-blur-2xl;
+}
+
+@utility neon-text {
+  text-shadow: 0 0 12px rgba(168, 85, 247, 0.9), 0 0 32px rgba(34, 227, 255, 0.5);
+}
+
+@utility input {
+  @apply w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none transition focus:border-neon-cyan focus:ring-2 focus:ring-neon-cyan/30;
+}
+
+@utility label {
+  @apply mb-1 block text-sm font-medium text-white/70;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 font-bold transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40;
+}
+
+@utility btn-primary {
+  @apply btn bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white shadow-[0_0_24px_rgba(217,70,239,0.45)] hover:brightness-110;
+}
+
+@utility btn-cyan {
+  @apply btn bg-gradient-to-r from-cyan-400 to-sky-500 text-ink-950 shadow-[0_0_24px_rgba(34,227,255,0.4)] hover:brightness-110;
+}
+
+@utility btn-ghost {
+  @apply btn border border-white/15 bg-white/5 text-white hover:bg-white/10;
+}
+
+@utility btn-danger {
+  @apply btn bg-gradient-to-r from-rose-500 to-red-600 text-white hover:brightness-110;
+}
+
+@utility btn-sm {
+  @apply px-3! py-1.5! text-sm! rounded-xl!;
+}
+
+@utility table-base {
+  @apply w-full text-left text-sm;
+  & th {
+    @apply sticky top-0 bg-ink-800/95 px-3 py-2 font-semibold text-white/70 backdrop-blur;
+  }
+  & td {
+    @apply border-t border-white/5 px-3 py-2;
+  }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 8px; }

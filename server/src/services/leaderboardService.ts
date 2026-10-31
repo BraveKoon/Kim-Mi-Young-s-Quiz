@@ -144,7 +144,10 @@ export class LeaderboardService {
          FROM class_sessions s WHERE s.competition_id = ?`,
       )
       .all(competitionId) as { id: number; quiz_set_id: number | null; quiz_set_title: string | null; qs: string | null }[];
-    const keys = new Set(rows.map((r) => (r.qs ? `q:${r.qs}` : `set:${r.quiz_set_id}`)));
+    // 시작된 세션은 실제 출제된 문제(스냅샷), 시작 전 세션은 현재 문제 세트 구성으로 비교한다.
+    const keys = new Set(
+      rows.map((r) => r.qs ?? (r.quiz_set_id ? this.repos.quizSets.questionIds(r.quiz_set_id).join(',') : `none:${r.id}`)),
+    );
     const comparable = keys.size <= 1;
     return {
       comparable,

@@ -277,7 +277,8 @@ export class SessionManager {
     this.notifyOverview();
   }
 
-  publishParticipants(classId: string) {
+  /** 대기실 참가자 목록 (대상별로 점수·이름 노출 수준이 다름) */
+  participantsPayload(classId: string, audience: Audience) {
     const session = this.repos.sessions.currentForClass(classId);
     const list = session
       ? this.repos.participants.bySession(session.id).map((p) => ({
@@ -288,17 +289,25 @@ export class SessionManager {
         }))
       : [];
     const mode = this.nameMode();
-    this.broadcaster.toClass(classId, EVENTS.PARTICIPANTS, (aud) => ({
+    return {
       classId,
       count: list.length,
       connectedCount: this.presence.count(classId),
       participants:
-        aud === 'projector'
+        audience === 'projector'
           ? list.map((p) => ({ ...p, totalScore: 0, nickname: displayName(p.nickname, mode) }))
-          : aud === 'student'
+          : audience === 'student'
             ? list.map((p) => ({ ...p, totalScore: 0 })) // 진행 중 점수 노출 방지
             : list,
-    }));
+    };
+  }
+
+  publishParticipants(classId: string) {
+    const cache = new Map<Audience, unknown>();
+    this.broadcaster.toClass(classId, EVENTS.PARTICIPANTS, (aud) => {
+      if (!cache.has(aud)) cache.set(aud, this.participantsPayload(classId, aud));
+      return cache.get(aud);
+    });
     this.notifyOverview();
   }
 

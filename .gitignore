@@ -4,8 +4,11 @@ dist/
 .env
 .env.*
 !.env.example
-server/data/*.sqlite*
-server/data/exports/
-server/data/test-*/
+server/data/*
+!server/data/.gitkeep
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+e2e-screenshots/
 coverage/
 .DS_Store

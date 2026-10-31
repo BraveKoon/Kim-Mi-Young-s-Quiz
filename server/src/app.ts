@@ -18,9 +18,12 @@ export function createExpressApp(ctx: AppContext) {
             directives: {
               defaultSrc: ["'self'"],
               connectSrc: ["'self'", 'ws:', 'wss:'],
+              workerSrc: ["'self'", 'blob:'], // canvas-confetti 웹 워커
               imgSrc: ["'self'", 'data:'],
               styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
               fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+              // 학교 내부망에서 HTTP로 운영하는 경우를 막지 않도록 비활성화 (운영 환경은 HTTPS 프록시 권장)
+              upgradeInsecureRequests: null,
             },
           }
         : false,

@@ -117,6 +117,7 @@ export function createSocketServer(httpServer: HttpServer, ctx: AppContext) {
       const classId = d.classId;
       socket.join(rooms.projector(classId));
       socket.emit(EVENTS.STATE, { state: ctx.sessions.getClassState(classId, 'projector') });
+      socket.emit(EVENTS.PARTICIPANTS, ctx.sessions.participantsPayload(classId, 'projector'));
       socket.on(EVENTS.PROJECTOR_REQUEST_STATE, (_p: unknown, ack?: (r: unknown) => void) => {
         const state = ctx.sessions.getClassState(classId, 'projector');
         if (typeof ack === 'function') ack({ ok: true, state });
