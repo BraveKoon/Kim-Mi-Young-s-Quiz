@@ -33,6 +33,14 @@ describe('초기화 및 시드', () => {
     const done = await seed(ts.server.ctx.repos, ts.config);
     expect(done).toEqual([]);
   });
+  it('API 단독 모드에서 루트(/)와 /api/health 모두 200 OK를 반환한다', async () => {
+    const rootRes = await request(ts.url).get('/');
+    expect(rootRes.status).toBe(200);
+    expect(rootRes.body).toMatchObject({ ok: true, service: 'ClassQuiz API' });
+    const healthRes = await request(ts.url).get('/api/health');
+    expect(healthRes.status).toBe(200);
+    expect(healthRes.body.ok).toBe(true);
+  });
 });
 
 describe('관리자 인증', () => {

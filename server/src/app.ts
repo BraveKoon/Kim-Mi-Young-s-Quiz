@@ -47,6 +47,8 @@ export function createExpressApp(ctx: AppContext) {
   if (dist && fs.existsSync(path.join(dist, 'index.html'))) {
     app.use(express.static(dist, { index: false, maxAge: '1h' }));
     app.get(/^(?!\/api|\/socket\.io).*/, (_req, res) => res.sendFile(path.join(dist, 'index.html')));
+  } else {
+    app.get('/', (_req, res) => res.json({ ok: true, service: 'ClassQuiz API', time: ctx.clock() }));
   }
   app.use(errorHandler(ctx.config.isProduction));
   return app;
