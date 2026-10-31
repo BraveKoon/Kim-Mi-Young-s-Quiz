@@ -31,10 +31,10 @@
 | 영역 | 내용 |
 | --- | --- |
 | 학급 로비 `/` | 12개 학급 카드(접속 인원, 참가/정원, 퀴즈 상태, 입장 가능 여부) — 5초마다 갱신 |
-| 학생 화면 `/2-1` ~ `/2-12` | 닉네임 입장 → 대기실 → 문제/타이머/4색·4도형 보기(▲◆●■) → 제출 완료 애니메이션 → 정답·해설·순위 변화 → 최종 시상대 + 폭죽. 잘못된 학급 ID는 404 |
+| 학생 화면 `/2-1` ~ `/2-12` | 닉네임 입장 → 대기실 → 문제/타이머/4지선다·O/X 보기(▲◆●■) 및 단답형 직접 입력 → 제출 완료 애니메이션 → 정답·해설·순위 변화 → 최종 시상대 + 폭죽. 잘못된 학급 ID는 404 |
 | 2배 점수 | 문제 시작 전 2초간 `⚡ DOUBLE POINTS x2! ⚡` 네온 배너 (서버도 2초 리드인을 두어 공정하게 시작) |
-| 재접속 | 새로고침·네트워크 끊김 후 현재 문제, 남은 시간, 제출 여부, 누적 점수, 순위 복구. 같은 학생이 다른 창에서 접속하면 **새 연결이 기존 연결을 대체** |
-| 관리자 `/admin` | 대시보드, 학급 관리, 학생 관리, 문제 관리, 문제 세트 관리, 퀴즈 진행 관리, 개인 순위, 학급 순위, 문항별 통계, 활동 로그, 대회 이력, 결과 내보내기, 설정 (13개 메뉴) |
+| 재접속 | 새로고침·네트워크 끊김 후 현재 문제, 남은 시간, 제출 여부(단답형 입력값 포함), 누적 점수, 순위 복구. 같은 학생이 다른 창에서 접속하면 **새 연결이 기존 연결을 대체** |
+| 관리자 `/admin` | 대시보드, 학급 관리, 학생 관리, 문제 관리(4지선다·O/X·단답형), 문제 세트 관리, 퀴즈 진행 관리, 개인 순위, 학급 순위, 문항별 통계, 활동 로그, 대회 이력, 결과 내보내기, 설정(관리자 계정 추가·삭제 포함) (13개 메뉴) |
 | 학급별 독립 제어 | 시작 / 일시정지 / 재개 / 결과 공개 / 다음 문제 / 종료 / 초기화 — 한 학급의 조작은 다른 학급에 영향 없음 |
 | 실시간 접속 현황 | 학급별 접속/정원, 전체 접속(예: 95/420), 참가·미접속·완료 인원, 평균 점수, 진행 상태 |
 | 프로젝터 `/projector/2-1` | 전체 화면, 큰 글씨, 접속 주소 안내, 현재 문제·타이머·제출 인원, 보기별 선택 분포 차트, 순위, 1~3위 시상대 + 폭죽. 이름 공개 방식(전체/마스킹 `김*수`/비공개)을 서버에서 적용 |
@@ -64,7 +64,7 @@ elapsedSec = (서버 수신 시각 - 서버 문제 시작 시각) / 1000
 - **Frontend**: React 19, Vite 8, TypeScript, Tailwind CSS 4, Framer Motion, Lucide React, Socket.io-client, Axios, React Router 7, canvas-confetti, Recharts
 - **Backend**: Node.js 22, Express 5, TypeScript, Socket.io 4, JWT(jsonwebtoken), bcrypt, Zod, helmet, express-rate-limit, ExcelJS
 - **Database**: SQLite (better-sqlite3) — WAL 모드, 외래 키, 인덱스, 트랜잭션, 마이그레이션, SQL Repository 계층
-- **Test**: Vitest + Supertest + socket.io-client (서버), Playwright (브라우저 E2E), 자체 부하 테스트 도구
+- **Test / CI**: Vitest + Supertest + socket.io-client (서버), Vitest + Testing Library + jsdom (프론트엔드), Playwright (브라우저 E2E), 자체 부하 테스트 도구, GitHub Actions CI/Pages
 
 ---
 
@@ -72,8 +72,10 @@ elapsedSec = (서버 수신 시각 - 서버 문제 시작 시각) / 1000
 
 ```
 classquiz/
+├── .github/workflows/         # GitHub Actions CI 및 GitHub Pages 배포 워크플로
 ├── client/                    # React 프론트엔드 (정적 호스팅 가능)
 │   ├── public/
+│   ├── tests/                 # 컴포넌트·훅·유틸 단위 테스트 (Vitest + Testing Library)
 │   └── src/
 │       ├── components/{common,quiz,leaderboard,dashboard,charts}
 │       ├── pages/             # HomePage, ClassPage, AdminLoginPage, AdminDashboard,
@@ -168,6 +170,7 @@ NODE_ENV=production JWT_SECRET=<32자 이상 임의값> npm start
 - 기본 계정은 `must_change_password` 상태로 생성되어, 로그인 직후 비밀번호 변경 화면만 사용할 수 있습니다. 서버도 변경 전에는 관리자 API·소켓을 `403 PASSWORD_CHANGE_REQUIRED` 로 차단합니다.
 - 새 비밀번호: 8자 이상, `1234`·아이디와 동일한 값 금지. 변경 시 기존 토큰은 모두 무효화되고 새 토큰이 발급됩니다.
 - 이후 변경: 관리자 대시보드 → **설정** → 관리자 비밀번호 변경
+- **관리자 계정 추가·삭제**: 관리자 대시보드 → **설정** → **관리자 계정 관리**에서 보조 교사 등 추가 관리자를 등록하거나 삭제할 수 있습니다. 새로 추가한 계정도 첫 로그인 시 비밀번호 변경이 강제되며, 마지막 남은 관리자 계정과 현재 로그인 중인 본인 계정은 삭제할 수 없습니다(계정 삭제 시 기존 로그인 토큰·소켓 연결은 즉시 무효화됨).
 - 운영 환경에서는 `ADMIN_USERNAME`, `ADMIN_PASSWORD` 환경 변수로 초기 계정을 지정하세요(계정이 하나도 없을 때만 적용).
 - 비밀번호를 잊은 경우: 서버를 중지하고 `sqlite3 data/classquiz.sqlite "DELETE FROM admins;"` 실행 후 서버를 재시작하면 환경 변수 값으로 초기 계정이 다시 생성됩니다(다른 데이터는 유지).
 
@@ -244,8 +247,12 @@ server {
 
 GitHub Pages는 **정적 파일만** 제공합니다. REST API와 Socket.io 서버는 반드시 별도의 Node.js 실행 환경(VPS, 학교 서버 등)에 배포해야 합니다.
 
+- **GitHub Actions 자동 배포(`.github/workflows/deploy-pages.yml`)**:
+  1. GitHub 저장소 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 설정합니다.
+  2. **Settings → Secrets and variables → Actions → Variables**에 `VITE_API_URL`(예: `https://quiz-api.school.kr`)과 필요 시 `VITE_BASE_PATH`(기본값 `/<저장소명>/`)를 등록하면 브랜치 푸시 시 자동으로 빌드·배포됩니다(`Actions` 탭에서 수동 실행 `workflow_dispatch`도 가능).
+
 ```bash
-# 프론트엔드
+# 수동 빌드 시
 cd client
 VITE_API_URL=https://quiz-api.school.kr VITE_BASE_PATH=/Kim-Mi-Young-s-Quiz/ npm run build
 # client/dist 를 gh-pages 브랜치 등에 업로드 (404.html 이 자동 생성되어 /2-1 같은 주소도 동작)
@@ -282,15 +289,16 @@ CLIENT_ORIGIN=https://<계정>.github.io NODE_ENV=production JWT_SECRET=... node
 ## 테스트
 
 ```bash
-npm test                 # 서버 기능·보안·복구 테스트 (Vitest, 42개)
-npm run typecheck        # 서버·클라이언트 타입 검사
+npm test                 # 서버(46개) + 프론트엔드(17개) 자동 테스트 (Vitest, 총 63개)
+npm run typecheck        # 서버·클라이언트(테스트 포함) 타입 검사
 ```
 
 | 구분 | 검증 항목 |
 | --- | --- |
-| 기능 | 시드(12학급·5문항·bcrypt), 관리자 로그인, 문제 생성/수정/삭제, 문제 세트 CRUD, 학생 입장, 닉네임 중복(공백 정규화 포함), **동시 45명 입장 시 정확히 35명만 허용**, 퀴즈 시작, 답안 제출, 서버 채점(1000/500/2배), 순위 계산(동점 처리), 결과 공개, 다음 문제, 최종 순위, 통계(응답자/전체 정답률), 대회 이력, CSV(BOM)·XLSX(시트 구성) 내보내기 |
-| 보안 | 학생의 관리자 API/이벤트 차단 및 로그, 위조·만료·`alg=none` JWT 차단, 로그아웃·비밀번호 변경 후 토큰 무효화, 다른 학급 Room/참가자/순위 접근 차단, 잘못된 participantId·토큰 차단, 중복 답안 차단, 제한시간 초과 차단, **클라이언트 점수 조작 무시**, XSS 닉네임 거부, SQL Injection 형태 입력 무해화, 소켓 이벤트 속도 제한, 초기화·삭제 확인 문구 |
+| 기능 | 시드(12학급·5문항·bcrypt), 관리자 로그인·계정 추가/삭제(마지막 관리자·본인 삭제 방지, 첫 로그인 비밀번호 변경 강제), 문제 생성/수정/삭제(4지선다·O/X·단답형), 문제 세트 CRUD, 학생 입장, 닉네임 중복(공백 정규화 포함), **동시 45명 입장 시 정확히 35명만 허용**, 퀴즈 시작, 답안 제출, 서버 채점(1000/500/2배·단답형 대소문자/공백 정규화), 순위 계산(동점 처리), 결과 공개, 다음 문제, 최종 순위, 통계(응답자/전체 정답률), 대회 이력, CSV(BOM)·XLSX(시트 구성) 내보내기 |
+| 보안 | 학생의 관리자 API/이벤트 차단 및 로그, 위조·만료·`alg=none`·삭제된 계정 JWT 차단, 로그아웃·비밀번호 변경 후 토큰 무효화, 다른 학급 Room/참가자/순위 접근 차단, 잘못된 participantId·토큰 차단, 중복 답안 차단, 제한시간 초과 차단, **클라이언트 점수 조작 무시**, 단답형 진행 중 인정 답안 비노출, XSS 닉네임 거부, SQL Injection 형태 입력 무해화, 소켓 이벤트 속도 제한, 초기화·삭제 확인 문구 |
 | 안정성 | 일시정지/재개 시 남은 시간 보존, 새로고침·중복 접속(기존 연결 교체) 후 상태 복구, 진행 중 점수 비노출, **서버 재시작 후 세션·타이머 복구**, 학급 간 이벤트 격리, 공정성 경고 |
+| 프론트엔드 | `TimerBar`(시간 올림·비율·경고 색상), `AnswerButton`(도형·비활성화·선택 인원), `DoublePointsBanner`, `StatusBadge`, `Leaderboard`·`Podium`(천 단위 점수·순위 변화·본인 강조), `QuestionsSection`(4지선다·O/X·단답형 폼), `AdminAccountsCard`(관리자 추가/삭제/비활성화 규칙), `useCountdown`(서버 시계 오프셋·일시정지 보정) |
 
 브라우저 E2E (Playwright가 설치된 환경):
 
@@ -394,6 +402,7 @@ RESULT(마지막) ──next──▶ FINISHED        (어느 상태에서든 fi
 | 메서드 | 경로 | 권한 |
 | --- | --- | --- |
 | POST | `/api/admin/login`, `/api/admin/logout`, `/api/admin/change-password` · GET `/api/admin/me`, `/api/admin/overview` | 관리자 |
+| GET/POST/DELETE | `/api/admins[/:id]` (관리자 계정 목록·추가·삭제, 마지막 관리자/본인 삭제 차단) | 관리자 |
 | GET/POST/PUT/DELETE | `/api/questions[/:id]`, `/api/quiz-sets[/:id]` | 관리자 |
 | GET | `/api/classes`, `/api/classes/:classId/session` | 공개(인원·상태만) |
 | POST | `/api/classes/:classId/join` | 공개(정원·중복 검사) |
@@ -424,9 +433,8 @@ RESULT(마지막) ──next──▶ FINISHED        (어느 상태에서든 fi
 구현하지 않았거나 검증 범위가 제한된 항목입니다.
 
 - **실제 학교 환경 부하 테스트 미실시**: 420명 테스트는 단일 머신 루프백에서 수행했습니다. 실제 서버 사양·교실 Wi‑Fi·학교 회선에서의 측정은 아직 하지 않았습니다.
-- **문제 유형**: 4지선다형만 관리자 화면에서 만들 수 있습니다. O/X(보기 2개)는 DB(`question_type`)와 API 검증·학생 화면 렌더링까지는 지원하지만 관리자 문제 편집 화면은 아직 4지선다 전용입니다. 단답형은 미지원(API에서 거부)입니다.
+- **단답형 채점 범위**: 단답형(`SHORT_ANSWER`)은 유니코드 NFC·앞뒤/연속 공백 정리·영문 대소문자 무시 후 등록된 인정 답안(최대 5개)과 일치 여부를 비교합니다. 오타 유사도나 형태소 기반 자동 부분 점수는 지원하지 않습니다.
 - **수평 확장 미지원**: 타이머와 접속 현황이 프로세스 메모리에 있어 단일 Node.js 프로세스 운영을 전제로 합니다(다중 프로세스는 Redis adapter·분산 타이머 필요).
-- **관리자 계정 관리 UI 없음**: 관리자 계정은 1개(초기 시드)이며 추가/삭제 화면은 없습니다.
-- **프론트엔드 자동 테스트**: 컴포넌트 단위 테스트는 없고, Playwright 시나리오(`e2e/scenario.mjs`)로 주요 흐름만 검증합니다. Playwright는 저장소 의존성에 포함되어 있지 않습니다.
+- **브라우저 E2E CI 미포함**: GitHub Actions CI(`ci.yml`)는 타입 검사, 서버·프론트엔드 Vitest 테스트, 운영 빌드까지 자동 검증합니다. Playwright 브라우저 시나리오(`e2e/scenario.mjs`)는 별도 수동 검증 스크립트로 제공되며 저장소 기본 의존성에 포함되어 있지 않습니다.
 - 헤드리스 Chromium(UTF‑8 로케일이 없는 테스트 컨테이너)에서는 한글 다운로드 파일명이 `download` 로 표시되었습니다. 서버는 `filename*=UTF-8''…` 헤더를 정상 전송하며 일반 브라우저에서는 한글 파일명이 유지됩니다.
 - 웹 폰트(Google Fonts)를 사용하므로 외부 인터넷이 차단된 학교망에서는 시스템 폰트로 대체됩니다.

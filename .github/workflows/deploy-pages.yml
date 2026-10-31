@@ -1,0 +1,72 @@
+name: Deploy Frontend to GitHub Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: '백엔드 서버 주소 (예: https://quiz-api.school.kr). 비우면 저장소 변수 VITE_API_URL 사용'
+        required: false
+        type: string
+      base_path:
+        description: '하위 경로 (예: /Kim-Mi-Young-s-Quiz/). 비우면 VITE_BASE_PATH 또는 /<저장소명>/ 사용'
+        required: false
+        type: string
+  push:
+    branches:
+      - main
+      - claude/classquiz-realtime-quiz-platform-iqy54o
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build static client
+    if: github.event_name == 'workflow_dispatch' || vars.VITE_API_URL != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build client (generates dist/index.html and dist/404.html)
+        env:
+          VITE_API_URL: ${{ inputs.api_url || vars.VITE_API_URL }}
+          VITE_BASE_PATH: ${{ inputs.base_path || vars.VITE_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+        run: |
+          npm run build -w client
+          test -f client/dist/404.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: client/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
