@@ -11,8 +11,8 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["vite/client"],
+    "types": ["vite/client", "@testing-library/jest-dom"],
     "paths": { "@shared/*": ["../shared/*"] }
   },
-  "include": ["src", "../shared"]
+  "include": ["src", "tests", "../shared"]
 }

@@ -15,7 +15,11 @@ export function AnswerButton(props: { index: number; text: string; mode: Mode; d
       whileHover={props.disabled ? undefined : { scale: 1.03, y: -2 }}
       whileTap={props.disabled ? undefined : { scale: 0.9 }}
       animate={props.mode === 'selected' ? { scale: [1, 1.08, 0.97, 1.02, 1] } : props.mode === 'correct' ? { scale: [1, 1.06, 1] } : { scale: 1 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 12 }}
+      transition={
+        props.mode === 'selected' || props.mode === 'correct'
+          ? { duration: 0.4, ease: 'easeOut' }
+          : { type: 'spring', stiffness: 400, damping: 12 }
+      }
       className={`relative flex w-full items-center gap-3 overflow-hidden rounded-2xl ${s.bg} px-4 text-left font-bold text-white shadow-[0_6px_0_rgba(0,0,0,0.35)] transition
         ${props.large ? 'min-h-28 py-5 text-2xl md:text-4xl' : 'min-h-20 py-4 text-lg md:text-2xl'}
         ${props.mode === 'selected' ? `ring-4 ${s.ring} ring-offset-2 ring-offset-ink-900` : ''}
