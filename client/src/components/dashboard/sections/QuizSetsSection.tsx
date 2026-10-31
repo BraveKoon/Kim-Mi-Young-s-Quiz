@@ -4,6 +4,7 @@ import { useToast } from '../../../contexts/ToastContext';
 import { useApi } from '../../../hooks/useApi';
 import { api, errorMessage } from '../../../services/api';
 import type { Question, QuizSet } from '../../../types';
+import { QUESTION_TYPE_LABEL } from '../../../utils/format';
 import { ConfirmDialog, Modal } from '../../common/Modal';
 import { Spinner } from '../../common/Spinner';
 import { SectionTitle } from '../CompetitionSelect';
@@ -157,7 +158,8 @@ function QuizSetForm({ initial, onClose, onSaved }: { initial: Partial<QuizSet>;
                 .map((q) => (
                   <li key={q.id}>
                     <button className="w-full truncate rounded-xl bg-white/5 px-2 py-1.5 text-left text-sm hover:bg-white/15" onClick={() => setIds([...ids, q.id])}>
-                      + {q.category && <span className="text-white/50">[{q.category}] </span>}
+                      + <span className="text-cyan-300/80">[{QUESTION_TYPE_LABEL[q.questionType] ?? q.questionType}]</span>{' '}
+                      {q.category && <span className="text-white/50">[{q.category}] </span>}
                       {q.questionText}
                     </button>
                   </li>

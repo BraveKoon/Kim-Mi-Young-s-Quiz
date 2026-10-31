@@ -13,9 +13,10 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       host: true,
+      allowedHosts: true,
       proxy: {
-        '/api': { target: backend, changeOrigin: true },
-        '/socket.io': { target: backend, ws: true, changeOrigin: true },
+        '/api': { target: backend, changeOrigin: true, headers: { origin: backend } },
+        '/socket.io': { target: backend, ws: true, changeOrigin: true, headers: { origin: backend } },
       },
     },
     build: { outDir: 'dist', sourcemap: false, chunkSizeWarningLimit: 1200 },

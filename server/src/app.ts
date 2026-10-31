@@ -28,6 +28,7 @@ export function createExpressApp(ctx: AppContext) {
           }
         : false,
       crossOriginResourcePolicy: { policy: 'same-site' },
+      frameguard: ctx.config.isProduction ? { action: 'sameorigin' } : false,
     }),
   );
   app.use(

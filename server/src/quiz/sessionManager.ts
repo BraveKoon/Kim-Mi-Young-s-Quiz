@@ -40,6 +40,11 @@ export const nullBroadcaster: Broadcaster = {
   disconnectParticipant() {},
 };
 
+/** 단답형 채점용 문자열 정규화 (유니코드 NFC, 앞뒤·연속 공백 정리, 영문 소문자화) */
+export function normalizeShortAnswer(s: string): string {
+  return s.normalize('NFC').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
 /** 2배 점수 문제 시작 전 배너 표시 시간 */
 export const DOUBLE_POINTS_LEAD_IN_MS = 2000;
 /** 모든 접속자가 답한 경우 자동 마감까지 지연 */
@@ -51,6 +56,7 @@ export class SessionManager {
   readonly timers = new ClassTimers();
   broadcaster: Broadcaster = nullBroadcaster;
   private overviewTimer: NodeJS.Timeout | null = null;
+  private closed = false;
 
   constructor(
     private repos: Repositories,
@@ -76,7 +82,8 @@ export class SessionManager {
       index,
       questionType: sq.question_type,
       text: sq.question_text,
-      options: JSON.parse(sq.options) as string[],
+      // 단답형은 options 컬럼에 인정 답안이 저장되므로 학생/프로젝터에는 빈 배열만 내려 정답 노출을 차단한다.
+      options: sq.question_type === 'SHORT_ANSWER' ? [] : (JSON.parse(sq.options) as string[]),
       timeLimit: sq.time_limit,
       isDoublePoints: sq.is_double_points === 1,
       category: sq.category,
@@ -91,11 +98,16 @@ export class SessionManager {
   buildResults(session: SessionRow, sq: SessionQuestionRow): QuestionResult {
     const answers = this.repos.answers.forQuestion(session.id, sq.question_id);
     const options = JSON.parse(sq.options) as string[];
-    const distribution = options.map(() => 0);
+    const isShort = sq.question_type === 'SHORT_ANSWER';
+    const distribution = isShort ? [0, 0] : options.map(() => 0);
     let correct = 0;
     let elapsedSum = 0;
     for (const a of answers) {
-      if (a.selected_index >= 0 && a.selected_index < distribution.length) distribution[a.selected_index]++;
+      if (isShort) {
+        distribution[a.is_correct ? 0 : 1]++;
+      } else if (a.selected_index >= 0 && a.selected_index < distribution.length) {
+        distribution[a.selected_index]++;
+      }
       if (a.is_correct) correct++;
       elapsedSum += a.elapsed_ms;
     }
@@ -103,6 +115,7 @@ export class SessionManager {
       questionId: sq.question_id,
       index: session.current_question_index,
       correctIndex: sq.correct_index,
+      ...(isShort ? { acceptedAnswers: options } : {}),
       explanation: sq.explanation,
       distribution,
       answeredCount: answers.length,
@@ -177,7 +190,15 @@ export class SessionManager {
       results: sq && session.status === 'RESULT' ? this.buildResults(session, sq) : null,
       leaderboard: showBoard ? this.maskBoard(ranking.slice(0, size), audience) : [],
     };
-    if (audience === 'admin') state.answerKey = sq ? { correctIndex: sq.correct_index, explanation: sq.explanation } : null;
+    if (audience === 'admin') {
+      state.answerKey = sq
+        ? {
+            correctIndex: sq.correct_index,
+            explanation: sq.explanation,
+            ...(sq.question_type === 'SHORT_ANSWER' ? { acceptedAnswers: JSON.parse(sq.options) as string[] } : {}),
+          }
+        : null;
+    }
 
     if (participantId !== undefined) {
       const p = this.repos.participants.find(participantId);
@@ -191,6 +212,7 @@ export class SessionManager {
           rank: entry?.rank ?? null,
           submitted: !!ans,
           selectedIndex: ans?.selected_index ?? null,
+          answerText: ans?.answer_text ?? null,
           lastResult:
             sq && (session.status === 'RESULT' || session.status === 'FINISHED')
               ? { isCorrect: ans?.is_correct === 1, awardedScore: ans?.awarded_score ?? 0 }
@@ -256,9 +278,10 @@ export class SessionManager {
 
   /** 관리자 현황 브로드캐스트 (짧게 묶어서 과도한 전송 방지) */
   notifyOverview() {
-    if (this.overviewTimer) return;
+    if (this.closed || this.overviewTimer) return;
     this.overviewTimer = setTimeout(() => {
       this.overviewTimer = null;
+      if (this.closed) return;
       try {
         this.broadcaster.toAdmins(EVENTS.ADMIN_OVERVIEW, this.getOverview());
       } catch (err) {
@@ -434,6 +457,7 @@ export class SessionManager {
         questionId,
         submitted: !!ans,
         selectedIndex: ans?.selected_index ?? null,
+        answerText: ans?.answer_text ?? null,
         isCorrect: ans?.is_correct === 1,
         awardedScore: ans?.awarded_score ?? 0,
         totalScore: entry.totalScore,
@@ -603,7 +627,7 @@ export class SessionManager {
 
   // ───────────────────────── 답안 제출 ─────────────────────────
 
-  submitAnswer(participantId: number, payload: { questionId: unknown; selectedIndex: unknown }): SubmitAnswerAck {
+  submitAnswer(participantId: number, payload: { questionId: unknown; selectedIndex?: unknown; answerText?: unknown }): SubmitAnswerAck {
     const now = this.clock(); // 서버 수신 시각
     const p = this.repos.participants.find(participantId);
     if (!p) return { ok: false, error: 'INVALID_PARTICIPANT', message: '참가자 정보를 찾을 수 없습니다.' };
@@ -625,10 +649,25 @@ export class SessionManager {
       return { ok: false, error: 'WRONG_QUESTION', message: '현재 진행 중인 문제가 아닙니다.' };
     }
     const sq = this.repos.sessions.sessionQuestion(s.id, questionId)!;
-    const optionCount = (JSON.parse(sq.options) as string[]).length;
-    if (typeof selectedIndex !== 'number' || !Number.isInteger(selectedIndex) || selectedIndex < 0 || selectedIndex >= optionCount) {
-      this.logger.log('INVALID_ANSWER', { ...logBase, severity: 'warning', details: { reason: 'INVALID_OPTION', selectedIndex: String(selectedIndex) } });
-      return { ok: false, error: 'INVALID_OPTION', message: '잘못된 보기입니다.' };
+    const isShort = sq.question_type === 'SHORT_ANSWER';
+    const rawOptions = JSON.parse(sq.options) as string[];
+    let trimmedText = '';
+    if (isShort) {
+      if (typeof payload.answerText !== 'string') {
+        this.logger.log('INVALID_ANSWER', { ...logBase, severity: 'warning', details: { reason: 'INVALID_TEXT' } });
+        return { ok: false, error: 'INVALID_OPTION', message: '답안을 입력하세요.' };
+      }
+      trimmedText = payload.answerText.normalize('NFC').replace(/\s+/g, ' ').trim();
+      if (!trimmedText || trimmedText.length > 120) {
+        this.logger.log('INVALID_ANSWER', { ...logBase, severity: 'warning', details: { reason: 'INVALID_TEXT_LENGTH', length: trimmedText.length } });
+        return { ok: false, error: 'INVALID_OPTION', message: !trimmedText ? '답안을 입력하세요.' : '답안은 120자 이하로 입력하세요.' };
+      }
+    } else {
+      const optionCount = rawOptions.length;
+      if (typeof selectedIndex !== 'number' || !Number.isInteger(selectedIndex) || selectedIndex < 0 || selectedIndex >= optionCount) {
+        this.logger.log('INVALID_ANSWER', { ...logBase, severity: 'warning', details: { reason: 'INVALID_OPTION', selectedIndex: String(selectedIndex) } });
+        return { ok: false, error: 'INVALID_OPTION', message: '잘못된 보기입니다.' };
+      }
     }
     const start = s.question_start_time!;
     const end = s.question_end_time!;
@@ -642,7 +681,10 @@ export class SessionManager {
       return { ok: true, duplicate: true, message: '이미 제출한 답안입니다.' };
     }
     const elapsedMs = Math.min(Math.max(0, now - start), sq.time_limit * 1000);
-    const isCorrect = selectedIndex === sq.correct_index;
+    const isCorrect = isShort
+      ? rawOptions.map(normalizeShortAnswer).includes(normalizeShortAnswer(trimmedText))
+      : selectedIndex === sq.correct_index;
+    const storedIndex = isShort ? (isCorrect ? 0 : -1) : (selectedIndex as number);
     const score = calculateScore({ isCorrect, elapsedMs, timeLimitSec: sq.time_limit, isDoublePoints: sq.is_double_points === 1 });
 
     const inserted = this.repos.tx(() => {
@@ -651,7 +693,8 @@ export class SessionManager {
         participant_id: p.id,
         class_id: p.class_id,
         question_id: questionId,
-        selected_index: selectedIndex,
+        selected_index: storedIndex,
+        answer_text: isShort ? trimmedText : null,
         is_correct: isCorrect ? 1 : 0,
         awarded_score: score,
         elapsed_ms: elapsedMs,
@@ -700,6 +743,7 @@ export class SessionManager {
   }
 
   shutdown() {
+    this.closed = true;
     this.timers.clearAll();
     if (this.overviewTimer) clearTimeout(this.overviewTimer);
     this.overviewTimer = null;

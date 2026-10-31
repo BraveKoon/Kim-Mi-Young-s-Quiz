@@ -111,6 +111,7 @@ export interface AnswerRow {
   class_id: string;
   question_id: number;
   selected_index: number;
+  answer_text?: string | null;
   is_correct: number;
   awarded_score: number;
   elapsed_ms: number;

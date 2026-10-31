@@ -1,3 +1,4 @@
+import type { QuestionType } from '@shared/types/index.js';
 import type { Repositories, SessionQuestionRow } from '../database/repositories/index.js';
 import { notFound } from '../utils/errors.js';
 import type { LeaderboardService } from '../services/leaderboardService.js';
@@ -5,9 +6,11 @@ import type { LeaderboardService } from '../services/leaderboardService.js';
 export interface QuestionStat {
   questionId: number;
   order: number;
+  questionType: QuestionType;
   text: string;
   options: string[];
   correctIndex: number;
+  acceptedAnswers?: string[];
   isDoublePoints: boolean;
   timeLimit: number;
   category: string | null;
@@ -51,13 +54,33 @@ export class AnalyticsService {
     const stats = new Map<number, QuestionStat & { _elapsed: number; _score: number }>();
     for (const sq of sqs) {
       let st = stats.get(sq.question_id);
-      const options = JSON.parse(sq.options) as string[];
+      const rawOptions = JSON.parse(sq.options) as string[];
+      const isShort = sq.question_type === 'SHORT_ANSWER';
+      const options = isShort ? ['정답', '오답'] : rawOptions;
       if (!st) {
         st = {
-          questionId: sq.question_id, order: sq.order_num, text: sq.question_text, options, correctIndex: sq.correct_index,
-          isDoublePoints: sq.is_double_points === 1, timeLimit: sq.time_limit, category: sq.category, participantCount: 0,
-          answeredCount: 0, noAnswerCount: 0, correctCount: 0, correctRateAnswered: 0, correctRateAll: 0,
-          distribution: options.map(() => 0), averageElapsedMs: null, averageScore: 0, byClass: [], _elapsed: 0, _score: 0,
+          questionId: sq.question_id,
+          order: sq.order_num,
+          questionType: sq.question_type,
+          text: sq.question_text,
+          options,
+          correctIndex: isShort ? 0 : sq.correct_index,
+          ...(isShort ? { acceptedAnswers: rawOptions } : {}),
+          isDoublePoints: sq.is_double_points === 1,
+          timeLimit: sq.time_limit,
+          category: sq.category,
+          participantCount: 0,
+          answeredCount: 0,
+          noAnswerCount: 0,
+          correctCount: 0,
+          correctRateAnswered: 0,
+          correctRateAll: 0,
+          distribution: options.map(() => 0),
+          averageElapsedMs: null,
+          averageScore: 0,
+          byClass: [],
+          _elapsed: 0,
+          _score: 0,
         };
         stats.set(sq.question_id, st);
       }
@@ -67,7 +90,12 @@ export class AnalyticsService {
       let clsAnswered = 0;
       let clsCorrect = 0;
       for (const r of rows) {
-        if (r.selected_index >= 0 && r.selected_index < st.distribution.length) st.distribution[r.selected_index] += r.n;
+        if (isShort) {
+          st.distribution[0] += r.correct;
+          st.distribution[1] += r.n - r.correct;
+        } else if (r.selected_index >= 0 && r.selected_index < st.distribution.length) {
+          st.distribution[r.selected_index] += r.n;
+        }
         clsAnswered += r.n;
         clsCorrect += r.correct;
         st._elapsed += r.elapsed;

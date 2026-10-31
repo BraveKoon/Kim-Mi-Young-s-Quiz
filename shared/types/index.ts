@@ -75,8 +75,9 @@ export interface QuestionResult {
   questionId: number;
   index: number;
   correctIndex: number;
+  acceptedAnswers?: string[];
   explanation: string | null;
-  distribution: number[]; // 보기별 선택 인원
+  distribution: number[]; // 보기별 선택 인원 (단답형은 [정답, 오답])
   answeredCount: number;
   correctCount: number;
   participantCount: number;
@@ -102,6 +103,7 @@ export interface MyStatus {
   rank: number | null;
   submitted: boolean;
   selectedIndex: number | null;
+  answerText?: string | null;
   lastResult: { isCorrect: boolean; awardedScore: number } | null;
 }
 
@@ -128,7 +130,7 @@ export interface ClassState {
   leaderboard: LeaderboardEntry[];
   me?: MyStatus;
   /** 관리자 화면에만 포함되는 정답 정보 */
-  answerKey?: { correctIndex: number; explanation: string | null } | null;
+  answerKey?: { correctIndex: number; explanation: string | null; acceptedAnswers?: string[] } | null;
 }
 
 export interface ParticipantSummary {

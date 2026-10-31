@@ -34,6 +34,7 @@ export interface MyResult {
   questionId?: number;
   submitted?: boolean;
   selectedIndex?: number | null;
+  answerText?: string | null;
   isCorrect?: boolean;
   awardedScore?: number;
   totalScore: number;
@@ -41,6 +42,12 @@ export interface MyResult {
   prevRank?: number | null;
   participantCount: number;
   final?: boolean;
+}
+
+export interface MySubmission {
+  questionId: number;
+  selectedIndex: number | null;
+  answerText?: string | null;
 }
 
 export type ConnStatus = 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'replaced' | 'kicked' | 'error';
@@ -53,7 +60,7 @@ export function useStudentQuiz(classId: string, creds: StudentCreds | null, onIn
   const [conn, setConn] = useState<ConnStatus>('idle');
   const [participants, setParticipants] = useState<ParticipantSummary[]>([]);
   const [answered, setAnswered] = useState<{ answeredCount: number; participantCount: number } | null>(null);
-  const [mySubmit, setMySubmit] = useState<{ questionId: number; selectedIndex: number } | null>(null);
+  const [mySubmit, setMySubmit] = useState<MySubmission | null>(null);
   const [myResult, setMyResult] = useState<MyResult | null>(null);
   const [myTotal, setMyTotal] = useState(0);
   const [myRank, setMyRank] = useState<number | null>(null);
@@ -73,12 +80,19 @@ export function useStudentQuiz(classId: string, creds: StudentCreds | null, onIn
       if (s.me) {
         setMyTotal(s.me.totalScore);
         setMyRank(s.me.rank);
-        if (s.question && s.me.submitted && s.me.selectedIndex !== null) setMySubmit({ questionId: s.question.id, selectedIndex: s.me.selectedIndex });
+        if (s.question && s.me.submitted) {
+          setMySubmit({
+            questionId: s.question.id,
+            selectedIndex: s.me.selectedIndex,
+            answerText: s.me.answerText ?? null,
+          });
+        }
         if (s.me.lastResult && s.question) {
           setMyResult({
             questionId: s.question.id,
             submitted: s.me.submitted,
             selectedIndex: s.me.selectedIndex,
+            answerText: s.me.answerText ?? null,
             isCorrect: s.me.lastResult.isCorrect,
             awardedScore: s.me.lastResult.awardedScore,
             totalScore: s.me.totalScore,
@@ -149,14 +163,16 @@ export function useStudentQuiz(classId: string, creds: StudentCreds | null, onIn
     };
   }, [classId, creds]);
 
-  const submit = useCallback(async (questionId: number, selectedIndex: number): Promise<SubmitAnswerAck> => {
+  const submit = useCallback(async (questionId: number, answer: number | string): Promise<SubmitAnswerAck> => {
     const s = socketRef.current;
     if (!s?.connected) return { ok: false, error: 'DISCONNECTED', message: '연결이 끊어졌습니다. 재연결 중입니다.' };
-    setMySubmit({ questionId, selectedIndex });
+    const isShort = typeof answer === 'string';
+    const payload = isShort ? { questionId, answerText: answer } : { questionId, selectedIndex: answer };
+    setMySubmit({ questionId, selectedIndex: isShort ? null : answer, answerText: isShort ? answer.trim() : null });
     // 네트워크 재전송 대비: 같은 답안을 다시 보내도 서버가 중복으로 처리한다.
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
-        const ack = await emitAck<SubmitAnswerAck>(s, EVENTS.STUDENT_SUBMIT, { questionId, selectedIndex }, 5000);
+        const ack = await emitAck<SubmitAnswerAck>(s, EVENTS.STUDENT_SUBMIT, payload, 5000);
         if (!ack.ok) setMySubmit(null);
         return ack;
       } catch {

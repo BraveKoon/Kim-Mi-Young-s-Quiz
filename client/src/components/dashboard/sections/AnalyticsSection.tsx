@@ -4,7 +4,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { classDisplayName } from '@shared/types/index';
 import { useApi } from '../../../hooks/useApi';
 import type { QuestionStat } from '../../../types';
-import { num, pct, seconds } from '../../../utils/format';
+import { QUESTION_TYPE_LABEL, num, pct, seconds } from '../../../utils/format';
 import { Modal } from '../../common/Modal';
 import { Spinner } from '../../common/Spinner';
 import { DistributionChart } from '../../charts/DistributionChart';
@@ -104,7 +104,17 @@ export function AnalyticsSection() {
       {detail && (
         <Modal open onClose={() => setDetail(null)} title={`Q${detail.order} 상세 분석`} wide>
           <div className="space-y-4">
-            <p className="text-lg font-bold">{detail.text}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {detail.questionType && (
+                <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs">{QUESTION_TYPE_LABEL[detail.questionType] ?? detail.questionType}</span>
+              )}
+              <p className="text-lg font-bold">{detail.text}</p>
+            </div>
+            {detail.acceptedAnswers && (
+              <div className="rounded-xl bg-lime-400/15 px-3 py-2 text-sm text-lime-100">
+                인정 답안: <b>{detail.acceptedAnswers.join(' / ')}</b>
+              </div>
+            )}
             <DistributionChart options={detail.options} distribution={detail.distribution} correctIndex={detail.correctIndex} />
             <div className="grid grid-cols-2 gap-2 text-center text-sm md:grid-cols-4">
               <Card label="응답자" value={`${detail.answeredCount}명`} />

@@ -1,8 +1,10 @@
 import type { DB } from '../connection.js';
 import * as m001 from './001_initial.js';
+import * as m002 from './002_short_answer.js';
 
 const migrations: { version: number; name: string; up: string }[] = [
   { version: 1, name: 'initial', up: m001.up },
+  { version: 2, name: 'short_answer', up: m002.up },
 ];
 
 /** 아직 적용되지 않은 마이그레이션을 순서대로 실행한다. */

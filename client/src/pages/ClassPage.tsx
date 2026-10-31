@@ -13,7 +13,7 @@ import { DoublePointsBanner } from '../components/quiz/DoublePointsBanner';
 import { TimerBar } from '../components/quiz/TimerBar';
 import { useToast } from '../contexts/ToastContext';
 import { useCountdown } from '../hooks/useCountdown';
-import { credStore, useStudentQuiz, type MyResult, type StudentCreds } from '../hooks/useStudentQuiz';
+import { credStore, useStudentQuiz, type MyResult, type MySubmission, type StudentCreds } from '../hooks/useStudentQuiz';
 import { errorMessage, studentApi } from '../services/api';
 import { celebrate } from '../utils/confetti';
 import { num } from '../utils/format';
@@ -246,20 +246,26 @@ function QuestionScreen({
 }: {
   state: ClassState;
   answered: { answeredCount: number; participantCount: number } | null;
-  mySubmit: { questionId: number; selectedIndex: number } | null;
-  submit: (qid: number, idx: number) => Promise<{ ok: boolean; message?: string }>;
+  mySubmit: MySubmission | null;
+  submit: (qid: number, answer: number | string) => Promise<{ ok: boolean; message?: string }>;
   timerSync: { serverNow: number; endTime: number } | null;
 }) {
   const toast = useToast();
   const question = state.question!;
+  const isShort = question.questionType === 'SHORT_ANSWER';
   const paused = state.status === 'PAUSED';
   const syncNow = timerSync && timerSync.endTime === state.endTime ? timerSync.serverNow : state.serverNow;
   const { remainingMs, beforeStartMs } = useCountdown({ endTime: state.endTime, startTime: state.startTime, running: !paused, frozenMs: state.remainingMs, serverNow: syncNow });
   const totalMs = question.timeLimit * 1000;
   const submitted = mySubmit?.questionId === question.id ? mySubmit : null;
   const [sending, setSending] = useState(false);
+  const [shortText, setShortText] = useState('');
   const notStarted = beforeStartMs > 0;
   const timeUp = remainingMs <= 0 && !paused;
+
+  useEffect(() => {
+    setShortText('');
+  }, [question.id]);
 
   // 예상 점수(참고용): 실제 점수는 서버 계산값
   const elapsedSec = Math.max(0, totalMs - remainingMs) / 1000;
@@ -269,6 +275,17 @@ function QuestionScreen({
     if (submitted || sending || paused || notStarted || timeUp) return;
     setSending(true);
     const r = await submit(question.id, idx);
+    setSending(false);
+    if (!r.ok) toast(r.message ?? '제출하지 못했습니다.', 'error');
+  };
+
+  const submitShort = async (e: FormEvent) => {
+    e.preventDefault();
+    if (submitted || sending || paused || notStarted || timeUp) return;
+    const text = shortText.trim();
+    if (!text) return toast('답안을 입력하세요.', 'error');
+    setSending(true);
+    const r = await submit(question.id, text);
     setSending(false);
     if (!r.ok) toast(r.message ?? '제출하지 못했습니다.', 'error');
   };
@@ -301,11 +318,50 @@ function QuestionScreen({
               <CheckCircle2 className="h-24 w-24 text-lime-300 drop-shadow-[0_0_20px_rgba(163,255,61,0.7)]" />
             </motion.div>
             <div className="font-display text-4xl">제출 완료!</div>
-            <AnswerButton index={submitted.selectedIndex} text={question.options[submitted.selectedIndex]} mode="selected" disabled />
+            {isShort ? (
+              <div className="w-full max-w-md rounded-2xl border border-neon-cyan/50 bg-cyan-400/15 px-5 py-4 text-xl font-bold">
+                내 답안: <span className="text-neon-cyan">{submitted.answerText ?? ''}</span>
+              </div>
+            ) : (
+              submitted.selectedIndex !== null && (
+                <AnswerButton index={submitted.selectedIndex} text={question.options[submitted.selectedIndex]} mode="selected" disabled />
+              )
+            )}
             <p className="text-white/60">
               다른 친구들을 기다리는 중… {answered && `(${answered.answeredCount}/${answered.participantCount}명 제출)`}
             </p>
           </motion.div>
+        ) : isShort ? (
+          <motion.form
+            key="short-form"
+            onSubmit={submitShort}
+            className="glass-strong flex flex-1 flex-col items-center justify-center gap-4 p-6 md:p-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <label className="label text-base" htmlFor="short-answer-input">
+              정답을 직접 입력하세요
+            </label>
+            <input
+              id="short-answer-input"
+              className="input max-w-lg text-center text-2xl font-bold"
+              placeholder="정답 입력 (최대 120자)"
+              value={shortText}
+              maxLength={120}
+              onChange={(e) => setShortText(e.target.value)}
+              autoFocus
+              autoComplete="off"
+              disabled={sending || paused || notStarted || timeUp}
+            />
+            <button
+              type="submit"
+              className="btn-primary w-full max-w-lg py-3 text-xl"
+              disabled={sending || paused || notStarted || timeUp || !shortText.trim()}
+            >
+              {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
+              답안 제출하기
+            </button>
+          </motion.form>
         ) : (
           <motion.div key="choices" className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {question.options.map((opt, i) => (
@@ -329,13 +385,15 @@ function QuestionScreen({
   );
 }
 
-function ResultScreen({ state, myResult, mySubmit, me }: { state: ClassState; myResult: MyResult | null; mySubmit: { questionId: number; selectedIndex: number } | null; me: number }) {
+function ResultScreen({ state, myResult, mySubmit, me }: { state: ClassState; myResult: MyResult | null; mySubmit: MySubmission | null; me: number }) {
   const r = state.results!;
   const question = state.question!;
+  const isShort = question.questionType === 'SHORT_ANSWER';
   const mine = myResult && myResult.questionId === question.id ? myResult : null;
   const selected = mine?.selectedIndex ?? (mySubmit?.questionId === question.id ? mySubmit.selectedIndex : null);
-  const correct = mine?.isCorrect ?? (selected !== null && selected === r.correctIndex);
-  const submitted = mine?.submitted ?? selected !== null;
+  const myAnswerText = mine?.answerText ?? (mySubmit?.questionId === question.id ? mySubmit.answerText : null);
+  const correct = mine?.isCorrect ?? (!isShort && selected !== null && selected === r.correctIndex);
+  const submitted = mine?.submitted ?? (isShort ? !!myAnswerText : selected !== null);
 
   useEffect(() => {
     if (correct) celebrate(false);
@@ -365,11 +423,24 @@ function ResultScreen({ state, myResult, mySubmit, me }: { state: ClassState; my
       </motion.div>
       <div className="glass p-4">
         <p className="mb-3 text-center font-bold">{question.text}</p>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {question.options.map((o, i) => (
-            <AnswerButton key={i} index={i} text={o} disabled count={r.distribution[i]} mode={i === r.correctIndex ? 'correct' : i === selected ? 'wrong' : 'dim'} />
-          ))}
-        </div>
+        {isShort ? (
+          <div className="space-y-2 text-center">
+            <div className="rounded-2xl bg-lime-400/20 px-4 py-3 text-lg font-bold text-lime-100 ring-1 ring-lime-300">
+              정답: {(r.acceptedAnswers ?? []).join(' / ')}
+            </div>
+            {submitted && (
+              <div className={`rounded-2xl px-4 py-2 text-base font-semibold ${correct ? 'bg-lime-400/10 text-lime-200' : 'bg-rose-500/15 text-rose-200'}`}>
+                내 답안: {myAnswerText ?? '-'}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {question.options.map((o, i) => (
+              <AnswerButton key={i} index={i} text={o} disabled count={r.distribution[i]} mode={i === r.correctIndex ? 'correct' : i === selected ? 'wrong' : 'dim'} />
+            ))}
+          </div>
+        )}
         {r.explanation && <p className="mt-3 rounded-xl bg-white/5 p-3 text-sm text-white/80">💡 {r.explanation}</p>}
       </div>
       <div className="glass p-4">

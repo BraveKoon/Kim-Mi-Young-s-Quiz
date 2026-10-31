@@ -50,11 +50,15 @@ export function registerStudentHandlers(io: Server, socket: AppSocket, ctx: AppC
     else socket.emit(EVENTS.STATE, { state });
   });
 
-  socket.on(EVENTS.STUDENT_SUBMIT, (payload: { questionId?: unknown; selectedIndex?: unknown } | undefined, ack?: Ack) => {
-    // 클라이언트가 보낸 점수·정답 여부·응답 시간 등은 무시하고 questionId/selectedIndex 만 사용한다.
+  socket.on(EVENTS.STUDENT_SUBMIT, (payload: { questionId?: unknown; selectedIndex?: unknown; answerText?: unknown } | undefined, ack?: Ack) => {
+    // 클라이언트가 보낸 점수·정답 여부·응답 시간 등은 무시하고 questionId, selectedIndex/answerText 만 사용한다.
     let result;
     try {
-      result = ctx.sessions.submitAnswer(participantId, { questionId: payload?.questionId, selectedIndex: payload?.selectedIndex });
+      result = ctx.sessions.submitAnswer(participantId, {
+        questionId: payload?.questionId,
+        selectedIndex: payload?.selectedIndex,
+        answerText: payload?.answerText,
+      });
     } catch (err) {
       console.error('submit_answer 오류', err);
       result = { ok: false, error: 'SERVER_ERROR', message: '서버 오류가 발생했습니다.' };

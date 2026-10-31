@@ -382,3 +382,116 @@ describe('서버 재시작 복구', () => {
     await t3.close();
   }, 60000);
 });
+
+describe('O/X 및 단답형 실시간 진행', () => {
+  it('O/X와 단답형 문제 진행 시 정답 비노출·채점·재접속 복구·통계·내보내기가 정상 동작한다', async () => {
+    const oxRes = await request(ts.url).post('/api/questions').set(auth()).send({
+      questionType: 'OX',
+      questionText: '물은 1기압에서 100℃에 끓는다.',
+      options: ['O', 'X'],
+      correctIndex: 0,
+      timeLimit: 15,
+    });
+    const shortRes = await request(ts.url).post('/api/questions').set(auth()).send({
+      questionType: 'SHORT_ANSWER',
+      questionText: '물의 화학식을 쓰세요.',
+      options: ['H2O', '물'],
+      correctIndex: 0,
+      timeLimit: 20,
+      isDoublePoints: false,
+    });
+    expect(oxRes.status).toBe(201);
+    expect(shortRes.status).toBe(201);
+
+    const setRes = await request(ts.url)
+      .post('/api/quiz-sets')
+      .set(auth())
+      .send({ title: 'OX+단답 테스트 세트', questionIds: [oxRes.body.question.id, shortRes.body.question.id] });
+    expect(setRes.status).toBe(201);
+
+    const classId = '2-12';
+    const compRes = await request(ts.url)
+      .post('/api/competitions')
+      .set(auth())
+      .send({ title: '유형 확장 대회', quizSetId: setRes.body.quizSet.id, classIds: [classId] });
+    expect(compRes.status).toBe(201);
+    const competitionId = compRes.body.competition.id;
+
+    const [s1, s2] = await students(classId, 2, 'OX단답');
+
+    // 1번 문항: O/X
+    const q1P = Promise.all([waitFor<any>(s1.socket, 'quiz:question'), waitFor<any>(s2.socket, 'quiz:question')]);
+    expect((await emitAck(admin, 'admin:start_quiz', { classId })).ok).toBe(true);
+    const [q1Payload] = await q1P;
+    expect(q1Payload.state.question.questionType).toBe('OX');
+    expect(q1Payload.state.question.options).toEqual(['O', 'X']);
+    // O/X에서 인덱스 2는 거부
+    expect(await emitAck(s1.socket, 'student:submit_answer', { questionId: q1Payload.state.question.id, selectedIndex: 2 })).toMatchObject({
+      ok: false,
+      error: 'INVALID_OPTION',
+    });
+    const r1P = waitFor<any>(s1.socket, 'quiz:results', (p) => p.state.questionIndex === 0);
+    expect(await emitAck(s1.socket, 'student:submit_answer', { questionId: q1Payload.state.question.id, selectedIndex: 0 })).toEqual({ ok: true });
+    expect(await emitAck(s2.socket, 'student:submit_answer', { questionId: q1Payload.state.question.id, selectedIndex: 1 })).toEqual({ ok: true });
+    const r1 = await r1P;
+    expect(r1.state.results.distribution).toEqual([1, 1]);
+    expect(r1.state.results.correctCount).toBe(1);
+
+    // 2번 문항: 단답형
+    const q2P = Promise.all([
+      waitFor<any>(s1.socket, 'quiz:question', (p) => p.state.questionIndex === 1),
+      waitFor<any>(s2.socket, 'quiz:question', (p) => p.state.questionIndex === 1),
+    ]);
+    expect((await emitAck(admin, 'admin:next_question', { classId })).ok).toBe(true);
+    const [q2Payload] = await q2P;
+    expect(q2Payload.state.question.questionType).toBe('SHORT_ANSWER');
+    // 학생/프로젝터에는 인정 답안(options)이 절대 노출되지 않아야 한다
+    expect(q2Payload.state.question.options).toEqual([]);
+    expect(JSON.stringify(q2Payload)).not.toContain('H2O');
+    const proj = await request(ts.url).get(`/api/public/projector/${classId}`);
+    expect(JSON.stringify(proj.body)).not.toContain('H2O');
+    // 관리자에게만 인정 답안 노출
+    const adminWatch = await emitAck(admin, 'admin:watch_class', { classId });
+    expect(adminWatch.state.answerKey.acceptedAnswers).toEqual(['H2O', '물']);
+
+    // 빈 문자열 제출 거부
+    expect(await emitAck(s1.socket, 'student:submit_answer', { questionId: q2Payload.state.question.id, answerText: '   ' })).toMatchObject({
+      ok: false,
+      error: 'INVALID_OPTION',
+    });
+    // 대소문자·앞뒤 공백 정규화로 정답 인정
+    expect(await emitAck(s1.socket, 'student:submit_answer', { questionId: q2Payload.state.question.id, answerText: '  h2o  ' })).toEqual({ ok: true });
+
+    // 진행 중 재접속 시 제출 문자열 복구 (정답 여부는 숨김)
+    const re = await connectStudent(ts, s1.participantId, s1.token);
+    sockets.push(re.socket);
+    expect(re.initial.state.me.submitted).toBe(true);
+    expect(re.initial.state.me.answerText).toBe('h2o');
+
+    const r2P = waitFor<any>(re.socket, 'quiz:results', (p) => p.state.questionIndex === 1);
+    const my2P = waitFor<any>(re.socket, 'quiz:my_result', (p) => p.questionId === q2Payload.state.question.id);
+    // s2는 오답 제출 → 전원 제출되어 자동 마감
+    expect(await emitAck(s2.socket, 'student:submit_answer', { questionId: q2Payload.state.question.id, answerText: 'CO2' })).toEqual({ ok: true });
+
+    const r2 = await r2P;
+    const my2 = await my2P;
+    expect(r2.state.results.acceptedAnswers).toEqual(['H2O', '물']);
+    expect(r2.state.results.distribution).toEqual([1, 1]);
+    expect(my2).toMatchObject({ isCorrect: true, answerText: 'h2o' });
+    expect(my2.awardedScore).toBeGreaterThanOrEqual(500);
+
+    // 종료 및 통계/CSV 검증
+    expect((await emitAck(admin, 'admin:next_question', { classId })).ok).toBe(true);
+    const an = await request(ts.url).get(`/api/analytics/competition/${competitionId}`).set(auth());
+    expect(an.status).toBe(200);
+    expect(an.body.questions[1]).toMatchObject({
+      questionType: 'SHORT_ANSWER',
+      acceptedAnswers: ['H2O', '물'],
+      distribution: [1, 1],
+      correctCount: 1,
+    });
+    const qCsv = await request(ts.url).get(`/api/exports/${competitionId}/csv?type=questions`).set(auth());
+    expect(qCsv.status).toBe(200);
+    expect(qCsv.text).toContain('H2O / 물');
+  });
+});

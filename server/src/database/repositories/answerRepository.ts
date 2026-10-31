@@ -13,11 +13,21 @@ export class AnswerRepository {
     return (
       this.db
         .prepare(
-          `INSERT OR IGNORE INTO answers (session_id, participant_id, class_id, question_id, selected_index, is_correct, awarded_score,
-           elapsed_ms, submitted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT OR IGNORE INTO answers (session_id, participant_id, class_id, question_id, selected_index, answer_text, is_correct, awarded_score,
+           elapsed_ms, submitted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         )
-        .run(a.session_id, a.participant_id, a.class_id, a.question_id, a.selected_index, a.is_correct, a.awarded_score, a.elapsed_ms,
-          a.submitted_at).changes > 0
+        .run(
+          a.session_id,
+          a.participant_id,
+          a.class_id,
+          a.question_id,
+          a.selected_index,
+          a.answer_text ?? null,
+          a.is_correct,
+          a.awarded_score,
+          a.elapsed_ms,
+          a.submitted_at,
+        ).changes > 0
     );
   }
   countForQuestion(sessionId: number, questionId: number): number {

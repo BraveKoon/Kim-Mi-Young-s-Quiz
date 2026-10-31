@@ -6,7 +6,7 @@ async function main() {
   const server = await createServer(config);
   for (const s of server.seeded) console.log(`[seed] ${s}`);
   if (server.recovered.length) console.log(`[recover] 진행 중이던 학급 복구: ${server.recovered.join(', ')}`);
-  server.httpServer.listen(config.port, () => {
+  server.httpServer.listen(config.port, '0.0.0.0', () => {
     console.log(`ClassQuiz 서버 실행 중: http://localhost:${config.port} (${config.nodeEnv})`);
     console.log(`DB: ${config.databasePath}`);
     if (!config.isProduction && config.adminPassword === '1234') {

@@ -59,9 +59,11 @@ export interface Competition {
 export interface QuestionStat {
   questionId: number;
   order: number;
+  questionType?: 'MULTIPLE_CHOICE' | 'OX' | 'SHORT_ANSWER';
   text: string;
   options: string[];
   correctIndex: number;
+  acceptedAnswers?: string[];
   isDoublePoints: boolean;
   timeLimit: number;
   category: string | null;

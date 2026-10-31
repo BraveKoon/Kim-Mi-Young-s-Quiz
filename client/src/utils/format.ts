@@ -20,6 +20,12 @@ export const STATUS_COLOR: Record<SessionStatus | 'NO_SESSION', string> = {
 
 export const COMPETITION_STATUS_LABEL: Record<string, string> = { READY: '준비', ACTIVE: '진행 중', FINISHED: '종료' };
 
+export const QUESTION_TYPE_LABEL: Record<string, string> = {
+  MULTIPLE_CHOICE: '4지선다',
+  OX: 'O/X',
+  SHORT_ANSWER: '단답형',
+};
+
 export const pct = (v: number, digits = 0) => `${(v * 100).toFixed(digits)}%`;
 export const num = (v: number) => v.toLocaleString('ko-KR');
 export const dateTime = (ms: number | null | undefined) =>

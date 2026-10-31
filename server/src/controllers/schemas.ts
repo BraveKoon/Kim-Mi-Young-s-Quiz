@@ -16,7 +16,7 @@ export const questionSchema = z
   .object({
     questionType: z.enum(QUESTION_TYPES).default('MULTIPLE_CHOICE'),
     questionText: text(500),
-    options: z.array(text(120)).min(2).max(4),
+    options: z.array(text(120)).min(1).max(5),
     correctIndex: z.number().int().min(0).max(3),
     timeLimit: z.number().int().min(5).max(300).default(20),
     isDoublePoints: z.boolean().default(false),
@@ -24,9 +24,19 @@ export const questionSchema = z
     explanation: optText(1000),
     category: optText(50),
   })
-  .refine((q) => q.correctIndex < q.options.length, { message: '정답 번호가 보기 개수를 벗어났습니다.', path: ['correctIndex'] })
-  .refine((q) => q.questionType !== 'MULTIPLE_CHOICE' || q.options.length === 4, { message: '4지선다형은 보기 4개가 필요합니다.', path: ['options'] })
-  .refine((q) => q.questionType !== 'SHORT_ANSWER', { message: '단답형은 아직 지원하지 않습니다.', path: ['questionType'] });
+  .refine((q) => q.questionType !== 'MULTIPLE_CHOICE' || q.options.length === 4, {
+    message: '4지선다형은 보기 4개가 필요합니다.',
+    path: ['options'],
+  })
+  .refine((q) => q.questionType !== 'OX' || q.options.length === 2, {
+    message: 'O/X 문제는 보기 2개가 필요합니다.',
+    path: ['options'],
+  })
+  .refine((q) => q.questionType !== 'SHORT_ANSWER' || (q.options.length >= 1 && q.options.length <= 5 && q.correctIndex === 0), {
+    message: '단답형은 인정 답안 1~5개와 correctIndex 0이 필요합니다.',
+    path: ['options'],
+  })
+  .refine((q) => q.correctIndex < q.options.length, { message: '정답 번호가 보기 개수를 벗어났습니다.', path: ['correctIndex'] });
 
 export const quizSetSchema = z.object({
   title: text(100),

@@ -133,6 +133,55 @@ describe('문제 및 문제 세트 관리', () => {
     expect(list.body.questions.find((q: any) => q.id === qid)).toBeUndefined();
     expect((await request(ts.url).delete(`/api/questions/${qid}`).set(auth())).status).toBe(404);
   });
+  it('O/X 및 단답형 문제 생성·검증·삭제', async () => {
+    // O/X: 보기 2개가 아니면 거부
+    const badOx = await request(ts.url).post('/api/questions').set(auth()).send({
+      questionType: 'OX',
+      questionText: '지구는 둥글다.',
+      options: ['O', 'X', '모름'],
+      correctIndex: 0,
+    });
+    expect(badOx.status).toBe(400);
+
+    const ox = await request(ts.url).post('/api/questions').set(auth()).send({
+      questionType: 'OX',
+      questionText: '지구는 태양 주위를 공전한다.',
+      options: ['O', 'X'],
+      correctIndex: 0,
+      timeLimit: 15,
+      category: '과학',
+    });
+    expect(ox.status).toBe(201);
+    expect(ox.body.question).toMatchObject({ questionType: 'OX', options: ['O', 'X'], correctIndex: 0 });
+
+    // 단답형: 인정 답안 1~5개, correctIndex=0
+    const badShort = await request(ts.url).post('/api/questions').set(auth()).send({
+      questionType: 'SHORT_ANSWER',
+      questionText: '훈민정음 창제 왕은?',
+      options: [],
+      correctIndex: 0,
+    });
+    expect(badShort.status).toBe(400);
+
+    const short = await request(ts.url).post('/api/questions').set(auth()).send({
+      questionType: 'SHORT_ANSWER',
+      questionText: '훈민정음을 창제한 왕은?',
+      options: ['세종대왕', '세종'],
+      correctIndex: 0,
+      timeLimit: 20,
+      category: '역사',
+    });
+    expect(short.status).toBe(201);
+    expect(short.body.question).toMatchObject({
+      questionType: 'SHORT_ANSWER',
+      options: ['세종대왕', '세종'],
+      correctIndex: 0,
+    });
+
+    // 테스트 후 소프트 삭제하여 기본 시드 문항 개수에 영향 없게 정리
+    expect((await request(ts.url).delete(`/api/questions/${ox.body.question.id}`).set(auth())).status).toBe(200);
+    expect((await request(ts.url).delete(`/api/questions/${short.body.question.id}`).set(auth())).status).toBe(200);
+  });
 });
 
 describe('학생 입장', () => {

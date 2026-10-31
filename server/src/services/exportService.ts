@@ -113,7 +113,10 @@ export class ExportService {
         ],
         rows: () =>
           this.analytics.questionStats(sessions.map((s) => s.id)).map((q) => ({
-            order: q.order, text: q.text, answer: `${q.correctIndex + 1}. ${q.options[q.correctIndex]}`, double: q.isDoublePoints ? 'O' : '',
+            order: q.order,
+            text: q.text,
+            answer: q.acceptedAnswers ? q.acceptedAnswers.join(' / ') : `${q.correctIndex + 1}. ${q.options[q.correctIndex]}`,
+            double: q.isDoublePoints ? 'O' : '',
             participants: q.participantCount, answered: q.answeredCount, noAnswer: q.noAnswerCount, correct: q.correctCount,
             rateAnswered: pct(q.correctRateAnswered), rateAll: pct(q.correctRateAll),
             avgSec: q.averageElapsedMs !== null ? Math.round(q.averageElapsedMs / 100) / 10 : '', avgScore: q.averageScore,

@@ -123,12 +123,23 @@ function ClassProjector({ classId }: { classId: string }) {
           <div className="grid flex-1 gap-6 lg:grid-cols-2">
             <div className="glass-strong flex flex-col gap-4 p-6">
               <h2 className="text-center text-3xl font-black">{state.question.text}</h2>
-              <DistributionChart options={state.question.options} distribution={state.results.distribution} correctIndex={state.results.correctIndex} height={300} />
-              <div className="grid grid-cols-2 gap-3">
-                {state.question.options.map((o, i) => (
-                  <AnswerButton key={i} index={i} text={o} disabled mode={i === state.results!.correctIndex ? 'correct' : 'dim'} />
-                ))}
-              </div>
+              <DistributionChart
+                options={state.question.questionType === 'SHORT_ANSWER' ? ['정답', '오답'] : state.question.options}
+                distribution={state.results.distribution}
+                correctIndex={state.question.questionType === 'SHORT_ANSWER' ? 0 : state.results.correctIndex}
+                height={300}
+              />
+              {state.question.questionType === 'SHORT_ANSWER' ? (
+                <div className="rounded-2xl bg-lime-400/20 px-6 py-4 text-center text-2xl font-black text-lime-100 ring-2 ring-lime-300">
+                  정답: {(state.results.acceptedAnswers ?? []).join(' / ')}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {state.question.options.map((o, i) => (
+                    <AnswerButton key={i} index={i} text={o} disabled mode={i === state.results!.correctIndex ? 'correct' : 'dim'} />
+                  ))}
+                </div>
+              )}
               <div className="text-center text-xl text-white/70">
                 정답률 {state.results.answeredCount ? pct(state.results.correctCount / state.results.answeredCount) : '0%'} ({state.results.correctCount}/{state.results.answeredCount}명)
               </div>
@@ -184,11 +195,18 @@ function ProjectorQuestion({ state, answered, timerSync }: { state: ClassState; 
           <PauseCircle className="h-10 w-10" /> 일시정지
         </div>
       )}
-      <div className="grid flex-1 grid-cols-2 gap-4">
-        {q.options.map((o, i) => (
-          <AnswerButton key={i} index={i} text={o} disabled large mode="idle" />
-        ))}
-      </div>
+      {q.questionType === 'SHORT_ANSWER' ? (
+        <div className="glass flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+          <div className="font-display text-3xl text-neon-cyan md:text-5xl">단답형 문제</div>
+          <p className="text-xl text-white/70 md:text-2xl">각자 화면에 정답을 직접 입력해 제출하세요!</p>
+        </div>
+      ) : (
+        <div className="grid flex-1 grid-cols-2 gap-4">
+          {q.options.map((o, i) => (
+            <AnswerButton key={i} index={i} text={o} disabled large mode="idle" />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
