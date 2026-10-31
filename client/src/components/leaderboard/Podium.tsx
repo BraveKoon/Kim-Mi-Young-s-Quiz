@@ -35,7 +35,7 @@ export function Podium({ entries, large, confetti = true }: { entries: Leaderboa
               <div className="text-white/30">-</div>
             )}
           </div>
-          <div className={`flex w-full ${c.h} items-start justify-center rounded-t-3xl bg-gradient-to-b ${c.color} pt-3 shadow-[0_0_40px_rgba(255,213,61,0.25)]`}>
+          <div className={`flex w-full ${c.h} items-start justify-center rounded-t-2xl bg-gradient-to-b ${c.color} pt-3`}>
             <span className={`font-display text-ink-950 ${large ? 'text-7xl' : 'text-4xl'}`}>{c.place}</span>
           </div>
         </motion.div>

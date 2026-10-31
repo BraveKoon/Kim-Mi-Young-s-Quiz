@@ -9,10 +9,10 @@ export function DistributionChart({ options, distribution, correctIndex, height 
       <BarChart data={data} margin={{ top: 24, right: 8, left: -16, bottom: 0 }}>
         <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.75)', fontSize: 12 }} interval={0} />
         <YAxis allowDecimals={false} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} />
-        <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ background: '#1e1048', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12 }} formatter={(v) => [`${v}명`, '선택']} />
-        <Bar dataKey="value" radius={[10, 10, 0, 0]}>
+        <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ background: '#172238', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} formatter={(v) => [`${v}명`, '선택']} />
+        <Bar dataKey="value" radius={[8, 8, 0, 0]}>
           {data.map((d) => (
-            <Cell key={d.i} fill={OPTION_STYLES[d.i].hex} stroke={d.i === correctIndex ? '#a3ff3d' : 'none'} strokeWidth={d.i === correctIndex ? 4 : 0} opacity={d.i === correctIndex ? 1 : 0.65} />
+            <Cell key={d.i} fill={OPTION_STYLES[d.i].hex} stroke={d.i === correctIndex ? '#34d399' : 'none'} strokeWidth={d.i === correctIndex ? 3 : 0} opacity={d.i === correctIndex ? 1 : 0.65} />
           ))}
           <LabelList dataKey="value" position="top" fill="#fff" formatter={(v) => `${v}명`} />
         </Bar>

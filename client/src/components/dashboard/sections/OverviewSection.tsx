@@ -13,10 +13,10 @@ export function OverviewSection() {
   if (!overview) return <Spinner label="실시간 현황을 불러오는 중…" />;
   const t = overview.totals;
   const stats = [
-    { label: '전체 접속', value: `${t.connected}/${t.capacity}`, icon: Wifi, color: 'text-lime-300' },
-    { label: '참가 학생', value: `${t.participants}명`, icon: Users, color: 'text-cyan-300' },
-    { label: '미접속', value: `${Math.max(0, t.participants - t.connected)}명`, icon: Activity, color: 'text-amber-300' },
-    { label: '진행 중인 학급', value: `${t.playing}/${t.classes}`, icon: PlayCircle, color: 'text-fuchsia-300' },
+    { label: '전체 접속', value: `${t.connected}/${t.capacity}`, icon: Wifi, color: 'text-emerald-400' },
+    { label: '참가 학생', value: `${t.participants}명`, icon: Users, color: 'text-sky-400' },
+    { label: '미접속', value: `${Math.max(0, t.participants - t.connected)}명`, icon: Activity, color: 'text-amber-400' },
+    { label: '진행 중인 학급', value: `${t.playing}/${t.classes}`, icon: PlayCircle, color: 'text-blue-400' },
   ];
   return (
     <div>
@@ -49,7 +49,7 @@ export function OverviewSection() {
               <Stat label="평균" value={num(c.averageScore)} />
             </div>
             <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full bg-gradient-to-r from-lime-300 to-cyan-400" style={{ width: `${(c.connectedCount / c.capacity) * 100}%` }} />
+              <div className="h-full bg-blue-500" style={{ width: `${(c.connectedCount / c.capacity) * 100}%` }} />
             </div>
             <div className="flex items-center justify-between text-xs text-white/60">
               <span>

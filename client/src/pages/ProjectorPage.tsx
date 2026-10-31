@@ -102,10 +102,10 @@ function ClassProjector({ classId }: { classId: string }) {
         {state.status === 'WAITING' && (
           <div className="flex flex-1 flex-col items-center justify-center gap-8 text-center">
             <div className="text-2xl text-white/70">접속 주소</div>
-            <div className="glass-strong px-8 py-5 font-display text-4xl tracking-wide text-neon-cyan md:text-6xl">{joinUrl.replace(/^https?:\/\//, '')}</div>
-            <motion.div animate={{ scale: [1, 1.04, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="font-display text-5xl neon-text md:text-7xl">
+            <div className="glass-strong px-8 py-5 font-display text-4xl tracking-wide text-sky-400 md:text-6xl">{joinUrl.replace(/^https?:\/\//, '')}</div>
+            <div className="font-display text-5xl md:text-6xl">
               닉네임을 입력하고 입장하세요!
-            </motion.div>
+            </div>
             <div className="flex max-w-6xl flex-wrap justify-center gap-3">
               <AnimatePresence>
                 {participants.map((p) => (
@@ -155,7 +155,7 @@ function ClassProjector({ classId }: { classId: string }) {
         )}
         {state.status === 'FINISHED' && (
           <div className="flex flex-1 flex-col gap-8">
-            <h2 className="text-center font-display text-6xl neon-text">🏆 최종 순위 발표 🏆</h2>
+            <h2 className="text-center font-display text-5xl md:text-6xl">🏆 최종 순위 발표</h2>
             <Podium entries={state.leaderboard} large confetti={false} />
             {state.leaderboard.some((e) => e.rank > 3) && (
               <div className="glass mx-auto w-full max-w-4xl p-4">
@@ -266,7 +266,7 @@ export function CompetitionProjectorPage() {
                     <span className="w-14 font-display text-3xl">{c.rank}위</span>
                     <span className="w-36 font-bold">{classDisplayName(c.classId)}</span>
                     <div className="h-10 flex-1 overflow-hidden rounded-full bg-white/10">
-                      <motion.div initial={{ width: 0 }} animate={{ width: `${(c.averageScore / max) * 100}%` }} transition={{ duration: 1, delay: i * 0.08 }} className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-cyan-400" />
+                      <motion.div initial={{ width: 0 }} animate={{ width: `${(c.averageScore / max) * 100}%` }} transition={{ duration: 1, delay: i * 0.08 }} className="h-full rounded-full bg-blue-500" />
                     </div>
                     <span className="w-32 text-right font-display">{num(Math.round(c.averageScore))}점</span>
                     <span className="w-20 text-right text-lg text-white/50">{c.participantCount}명</span>

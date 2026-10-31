@@ -104,8 +104,8 @@ export default function ResultsPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
               <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.7)' }} />
               <YAxis tick={{ fill: 'rgba(255,255,255,0.5)' }} />
-              <Tooltip contentStyle={{ background: '#1e1048', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12 }} formatter={(v) => [`${v}점`, '평균']} />
-              <Bar dataKey="avg" fill="#a855f7" radius={[8, 8, 0, 0]} />
+              <Tooltip contentStyle={{ background: '#172238', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} formatter={(v) => [`${v}점`, '평균']} />
+              <Bar dataKey="avg" fill="#3b82f6" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
           <table className="table-base mt-3">

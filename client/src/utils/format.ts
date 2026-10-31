@@ -12,7 +12,7 @@ export const STATUS_LABEL: Record<SessionStatus | 'NO_SESSION', string> = {
 export const STATUS_COLOR: Record<SessionStatus | 'NO_SESSION', string> = {
   WAITING: 'bg-sky-400/20 text-sky-200 border-sky-300/30',
   PLAYING: 'bg-lime-400/20 text-lime-200 border-lime-300/30',
-  RESULT: 'bg-fuchsia-400/20 text-fuchsia-200 border-fuchsia-300/30',
+  RESULT: 'bg-indigo-500/15 text-indigo-200 border-indigo-400/30',
   PAUSED: 'bg-amber-400/20 text-amber-200 border-amber-300/30',
   FINISHED: 'bg-white/10 text-white/60 border-white/20',
   NO_SESSION: 'bg-white/5 text-white/40 border-white/10',

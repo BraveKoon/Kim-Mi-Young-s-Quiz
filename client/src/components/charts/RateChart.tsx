@@ -15,10 +15,10 @@ export function RateChart({ data, onSelect, height = 280 }: { data: { label: str
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
         <XAxis dataKey="label" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }} />
         <YAxis domain={[0, 100]} unit="%" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} />
-        <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ background: '#1e1048', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12 }} formatter={(v) => `${v}%`} />
+        <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ background: '#172238', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} formatter={(v) => `${v}%`} />
         <Legend wrapperStyle={{ color: '#fff' }} />
-        <Bar dataKey="answered" name="정답률(응답자 기준)" fill="#22e3ff" radius={[6, 6, 0, 0]} cursor="pointer" />
-        <Bar dataKey="all" name="정답률(전체 참가자 기준)" fill="#ff3dbb" radius={[6, 6, 0, 0]} cursor="pointer" />
+        <Bar dataKey="answered" name="정답률(응답자 기준)" fill="#38bdf8" radius={[6, 6, 0, 0]} cursor="pointer" />
+        <Bar dataKey="all" name="정답률(전체 참가자 기준)" fill="#818cf8" radius={[6, 6, 0, 0]} cursor="pointer" />
       </BarChart>
     </ResponsiveContainer>
   );

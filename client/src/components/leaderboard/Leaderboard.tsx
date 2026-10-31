@@ -36,8 +36,8 @@ export function Leaderboard({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0 }}
               transition={{ type: 'spring', stiffness: 260, damping: 26, delay: Math.min(i * 0.03, 0.4) }}
-              className={`flex items-center gap-3 rounded-2xl border px-3 ${large ? 'py-3 text-2xl' : 'py-2'} ${
-                e.participantId === highlightId ? 'border-neon-cyan bg-cyan-400/15 shadow-[0_0_20px_rgba(34,227,255,0.35)]' : 'border-white/10 bg-white/5'
+              className={`flex items-center gap-3 rounded-xl border px-3 ${large ? 'py-3 text-2xl' : 'py-2'} ${
+                e.participantId === highlightId ? 'border-neon-cyan bg-sky-400/10' : 'border-white/10 bg-white/[0.03]'
               }`}
             >
               <span className={`grid shrink-0 place-items-center rounded-xl bg-gradient-to-br font-display ${medal} ${large ? 'h-12 w-12 text-2xl' : 'h-9 w-9'}`}>

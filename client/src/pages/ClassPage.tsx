@@ -203,9 +203,9 @@ function Centered({ children }: { children: React.ReactNode }) {
 function WaitingRoom({ state, participants, me }: { state: ClassState; participants: { id: number; nickname: string; connected: boolean }[]; me: number }) {
   return (
     <div className="flex flex-1 flex-col items-center gap-6 py-6 text-center">
-      <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="font-display text-4xl md:text-5xl neon-text">
+      <div className="font-display text-4xl md:text-5xl">
         곧 퀴즈가 시작돼요!
-      </motion.div>
+      </div>
       <p className="text-white/70">
         {state.competitionTitle} · {state.quizSetTitle} ({state.totalQuestions}문항)
       </p>
@@ -313,11 +313,9 @@ function QuestionScreen({
 
       <AnimatePresence mode="wait">
         {submitted ? (
-          <motion.div key="done" initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-strong flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-            <motion.div animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1] }} transition={{ duration: 0.8 }}>
-              <CheckCircle2 className="h-24 w-24 text-lime-300 drop-shadow-[0_0_20px_rgba(163,255,61,0.7)]" />
-            </motion.div>
-            <div className="font-display text-4xl">제출 완료!</div>
+          <motion.div key="done" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-strong flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
+            <CheckCircle2 className="h-20 w-20 text-emerald-400" />
+            <div className="font-display text-3xl md:text-4xl">제출 완료!</div>
             {isShort ? (
               <div className="w-full max-w-md rounded-2xl border border-neon-cyan/50 bg-cyan-400/15 px-5 py-4 text-xl font-bold">
                 내 답안: <span className="text-neon-cyan">{submitted.answerText ?? ''}</span>
@@ -402,10 +400,10 @@ function ResultScreen({ state, myResult, mySubmit, me }: { state: ClassState; my
   return (
     <div className="flex flex-1 flex-col gap-4">
       <motion.div
-        initial={{ scale: 0.5, opacity: 0 }}
+        initial={{ scale: 0.92, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 12 }}
-        className={`flex flex-col items-center gap-2 rounded-3xl p-6 text-center ${correct ? 'bg-gradient-to-br from-lime-400/30 to-emerald-600/30' : 'bg-gradient-to-br from-rose-500/30 to-red-700/30'}`}
+        transition={{ duration: 0.25 }}
+        className={`flex flex-col items-center gap-2 rounded-2xl border p-6 text-center ${correct ? 'border-emerald-400/35 bg-emerald-500/15' : 'border-rose-400/35 bg-rose-500/15'}`}
       >
         {correct ? <CheckCircle2 className="h-16 w-16 text-lime-300" /> : <XCircle className="h-16 w-16 text-rose-300" />}
         <div className="font-display text-4xl">{correct ? '정답!' : submitted ? '아쉬워요!' : '시간 초과'}</div>
@@ -459,8 +457,8 @@ function FinalScreen({ state, me, myTotal, myRank }: { state: ClassState; me: nu
   return (
     <div className="flex flex-1 flex-col gap-6 py-4">
       <div className="text-center">
-        <PartyPopper className="mx-auto h-12 w-12 text-neon-yellow" />
-        <h2 className="font-display text-4xl md:text-5xl neon-text">최종 결과</h2>
+        <PartyPopper className="mx-auto h-10 w-10 text-amber-400" />
+        <h2 className="mt-1 font-display text-4xl md:text-5xl">최종 결과</h2>
       </div>
       <Podium entries={state.leaderboard} />
       <div className="glass-strong p-5 text-center">

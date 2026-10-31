@@ -140,7 +140,7 @@ function AssignSessionModal({ initial, onClose }: { initial: string[]; onClose: 
           </div>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {CLASS_IDS.map((id) => (
-              <label key={id} className={`cursor-pointer rounded-xl border px-2 py-2 text-center text-sm ${classIds.includes(id) ? 'border-fuchsia-400 bg-fuchsia-500/20' : 'border-white/10 bg-white/5'}`}>
+              <label key={id} className={`cursor-pointer rounded-xl border px-2 py-2 text-center text-sm ${classIds.includes(id) ? 'border-blue-400 bg-blue-500/20 text-white' : 'border-white/10 bg-white/5'}`}>
                 <input type="checkbox" className="hidden" checked={classIds.includes(id)} onChange={(e) => setClassIds(e.target.checked ? [...classIds, id] : classIds.filter((x) => x !== id))} />
                 {classDisplayName(id).replace('2학년 ', '')}
               </label>

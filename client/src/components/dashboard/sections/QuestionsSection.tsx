@@ -238,10 +238,10 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                   role="radio"
                   aria-checked={active}
                   onClick={() => switchType(t.type)}
-                  className={`rounded-2xl border px-3 py-2.5 text-left transition ${
+                  className={`rounded-xl border px-3 py-2.5 text-left transition ${
                     active
-                      ? 'border-neon-cyan bg-cyan-400/20 text-white shadow-[0_0_16px_rgba(34,227,255,0.25)]'
-                      : 'border-white/15 bg-white/5 text-white/70 hover:bg-white/10'
+                      ? 'border-sky-400 bg-sky-500/15 text-white'
+                      : 'border-white/15 bg-white/[0.04] text-white/70 hover:bg-white/[0.08]'
                   }`}
                 >
                   <div className="font-bold text-sm">{t.label}</div>

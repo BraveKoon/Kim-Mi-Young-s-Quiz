@@ -66,8 +66,8 @@ export function ClassRankingSection() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
                 <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.7)' }} />
                 <YAxis tick={{ fill: 'rgba(255,255,255,0.5)' }} />
-                <Tooltip contentStyle={{ background: '#1e1048', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12 }} />
-                <Bar dataKey="avg" name="평균 점수" fill="#a855f7" radius={[8, 8, 0, 0]} />
+                <Tooltip contentStyle={{ background: '#172238', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} />
+                <Bar dataKey="avg" name="평균 점수" fill="#3b82f6" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

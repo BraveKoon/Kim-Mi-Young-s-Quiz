@@ -13,7 +13,7 @@ import { Spinner } from '../../common/Spinner';
 import { StatusBadge } from '../../common/StatusBadge';
 import { SectionTitle } from '../CompetitionSelect';
 
-const COLORS = ['#a855f7', '#22e3ff', '#ff3dbb', '#ffd53d', '#a3ff3d', '#f97316'];
+const COLORS = ['#3b82f6', '#38bdf8', '#34d399', '#fbbf24', '#818cf8', '#f97316'];
 
 export function CompetitionsSection() {
   const toast = useToast();
@@ -178,7 +178,7 @@ function CreateCompetition({ onClose, onDone }: { onClose: () => void; onDone: (
             <label className="label">참가 학급 (선택한 학급에 새 대기 세션이 생성됩니다)</label>
             <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
               {CLASS_IDS.map((id) => (
-                <label key={id} className={`cursor-pointer rounded-xl border px-2 py-2 text-center text-sm ${classIds.includes(id) ? 'border-fuchsia-400 bg-fuchsia-500/20' : 'border-white/10 bg-white/5'}`}>
+                <label key={id} className={`cursor-pointer rounded-xl border px-2 py-2 text-center text-sm ${classIds.includes(id) ? 'border-blue-400 bg-blue-500/20 text-white' : 'border-white/10 bg-white/5'}`}>
                   <input type="checkbox" className="hidden" checked={classIds.includes(id)} onChange={(e) => setClassIds(e.target.checked ? [...classIds, id] : classIds.filter((x) => x !== id))} />
                   {id.replace('2-', '')}반
                 </label>
@@ -241,7 +241,7 @@ function CompareModal({ ids, onClose }: { ids: number[]; onClose: () => void }) 
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
                 <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }} />
                 <YAxis tick={{ fill: 'rgba(255,255,255,0.5)' }} />
-                <Tooltip contentStyle={{ background: '#1e1048', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12 }} />
+                <Tooltip contentStyle={{ background: '#172238', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} />
                 <Legend />
                 {data.competitions.map((c, i) => (
                   <Bar key={c.id} dataKey={c.title} fill={COLORS[i % COLORS.length]} radius={[4, 4, 0, 0]} />
