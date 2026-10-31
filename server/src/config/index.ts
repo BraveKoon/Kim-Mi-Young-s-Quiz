@@ -28,6 +28,16 @@ function bool(v: string | undefined, def: boolean): boolean {
   return ['1', 'true', 'yes', 'on'].includes(v.toLowerCase());
 }
 
+function normalizeOrigin(raw: string): string {
+  const s = raw.trim();
+  if (!s || s === '*') return s;
+  try {
+    return new URL(s).origin;
+  } catch {
+    return s.replace(/\/+$/, '');
+  }
+}
+
 export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
   const env = process.env;
   const nodeEnv = env.NODE_ENV ?? 'development';
@@ -40,9 +50,9 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     jwtSecret,
     jwtExpiresIn: env.JWT_EXPIRES_IN ?? '8h',
     databasePath: path.resolve(env.DATABASE_PATH ?? './data/classquiz.sqlite'),
-    clientOrigins: (env.CLIENT_ORIGIN ?? 'http://localhost:5173')
+    clientOrigins: (env.CLIENT_ORIGIN ?? 'http://localhost:5173,https://bravekoon.github.io')
       .split(',')
-      .map((s) => s.trim())
+      .map(normalizeOrigin)
       .filter(Boolean),
     adminUsername: env.ADMIN_USERNAME ?? 'admin',
     adminPassword: env.ADMIN_PASSWORD ?? '1234',

@@ -1,7 +1,14 @@
 import axios, { AxiosError } from 'axios';
 
+function normalizeApiOrigin(raw: string | undefined): string {
+  const trimmed = raw?.trim() ?? '';
+  if (!trimmed) return '';
+  const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  return withProto.replace(/\/+$/, '').replace(/\/api$/i, '');
+}
+
 /** 백엔드 기본 주소. 비어 있으면 같은 출처(개발 시 Vite 프록시) 사용 */
-export const API_ORIGIN = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ?? '';
+export const API_ORIGIN = normalizeApiOrigin(import.meta.env.VITE_API_URL as string | undefined);
 
 const ADMIN_TOKEN_KEY = 'classquiz.adminToken';
 

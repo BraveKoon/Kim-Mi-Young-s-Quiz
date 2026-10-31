@@ -48,9 +48,10 @@ jobs:
 
       - name: Build client (generates dist/index.html and dist/404.html)
         env:
-          VITE_API_URL: ${{ inputs.api_url || vars.VITE_API_URL || '' }}
-          VITE_BASE_PATH: ${{ inputs.base_path || vars.VITE_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+          VITE_API_URL: ${{ inputs.api_url || vars.VITE_API_URL || secrets.VITE_API_URL || '' }}
+          VITE_BASE_PATH: ${{ inputs.base_path || vars.VITE_BASE_PATH || secrets.VITE_BASE_PATH || format('/{0}/', github.event.repository.name) }}
         run: |
+          if [ -n "$VITE_API_URL" ]; then echo "Building with configured VITE_API_URL"; else echo "::warning::VITE_API_URL is empty (building without external backend origin)"; fi
           npm run build -w client
           test -f client/dist/404.html
 
