@@ -31,6 +31,7 @@ export interface Broadcaster {
   toParticipant(participantId: number, event: string, payload: unknown): void;
   toAdmins(event: string, payload: unknown): void;
   disconnectParticipant(participantId: number, reason: string): void;
+  disconnectAdmin(adminId: number): void;
 }
 
 export const nullBroadcaster: Broadcaster = {
@@ -38,6 +39,7 @@ export const nullBroadcaster: Broadcaster = {
   toParticipant() {},
   toAdmins() {},
   disconnectParticipant() {},
+  disconnectAdmin() {},
 };
 
 /** 단답형 채점용 문자열 정규화 (유니코드 NFC, 앞뒤·연속 공백 정리, 영문 소문자화) */

@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import type { AppConfig } from '../config/index.js';
 import type { AdminRow, Repositories } from '../database/repositories/index.js';
 import type { Clock } from '../utils/clock.js';
-import { AppError, badRequest, unauthorized } from '../utils/errors.js';
+import { AppError, badRequest, conflict, notFound, unauthorized } from '../utils/errors.js';
 import type { ActivityLogger } from './activityLogger.js';
 
 export interface AdminTokenPayload {
@@ -43,7 +43,56 @@ export class AuthService {
   }
 
   publicAdmin(admin: AdminRow) {
-    return { id: admin.id, username: admin.username, mustChangePassword: admin.must_change_password === 1 };
+    return {
+      id: admin.id,
+      username: admin.username,
+      mustChangePassword: admin.must_change_password === 1,
+      passwordChangedAt: admin.password_changed_at,
+      createdAt: admin.created_at,
+    };
+  }
+
+  listAdmins() {
+    return this.repos.admins.list().map((a) => this.publicAdmin(a));
+  }
+
+  async createAdmin(actor: AdminRow, username: string, password: string) {
+    if (password === '1234' || password.toLowerCase() === username.toLowerCase()) {
+      throw new AppError(400, 'WEAK_PASSWORD', '추측하기 쉬운 비밀번호는 사용할 수 없습니다.');
+    }
+    if (this.repos.admins.findByUsernameInsensitive(username)) {
+      throw conflict('이미 사용 중인 관리자 아이디입니다.', 'DUPLICATE_USERNAME');
+    }
+    const hash = await bcrypt.hash(password, 12);
+    const now = this.clock();
+    let id: number;
+    try {
+      id = this.repos.admins.create(username, hash, true, now);
+    } catch {
+      throw conflict('이미 사용 중인 관리자 아이디입니다.', 'DUPLICATE_USERNAME');
+    }
+    this.logger.log('ADMIN_CREATED', { details: { createdId: id, createdUsername: username, by: actor.username } });
+    return this.publicAdmin(this.repos.admins.findById(id)!);
+  }
+
+  deleteAdmin(actor: AdminRow, targetId: number, onDeleted?: (adminId: number) => void) {
+    const deleted = this.repos.tx(() => {
+      const target = this.repos.admins.findById(targetId);
+      if (!target) throw notFound('관리자 계정을 찾을 수 없습니다.');
+      if (this.repos.admins.count() <= 1) {
+        throw conflict('마지막 관리자 계정은 삭제할 수 없습니다.', 'LAST_ADMIN');
+      }
+      if (target.id === actor.id) {
+        throw conflict('현재 로그인한 본인 계정은 삭제할 수 없습니다.', 'CANNOT_DELETE_SELF');
+      }
+      this.repos.admins.deleteById(targetId);
+      return target;
+    });
+    onDeleted?.(deleted.id);
+    this.logger.log('ADMIN_DELETED', {
+      severity: 'warning',
+      details: { deletedId: deleted.id, deletedUsername: deleted.username, by: actor.username },
+    });
   }
 
   /** JWT 검증 + 폐기 여부 + 계정 존재 확인 */

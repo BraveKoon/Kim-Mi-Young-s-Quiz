@@ -12,6 +12,16 @@ export const changePasswordSchema = z.object({
   newPassword: z.string().min(8, '비밀번호는 8자 이상이어야 합니다.').max(200),
 });
 
+export const createAdminSchema = z.object({
+  username: z
+    .string()
+    .trim()
+    .min(3, '아이디는 3자 이상이어야 합니다.')
+    .max(30, '아이디는 30자 이하로 입력하세요.')
+    .regex(/^[0-9A-Za-z._-]+$/, '아이디에는 영문, 숫자, . _ - 만 사용할 수 있습니다.'),
+  password: z.string().min(8, '초기 비밀번호는 8자 이상이어야 합니다.').max(200),
+});
+
 export const questionSchema = z
   .object({
     questionType: z.enum(QUESTION_TYPES).default('MULTIPLE_CHOICE'),

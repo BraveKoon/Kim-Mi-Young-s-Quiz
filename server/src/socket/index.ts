@@ -42,6 +42,11 @@ export function createSocketServer(httpServer: HttpServer, ctx: AppContext) {
       io.to(rooms.participant(participantId)).emit(EVENTS.RESET, { reason });
       io.in(rooms.participant(participantId)).disconnectSockets(true);
     },
+    disconnectAdmin(adminId) {
+      for (const s of io.sockets.sockets.values()) {
+        if (s.data.role === 'admin' && s.data.adminId === adminId) s.disconnect(true);
+      }
+    },
   };
   ctx.sessions.broadcaster = broadcaster;
   ctx.logger.onLog((entry) => broadcaster.toAdmins(EVENTS.ADMIN_LOG, entry));

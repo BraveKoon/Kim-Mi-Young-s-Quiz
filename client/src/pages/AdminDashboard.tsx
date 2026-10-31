@@ -66,7 +66,7 @@ export default function AdminDashboard() {
         <div className="glass-strong w-full max-w-md space-y-4 p-8">
           <Logo size="sm" />
           <h1 className="font-display text-2xl">초기 비밀번호 변경</h1>
-          <p className="text-sm text-amber-100">보안을 위해 기본 비밀번호(1234)를 변경해야 관리자 기능을 사용할 수 있습니다.</p>
+          <p className="text-sm text-amber-100">보안을 위해 초기 비밀번호를 변경해야 관리자 기능을 사용할 수 있습니다.</p>
           <ChangePasswordForm />
           <button className="btn-ghost w-full" onClick={logout}>
             로그아웃

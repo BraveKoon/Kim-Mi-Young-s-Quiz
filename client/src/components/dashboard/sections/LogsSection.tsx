@@ -37,6 +37,8 @@ export const EVENT_LABEL: Record<string, string> = {
   ADMIN_LOGIN: '관리자 로그인',
   ADMIN_LOGIN_FAILED: '관리자 로그인 실패',
   ADMIN_PASSWORD_CHANGED: '비밀번호 변경',
+  ADMIN_CREATED: '관리자 계정 추가',
+  ADMIN_DELETED: '관리자 계정 삭제',
   QUIZ_STARTED: '퀴즈 시작',
   QUIZ_PAUSED: '일시정지',
   QUIZ_RESUMED: '재개',

@@ -1,11 +1,15 @@
-import { AlertTriangle, KeyRound, Save } from 'lucide-react';
+import { AlertTriangle, KeyRound, Save, ShieldCheck, Trash2, UserPlus } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { EVENTS } from '@shared/types/index';
 import { useAdminAuth } from '../../../contexts/AdminAuthContext';
 import { useAdminSocket } from '../../../contexts/AdminSocketContext';
 import { useToast } from '../../../contexts/ToastContext';
+import { useApi } from '../../../hooks/useApi';
 import { api, errorMessage } from '../../../services/api';
+import type { AdminInfo } from '../../../types';
+import { dateOnly } from '../../../utils/format';
 import { ConfirmDialog } from '../../common/Modal';
+import { Spinner } from '../../common/Spinner';
 import { SectionTitle } from '../CompetitionSelect';
 
 export function ChangePasswordForm() {
@@ -40,6 +44,157 @@ export function ChangePasswordForm() {
         <KeyRound className="h-4 w-4" /> 비밀번호 변경
       </button>
     </form>
+  );
+}
+
+export function AdminAccountsCard() {
+  const { admin: currentAdmin } = useAdminAuth();
+  const toast = useToast();
+  const { data, reload } = useApi<{ admins: AdminInfo[] }>('/admins');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [formError, setFormError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [delTarget, setDelTarget] = useState<AdminInfo | null>(null);
+
+  const admins = data?.admins ?? [];
+
+  const addAdmin = async (e: FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    const trimmed = username.trim();
+    if (trimmed.length < 3) return setFormError('아이디는 3자 이상이어야 합니다.');
+    if (password.length < 8) return setFormError('초기 비밀번호는 8자 이상이어야 합니다.');
+    setBusy(true);
+    try {
+      await api.post('/admins', { username: trimmed, password });
+      toast(`관리자 '${trimmed}' 계정을 추가했습니다.`, 'success');
+      setUsername('');
+      setPassword('');
+      reload();
+    } catch (err) {
+      setFormError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="glass space-y-4 p-5 lg:col-span-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="flex items-center gap-2 font-display text-xl">
+          <ShieldCheck className="h-5 w-5 text-neon-cyan" /> 관리자 계정 관리
+        </h3>
+        <span className="text-xs text-white/50">총 {admins.length}명 · 마지막 관리자 계정은 삭제할 수 없습니다.</span>
+      </div>
+
+      {!data ? (
+        <Spinner />
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="table-base">
+            <thead>
+              <tr>
+                <th>아이디</th>
+                <th>상태</th>
+                <th>생성일</th>
+                <th className="text-right">관리</th>
+              </tr>
+            </thead>
+            <tbody>
+              {admins.map((a) => {
+                const isSelf = a.id === currentAdmin?.id;
+                const isLast = admins.length <= 1;
+                const disableDelete = isLast || isSelf;
+                const disableReason = isLast
+                  ? '마지막 관리자 계정은 삭제할 수 없습니다.'
+                  : isSelf
+                    ? '현재 로그인한 본인 계정은 삭제할 수 없습니다.'
+                    : '관리자 계정 삭제';
+                return (
+                  <tr key={a.id}>
+                    <td className="font-bold">
+                      {a.username}
+                      {isSelf && <span className="ml-2 rounded-full bg-cyan-400/20 px-2 py-0.5 text-xs text-cyan-200">본인</span>}
+                    </td>
+                    <td>
+                      {a.mustChangePassword ? (
+                        <span className="rounded-full bg-amber-400/20 px-2.5 py-0.5 text-xs text-amber-200">초기 비밀번호 변경 대기</span>
+                      ) : (
+                        <span className="rounded-full bg-lime-400/20 px-2.5 py-0.5 text-xs text-lime-200">사용 중</span>
+                      )}
+                    </td>
+                    <td className="text-white/60">{dateOnly(a.createdAt)}</td>
+                    <td className="text-right">
+                      <button
+                        type="button"
+                        className="btn-ghost btn-sm text-rose-200"
+                        disabled={disableDelete}
+                        title={disableReason}
+                        aria-label={`${a.username} 계정 삭제`}
+                        onClick={() => setDelTarget(a)}
+                      >
+                        <Trash2 className="h-4 w-4" /> 삭제
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <form onSubmit={addAdmin} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
+        <div className="font-bold text-sm">새 관리자 추가</div>
+        <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+          <input
+            className="input"
+            placeholder="아이디 (영문·숫자·._- 3~30자)"
+            aria-label="새 관리자 아이디"
+            value={username}
+            maxLength={30}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="off"
+            required
+          />
+          <input
+            type="password"
+            className="input"
+            placeholder="초기 비밀번호 (8자 이상)"
+            aria-label="새 관리자 초기 비밀번호"
+            value={password}
+            maxLength={200}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+            required
+          />
+          <button type="submit" className="btn-primary whitespace-nowrap" disabled={busy}>
+            <UserPlus className="h-4 w-4" /> 관리자 추가
+          </button>
+        </div>
+        {formError && <p className="rounded-xl bg-rose-500/15 px-3 py-2 text-sm text-rose-200">{formError}</p>}
+        <p className="text-xs text-white/50">새로 추가한 관리자는 첫 로그인 시 비밀번호 변경이 강제됩니다.</p>
+      </form>
+
+      <ConfirmDialog
+        open={!!delTarget}
+        danger
+        title="관리자 계정 삭제"
+        confirmText="삭제"
+        message={`관리자 '${delTarget?.username}' 계정을 삭제할까요? 해당 계정의 로그인 세션도 즉시 종료됩니다.`}
+        onClose={() => setDelTarget(null)}
+        onConfirm={async () => {
+          try {
+            await api.delete(`/admins/${delTarget!.id}`);
+            toast(`관리자 '${delTarget!.username}' 계정을 삭제했습니다.`, 'success');
+            reload();
+          } catch (e) {
+            toast(errorMessage(e), 'error');
+          }
+        }}
+      />
+    </div>
   );
 }
 
@@ -91,6 +246,7 @@ export function SettingsSection() {
           <h3 className="font-display text-xl">관리자 비밀번호 변경</h3>
           <ChangePasswordForm />
         </div>
+        <AdminAccountsCard />
         <div className="glass space-y-3 border-rose-400/30 p-5 lg:col-span-2">
           <h3 className="flex items-center gap-2 font-display text-xl text-rose-200">
             <AlertTriangle className="h-5 w-5" /> 위험 구역

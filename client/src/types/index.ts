@@ -4,6 +4,8 @@ export interface AdminInfo {
   id: number;
   username: string;
   mustChangePassword: boolean;
+  passwordChangedAt?: number | null;
+  createdAt?: number;
 }
 
 export interface Question {

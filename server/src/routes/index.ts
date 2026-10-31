@@ -35,6 +35,9 @@ export function createApiRouter(ctx: AppContext) {
   r.get('/admin/me', adminPending, a.me);
   r.post('/admin/change-password', limit.login, adminPending, validate({ body: S.changePasswordSchema }), a.changePassword);
   r.get('/admin/overview', admin, a.overview);
+  r.get('/admins', admin, a.listAdmins);
+  r.post('/admins', admin, validate({ body: S.createAdminSchema }), a.createAdmin);
+  r.delete('/admins/:id', admin, validate({ params: idParam }), a.removeAdmin);
   r.get('/settings', admin, a.getSettings);
   r.put('/settings', admin, validate({ body: S.settingsSchema }), a.updateSettings);
 

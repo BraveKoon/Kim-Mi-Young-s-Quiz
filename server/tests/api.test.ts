@@ -86,6 +86,69 @@ describe('관리자 인증', () => {
   });
 });
 
+describe('관리자 계정 관리', () => {
+  it('목록 조회 시 비밀번호 해시를 노출하지 않으며 마지막 관리자는 삭제할 수 없다', async () => {
+    const list = await request(ts.url).get('/api/admins').set(auth());
+    expect(list.status).toBe(200);
+    expect(list.body.admins).toHaveLength(1);
+    expect(list.body.admins[0]).toMatchObject({ username: 'admin', mustChangePassword: false });
+    expect(JSON.stringify(list.body)).not.toContain('password_hash');
+
+    const lastDel = await request(ts.url).delete(`/api/admins/${list.body.admins[0].id}`).set(auth());
+    expect(lastDel.status).toBe(409);
+    expect(lastDel.body.error).toBe('LAST_ADMIN');
+  });
+
+  it('새 관리자 추가 시 첫 로그인 비밀번호 변경을 강제하고, 본인 삭제 금지 및 계정 삭제 시 토큰을 즉시 무효화한다', async () => {
+    // 중복 아이디(대소문자 무시)·약한 비밀번호·잘못된 형식 차단
+    expect((await request(ts.url).post('/api/admins').set(auth()).send({ username: 'Admin', password: 'temp-pass-2026!' })).status).toBe(409);
+    expect((await request(ts.url).post('/api/admins').set(auth()).send({ username: 'teacher2', password: 'teacher2' })).status).toBe(400);
+    expect((await request(ts.url).post('/api/admins').set(auth()).send({ username: '한글아이디', password: 'temp-pass-2026!' })).status).toBe(400);
+
+    // 새 관리자 생성
+    const created = await request(ts.url).post('/api/admins').set(auth()).send({ username: 'teacher_kim', password: 'init-pass-2026!' });
+    expect(created.status).toBe(201);
+    expect(created.body.admin).toMatchObject({ username: 'teacher_kim', mustChangePassword: true });
+    const newId = created.body.admin.id as number;
+
+    // 새 관리자로 첫 로그인 → 비밀번호 변경 전까지 관리자 API 차단
+    const firstLogin = await request(ts.url).post('/api/admin/login').send({ username: 'teacher_kim', password: 'init-pass-2026!' });
+    expect(firstLogin.status).toBe(200);
+    expect(firstLogin.body.admin.mustChangePassword).toBe(true);
+    const blocked = await request(ts.url).get('/api/admins').set('Authorization', `Bearer ${firstLogin.body.token}`);
+    expect(blocked.status).toBe(403);
+    expect(blocked.body.error).toBe('PASSWORD_CHANGE_REQUIRED');
+
+    // 비밀번호 변경 후 정상 사용 가능
+    const changed = await request(ts.url)
+      .post('/api/admin/change-password')
+      .set('Authorization', `Bearer ${firstLogin.body.token}`)
+      .send({ currentPassword: 'init-pass-2026!', newPassword: 'kim-new-password-99!' });
+    expect(changed.status).toBe(200);
+    expect(changed.body.admin.mustChangePassword).toBe(false);
+    const kimToken = changed.body.token as string;
+
+    const listAsKim = await request(ts.url).get('/api/admins').set('Authorization', `Bearer ${kimToken}`);
+    expect(listAsKim.status).toBe(200);
+    expect(listAsKim.body.admins).toHaveLength(2);
+
+    // 본인 계정 삭제는 거부
+    const selfDel = await request(ts.url).delete(`/api/admins/${newId}`).set('Authorization', `Bearer ${kimToken}`);
+    expect(selfDel.status).toBe(409);
+    expect(selfDel.body.error).toBe('CANNOT_DELETE_SELF');
+
+    // 기존 관리자(admin)가 teacher_kim 삭제 → 성공 및 토큰 즉시 무효화
+    const delRes = await request(ts.url).delete(`/api/admins/${newId}`).set(auth());
+    expect(delRes.status).toBe(200);
+    expect((await request(ts.url).get('/api/admin/me').set('Authorization', `Bearer ${kimToken}`)).status).toBe(401);
+    expect((await request(ts.url).delete(`/api/admins/${newId}`).set(auth())).status).toBe(404);
+
+    // 활동 로그 기록 확인
+    expect(ts.server.ctx.repos.logs.query({ eventType: 'ADMIN_CREATED' }).total).toBeGreaterThanOrEqual(1);
+    expect(ts.server.ctx.repos.logs.query({ eventType: 'ADMIN_DELETED' }).total).toBeGreaterThanOrEqual(1);
+  });
+});
+
 describe('문제 및 문제 세트 관리', () => {
   let qid: number;
   it('문제 생성', async () => {

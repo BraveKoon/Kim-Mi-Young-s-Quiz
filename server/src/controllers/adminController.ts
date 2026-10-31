@@ -23,6 +23,19 @@ export function adminController(ctx: AppContext) {
     overview(_req: Request, res: Response) {
       res.json(ctx.sessions.getOverview());
     },
+    listAdmins(_req: Request, res: Response) {
+      res.json({ admins: ctx.auth.listAdmins() });
+    },
+    async createAdmin(req: Request, res: Response) {
+      const { username, password } = req.valid!.body;
+      const created = await ctx.auth.createAdmin(req.admin!, username, password);
+      res.status(201).json({ admin: created });
+    },
+    removeAdmin(req: Request, res: Response) {
+      const { id } = req.valid!.params;
+      ctx.auth.deleteAdmin(req.admin!, id, (adminId) => ctx.sessions.broadcaster.disconnectAdmin(adminId));
+      res.json({ ok: true });
+    },
     getSettings(_req: Request, res: Response) {
       res.json({
         projectorNameMode: ctx.repos.settings.get('projector_name_mode') ?? 'MASKED',
