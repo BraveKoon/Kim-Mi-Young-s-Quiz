@@ -249,7 +249,7 @@ GitHub Pages는 **정적 파일만** 제공합니다. REST API와 Socket.io 서�
 
 - **GitHub Actions 자동 배포(`.github/workflows/deploy-pages.yml`)**:
   1. GitHub 저장소 **Settings → Pages → Build and deployment → Source**를 **GitHub Actions**로 설정합니다.
-  2. **Settings → Secrets and variables → Actions → Variables**에 `VITE_API_URL`(예: `https://quiz-api.school.kr`)과 필요 시 `VITE_BASE_PATH`(기본값 `/<저장소명>/`)를 등록하면 브랜치 푸시 시 자동으로 빌드·배포됩니다(`Actions` 탭에서 수동 실행 `workflow_dispatch`도 가능).
+  2. **Settings → Secrets and variables → Actions → Variables**에 `VITE_API_URL`(예: `https://quiz-api.school.kr`)과 필요 시 `VITE_BASE_PATH`(기본값 `/<저장소명>/`)를 등록하면 브랜치 푸시 시 자동으로 빌드·배포됩니다(`Actions` 탭에서 **`Deploy Frontend to GitHub Pages`** 워크플로 수동 실행 `workflow_dispatch`도 가능 — 이전 레거시 기록인 `pages build and deployment`를 재실행하면 루트 `README.md`가 덮어써지므로 실행하지 마세요).
 
 ```bash
 # 수동 빌드 시
