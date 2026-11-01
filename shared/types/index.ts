@@ -14,6 +14,13 @@ export function classDisplayName(classId: string): string {
   return `${grade}학년 ${num}반`;
 }
 
+/** 학년·반·번호·이름으로 학번 포함 닉네임 생성 (예: 2, 1, 1, "홍길동" → "20101 홍길동") */
+export function formatStudentNickname(grade: number, classNum: number, studentNum: number, name: string): string {
+  const cleanName = name.normalize('NFC').replace(/\s+/g, ' ').trim();
+  const id = `${grade}${String(classNum).padStart(2, '0')}${String(studentNum).padStart(2, '0')}`;
+  return `${id} ${cleanName}`;
+}
+
 export const SESSION_STATUSES = ['WAITING', 'PLAYING', 'RESULT', 'PAUSED', 'FINISHED'] as const;
 export type SessionStatus = (typeof SESSION_STATUSES)[number];
 

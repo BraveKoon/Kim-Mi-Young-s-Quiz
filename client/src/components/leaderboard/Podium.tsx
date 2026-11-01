@@ -27,7 +27,7 @@ export function Podium({ entries, large, confetti = true }: { entries: Leaderboa
             {c.list.length ? (
               c.list.map((e) => (
                 <div key={e.participantId}>
-                  <div className={`font-display ${large ? 'text-4xl' : 'text-xl'} break-all`}>{e.nickname}</div>
+                  <div className={`font-display ${large ? 'text-4xl' : 'text-xl'} break-keep`}>{e.nickname}</div>
                   <div className={`font-bold text-white/70 ${large ? 'text-2xl' : 'text-sm'}`}>{num(e.totalScore)}점</div>
                 </div>
               ))

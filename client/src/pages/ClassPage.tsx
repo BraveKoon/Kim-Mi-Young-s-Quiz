@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, Loader2, LogIn, PauseCircle, PartyPopper, RefreshCw, Trophy, Users, WifiOff, XCircle } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { classDisplayName, isValidClassId, type ClassState } from '@shared/types/index';
+import { CLASS_CAPACITY, classDisplayName, formatStudentNickname, isValidClassId, type ClassState } from '@shared/types/index';
 import { Logo } from '../components/common/Logo';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { FullScreenSpinner } from '../components/common/Spinner';
@@ -64,7 +64,11 @@ function ClassView({ classId }: { classId: string }) {
 // ───────────────────────── 입장 폼 ─────────────────────────
 
 function JoinForm({ classId, notice, onJoined }: { classId: string; notice: string; onJoined: (c: StudentCreds) => void }) {
-  const [nickname, setNickname] = useState('');
+  const [gradeStr, classNumStr] = classId.split('-');
+  const grade = Number(gradeStr);
+  const classNum = Number(classNumStr);
+  const [studentNum, setStudentNum] = useState<number>(1);
+  const [studentName, setStudentName] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [info, setInfo] = useState<{ status: ClassState['status']; participantCount: number; capacity: number; competitionTitle: string | null } | null>(null);
@@ -76,14 +80,22 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
       .catch(() => setInfo(null));
   }, [classId]);
 
+  const trimmedName = studentName.normalize('NFC').replace(/\s+/g, ' ').trim();
+  const studentIdPrefix = `${grade}${String(classNum).padStart(2, '0')}${String(studentNum).padStart(2, '0')}`;
+  const generatedNickname = trimmedName ? formatStudentNickname(grade, classNum, studentNum, trimmedName) : '';
+
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
-    const name = nickname.trim();
-    if (!name) return setError('닉네임을 입력하세요.');
+    if (!trimmedName) return setError('이름을 입력하세요.');
+    if (trimmedName.length > 14) return setError('이름은 14자 이하로 입력하세요.');
+    if (!/^[0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ _.\-]+$/.test(trimmedName)) {
+      return setError('이름에는 한글, 영문, 숫자만 사용할 수 있습니다.');
+    }
+    const nickname = formatStudentNickname(grade, classNum, studentNum, trimmedName);
     setBusy(true);
     try {
-      const r = await studentApi.post(`/classes/${classId}/join`, { nickname: name });
+      const r = await studentApi.post(`/classes/${classId}/join`, { nickname });
       onJoined({ participantId: r.data.participantId, token: r.data.token, nickname: r.data.nickname, sessionId: r.data.sessionId });
     } catch (err) {
       setError(errorMessage(err, '입장하지 못했습니다.'));
@@ -100,7 +112,7 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
       <Logo />
       <motion.form onSubmit={submit} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-strong w-full max-w-md space-y-5 p-8 text-center">
         <div>
-          <div className="font-display text-5xl text-white">{classDisplayName(classId)}</div>
+          <div className="font-display text-4xl text-white">{classDisplayName(classId)}</div>
           {info && (
             <div className="mt-3 flex items-center justify-center gap-2 text-sm text-white/70">
               <StatusBadge status={info.status} />
@@ -112,21 +124,53 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
           {info?.competitionTitle && <p className="mt-2 text-white/60">{info.competitionTitle}</p>}
         </div>
         {notice && <p className="rounded-xl bg-amber-400/15 px-3 py-2 text-sm text-amber-100">{notice}</p>}
-        <div className="text-left">
-          <label className="label" htmlFor="nickname">
-            닉네임 (최대 12자)
-          </label>
-          <input
-            id="nickname"
-            className="input text-center text-xl font-bold"
-            placeholder="예) 퀴즈왕"
-            value={nickname}
-            maxLength={12}
-            onChange={(e) => setNickname(e.target.value)}
-            autoFocus
-            autoComplete="off"
-            disabled={closed || full}
-          />
+        <div className="grid grid-cols-3 gap-2.5 text-left">
+          <div>
+            <label className="label" htmlFor="join-studentNum">
+              번호
+            </label>
+            <select
+              id="join-studentNum"
+              className="input font-semibold"
+              value={studentNum}
+              onChange={(e) => {
+                setStudentNum(Number(e.target.value));
+                if (error) setError('');
+              }}
+              disabled={closed || full}
+            >
+              {Array.from({ length: info?.capacity ?? CLASS_CAPACITY }, (_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {i + 1}번
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="col-span-2">
+            <label className="label" htmlFor="join-studentName">
+              이름
+            </label>
+            <input
+              id="join-studentName"
+              className="input font-bold"
+              placeholder="예) 홍길동"
+              value={studentName}
+              maxLength={14}
+              onChange={(e) => {
+                setStudentName(e.target.value);
+                if (error) setError('');
+              }}
+              autoFocus
+              autoComplete="name"
+              disabled={closed || full}
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-between rounded-xl border border-white/10 bg-ink-950/70 px-4 py-2.5 text-sm">
+          <span className="text-slate-400">자동 생성 닉네임</span>
+          <span className={`font-mono font-bold ${generatedNickname ? 'text-blue-300' : 'text-slate-500'}`}>
+            {generatedNickname || `${studentIdPrefix} 홍길동`}
+          </span>
         </div>
         {error && <p className="rounded-xl bg-rose-500/15 px-3 py-2 text-sm text-rose-200">{error}</p>}
         <button className="btn-primary w-full py-3 text-xl" disabled={busy || closed || full}>
@@ -134,7 +178,7 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
           {closed ? (info?.status === 'FINISHED' ? '퀴즈가 종료되었습니다' : '퀴즈 준비 중') : full ? '정원 마감' : '입장하기'}
         </button>
         <Link to="/" className="block text-sm text-white/50 hover:text-white">
-          ← 다른 학급 선택
+          ← 처음 화면으로
         </Link>
       </motion.form>
     </div>
@@ -169,7 +213,7 @@ function QuizRoom({ classId, creds, onInvalid }: { classId: string; creds: Stude
           <StatusBadge status={state.status} />
         </div>
         <div className="glass flex items-center gap-3 rounded-2xl px-3 py-1.5 text-sm">
-          <span className="max-w-28 truncate font-bold">{creds.nickname}</span>
+          <span className="max-w-44 truncate font-bold">{creds.nickname}</span>
           <span className="font-display text-lg text-neon-yellow tabular-nums">{num(q.myTotal)}점</span>
           {q.myRank && state.status !== 'PLAYING' && state.status !== 'PAUSED' && <span className="text-white/60">{q.myRank}위</span>}
         </div>

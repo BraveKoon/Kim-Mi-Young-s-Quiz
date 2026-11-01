@@ -280,6 +280,14 @@ describe('학생 입장', () => {
     expect((await join(ts, '2-3', '<script>')).status).toBe(400);
     expect((await join(ts, '2-3', 'a"onload=')).status).toBe(400);
   });
+  it('학번+이름 형식(20101 홍길동 등 최대 20자) 닉네임 입장 허용', async () => {
+    const r1 = await join(ts, '2-1', '20101 홍길동');
+    expect(r1.status).toBe(201);
+    expect(r1.body.nickname).toBe('20101 홍길동');
+    const r2 = await join(ts, '2-12', '21235 Christopher');
+    expect(r2.status).toBe(201);
+    expect(r2.body.nickname).toBe('21235 Christopher');
+  });
   it('SQL Injection 형태의 입력은 단순 문자열로 처리된다', async () => {
     const res = await request(ts.url).get("/api/classes/2-1' OR '1'='1/session");
     expect(res.status).toBe(400);

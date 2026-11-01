@@ -34,10 +34,13 @@ describe('순위/마스킹/CSV', () => {
     ]);
     expect(r.map((x) => [x.id, x.rank])).toEqual([[2, 1], [3, 2], [1, 2], [4, 4]]);
   });
-  it('닉네임 마스킹', () => {
+  it('닉네임 마스킹 (일반 이름 및 학번+이름)', () => {
     expect(maskName('김민수')).toBe('김*수');
     expect(maskName('민수')).toBe('민*');
     expect(maskName('남궁민수')).toBe('남**수');
+    expect(maskName('20101 홍길동')).toBe('20101 홍*동');
+    expect(maskName('21235 민수')).toBe('21235 민*');
+    expect(maskName('21235 남궁민수')).toBe('21235 남**수');
   });
   it('CSV 수식 주입 방지', () => {
     expect(csvCell('=SUM(A1)')).toBe("'=SUM(A1)");

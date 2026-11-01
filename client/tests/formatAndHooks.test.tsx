@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { classDisplayName, isValidClassId } from '@shared/types/index';
+import { classDisplayName, formatStudentNickname, isValidClassId } from '@shared/types/index';
 import { useCountdown } from '../src/hooks/useCountdown';
 import { QUESTION_TYPE_LABEL, num, pct, seconds } from '../src/utils/format';
 
@@ -26,6 +26,8 @@ describe('포맷 유틸 및 공용 학급 헬퍼', () => {
     expect(isValidClassId('2-13')).toBe(false);
     expect(isValidClassId('1-1')).toBe(false);
     expect(classDisplayName('2-7')).toBe('2학년 7반');
+    expect(formatStudentNickname(2, 1, 1, '홍길동')).toBe('20101 홍길동');
+    expect(formatStudentNickname(2, 12, 35, '  김철수 ')).toBe('21235 김철수');
   });
 });
 

@@ -1,12 +1,13 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QuestionsSection } from '../src/components/dashboard/sections/QuestionsSection';
 import { AdminAccountsCard } from '../src/components/dashboard/sections/SettingsSection';
 import { ToastProvider } from '../src/contexts/ToastContext';
 import AdminLoginPage from '../src/pages/AdminLoginPage';
-import { api } from '../src/services/api';
+import HomePage from '../src/pages/HomePage';
+import { api, studentApi } from '../src/services/api';
 
 const mockUseAdminAuth = vi.fn();
 vi.mock('../src/contexts/AdminAuthContext', () => ({
@@ -195,5 +196,67 @@ describe('AdminLoginPage', () => {
     const homeLink = screen.getByRole('link', { name: '홈으로' });
     expect(homeLink).toBeInTheDocument();
     expect(homeLink).toHaveAttribute('href', '/');
+  });
+});
+
+describe('HomePage (학번+이름 자동 닉네임 입장)', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    localStorage.clear();
+  });
+
+  it('학년·반·번호·이름 선택 시 닉네임(예: 20307 홍길동)을 자동 생성해 바로 학급으로 입장하고 하단 관리자 로그인 링크를 유지한다', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(studentApi, 'get').mockResolvedValue({
+      data: {
+        classes: Array.from({ length: 12 }, (_, i) => ({
+          classId: `2-${i + 1}`,
+          className: `2학년 ${i + 1}반`,
+          capacity: 35,
+          status: 'WAITING',
+          participantCount: 0,
+          connectedCount: 0,
+          joinable: true,
+        })),
+      },
+    } as any);
+    const joinSpy = vi.spyOn(studentApi, 'post').mockResolvedValue({
+      data: {
+        participantId: 101,
+        token: 'tok-test-student-20307',
+        nickname: '20307 홍길동',
+        sessionId: 5,
+      },
+    } as any);
+
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/:classId" element={<div>학급 퀴즈방 진입 완료</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    // 하단 관리자 로그인 버튼 유지 확인
+    const adminLink = screen.getByRole('link', { name: /선생님\(관리자\) 로그인/ });
+    expect(adminLink).toHaveAttribute('href', '/admin');
+
+    // 기본값: 2학년 1반 1번 -> 20101 홍길동 미리보기
+    expect(await screen.findByRole('button', { name: /2학년 1반 입장하기/ })).toBeEnabled();
+    await user.selectOptions(screen.getByLabelText('반'), '3');
+    await user.selectOptions(screen.getByLabelText('번호'), '7');
+    await user.type(screen.getByLabelText('이름'), '홍길동');
+
+    expect(screen.getByTestId('generated-nickname')).toHaveTextContent('20307 홍길동');
+
+    await user.click(screen.getByRole('button', { name: /2학년 3반 입장하기/ }));
+
+    await waitFor(() =>
+      expect(joinSpy).toHaveBeenCalledWith('/classes/2-3/join', {
+        nickname: '20307 홍길동',
+      }),
+    );
+    expect(await screen.findByText('학급 퀴즈방 진입 완료')).toBeInTheDocument();
   });
 });

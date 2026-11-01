@@ -55,7 +55,7 @@ export const quizSetSchema = z.object({
   questionIds: z.array(z.number().int().positive()).max(200).default([]),
 });
 
-// 닉네임: 한글/영문/숫자/공백/일부 기호만 허용 (HTML 특수문자 차단)
+// 닉네임: 한글/영문/숫자/공백/일부 기호만 허용 (HTML 특수문자 차단, 학번+이름 "20101 홍길동" 포함 최대 20자)
 export const nicknameSchema = z
   .string()
   .transform((s) => s.normalize('NFC').replace(/\s+/g, ' ').trim())
@@ -63,7 +63,7 @@ export const nicknameSchema = z
     z
       .string()
       .min(1, '닉네임을 입력하세요.')
-      .max(12, '닉네임은 12자 이하로 입력하세요.')
+      .max(20, '닉네임은 20자 이하로 입력하세요.')
       .regex(/^[0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ _.\-]+$/, '닉네임에는 한글, 영문, 숫자, 공백, _ . - 만 사용할 수 있습니다.'),
   );
 export const joinSchema = z.object({ nickname: nicknameSchema });
