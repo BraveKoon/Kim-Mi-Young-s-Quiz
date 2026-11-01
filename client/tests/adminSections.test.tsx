@@ -262,8 +262,11 @@ describe('HomePage (학번+이름 자동 닉네임 입장)', () => {
     const adminLink = screen.getByRole('link', { name: /선생님\(관리자\) 로그인/ });
     expect(adminLink).toHaveAttribute('href', '/admin');
 
-    // 기본값: 2학년 1반 1번 -> 20101 홍길동 미리보기
+    // 기본값: 2학년 1반 1번 -> 학급 상태·참가 인원 표시 및 20101 홍길동 미리보기
     expect(await screen.findByRole('button', { name: /2학년 1반 입장하기/ })).toBeEnabled();
+    expect(screen.getByText('입장 가능 · 대기 중')).toBeInTheDocument();
+    expect(screen.getByText('0/35명')).toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText('학년'), '2');
     await user.selectOptions(screen.getByLabelText('반'), '3');
     await user.selectOptions(screen.getByLabelText('번호'), '7');
     await user.type(screen.getByLabelText('이름'), '홍길동');
