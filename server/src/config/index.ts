@@ -50,7 +50,7 @@ export function loadConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     jwtSecret,
     jwtExpiresIn: env.JWT_EXPIRES_IN ?? '8h',
     databasePath: path.resolve(env.DATABASE_PATH ?? './data/classquiz.sqlite'),
-    clientOrigins: (env.CLIENT_ORIGIN ?? 'http://localhost:5173,https://bravekoon.github.io,https://classquiz.bravekoon.workers.dev')
+    clientOrigins: (env.CLIENT_ORIGIN ?? 'http://localhost:5173,https://classquiz.bravekoon.workers.dev')
       .split(',')
       .map(normalizeOrigin)
       .filter(Boolean),

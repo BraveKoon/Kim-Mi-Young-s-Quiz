@@ -11,11 +11,6 @@ on:
         description: '하위 경로 (예: /Kim-Mi-Young-s-Quiz/). 비우면 VITE_BASE_PATH 또는 /<저장소명>/ 사용'
         required: false
         type: string
-  push:
-    branches:
-      - main
-      - claude/classquiz-realtime-quiz-platform-iqy54o
-      - 'arena/**'
 
 permissions:
   contents: read
