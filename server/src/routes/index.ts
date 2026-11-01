@@ -44,6 +44,7 @@ export function createApiRouter(ctx: AppContext) {
   // ── 문제
   const q = questionController(ctx);
   r.get('/questions', admin, q.list);
+  r.post('/questions/bulk', admin, validate({ body: S.bulkQuestionSchema }), q.bulkCreate);
   r.post('/questions', admin, validate({ body: S.questionSchema }), q.create);
   r.put('/questions/:id', admin, validate({ params: idParam, body: S.questionSchema }), q.update);
   r.delete('/questions/:id', admin, validate({ params: idParam }), q.remove);

@@ -107,6 +107,25 @@ describe('QuestionsSection (4지선다 · O/X · 단답형)', () => {
         correctIndex: 0,
       }),
     );
+
+    // 3) JSON 일괄 등록 모달에서 고사성어·사자성어 30문제 프리셋 불러오기 후 등록
+    postSpy.mockResolvedValueOnce({ data: { count: 30, questionIds: Array.from({ length: 30 }, (_, i) => i + 10), quizSetId: 9 } } as any);
+    await user.click(await screen.findByRole('button', { name: /JSON 일괄 등록/ }));
+    const bulkDialog = await screen.findByRole('dialog', { name: 'JSON 문제 일괄 등록' });
+    await user.click(within(bulkDialog).getByRole('button', { name: /고사성어·사자성어 30문제 불러오기/ }));
+    await user.click(within(bulkDialog).getByRole('button', { name: '일괄 등록' }));
+
+    await waitFor(() => expect(postSpy).toHaveBeenCalledTimes(3));
+    expect(postSpy).toHaveBeenLastCalledWith(
+      '/questions/bulk',
+      expect.objectContaining({
+        quizSetTitle: '중2 고사성어·사자성어 퀴즈 (30문항)',
+        questions: expect.arrayContaining([
+          expect.objectContaining({ orderNum: 1, options: expect.arrayContaining(['작심삼일']) }),
+          expect.objectContaining({ orderNum: 30, questionType: 'SHORT_ANSWER', options: ['권선징악'] }),
+        ]),
+      }),
+    );
   });
 });
 

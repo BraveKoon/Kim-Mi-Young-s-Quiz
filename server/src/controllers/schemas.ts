@@ -55,6 +55,14 @@ export const quizSetSchema = z.object({
   questionIds: z.array(z.number().int().positive()).max(200).default([]),
 });
 
+export const bulkQuestionSchema = z.object({
+  questions: z.array(questionSchema).min(1, '최소 1개 이상의 문제가 필요합니다.').max(200, '한 번에 최대 200개까지 등록할 수 있습니다.'),
+  replaceExisting: z.boolean().default(false),
+  quizSetTitle: optText(100),
+  quizSetDescription: optText(500),
+  quizSetCategory: optText(50),
+});
+
 // 닉네임: 한글/영문/숫자/공백/일부 기호만 허용 (HTML 특수문자 차단, 학번+이름 "20101 홍길동" 포함 최대 20자)
 export const nicknameSchema = z
   .string()

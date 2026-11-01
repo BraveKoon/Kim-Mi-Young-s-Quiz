@@ -30,6 +30,40 @@ export function questionController(ctx: AppContext) {
       const id = ctx.repos.questions.create(req.valid!.body, ctx.clock());
       res.status(201).json({ question: serializeQuestion(ctx.repos.questions.find(id)!) });
     },
+    bulkCreate(req: Request, res: Response) {
+      const { questions, replaceExisting, quizSetTitle, quizSetDescription, quizSetCategory } = req.valid!.body;
+      const now = ctx.clock();
+      const result = ctx.repos.tx(() => {
+        if (replaceExisting) {
+          for (const old of ctx.repos.questions.list()) {
+            ctx.repos.questions.softDelete(old.id, now);
+          }
+        }
+        const baseOrder = replaceExisting ? 0 : (ctx.repos.questions.list().at(-1)?.order_num ?? 0);
+        const questionIds = questions.map((item: any, idx: number) =>
+          ctx.repos.questions.create(
+            {
+              ...item,
+              orderNum: item.orderNum > 0 ? item.orderNum : baseOrder + idx + 1,
+            },
+            now,
+          ),
+        );
+        const quizSetId = quizSetTitle
+          ? ctx.repos.quizSets.create(
+              {
+                title: quizSetTitle,
+                description: quizSetDescription ?? null,
+                category: quizSetCategory ?? null,
+                questionIds,
+              },
+              now,
+            )
+          : null;
+        return { count: questionIds.length, questionIds, quizSetId };
+      });
+      res.status(201).json(result);
+    },
     update(req: Request, res: Response) {
       const { id } = req.valid!.params;
       if (!ctx.repos.questions.update(id, req.valid!.body, ctx.clock())) throw notFound('문제를 찾을 수 없습니다.');

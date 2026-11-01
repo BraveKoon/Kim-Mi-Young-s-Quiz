@@ -253,6 +253,31 @@ describe('문제 및 문제 세트 관리', () => {
     expect((await request(ts.url).delete(`/api/questions/${ox.body.question.id}`).set(auth())).status).toBe(200);
     expect((await request(ts.url).delete(`/api/questions/${short.body.question.id}`).set(auth())).status).toBe(200);
   });
+
+  it('JSON 문제 일괄 등록(POST /api/questions/bulk)으로 30문항 프리셋과 문제 세트를 한 번에 생성한다', async () => {
+    const { IDIOM_QUIZ_30 } = await import('../../client/src/data/idiomQuiz30.js');
+    const res = await request(ts.url).post('/api/questions/bulk').set(auth()).send({
+      questions: IDIOM_QUIZ_30,
+      replaceExisting: false,
+      quizSetTitle: '중2 고사성어·사자성어 퀴즈 (30문항)',
+      quizSetDescription: '검수 완료 30문항 세트',
+      quizSetCategory: '고사성어',
+    });
+    expect(res.status).toBe(201);
+    expect(res.body.count).toBe(30);
+    expect(res.body.questionIds).toHaveLength(30);
+    expect(res.body.quizSetId).toBeGreaterThan(0);
+
+    const setRes = await request(ts.url).get(`/api/quiz-sets/${res.body.quizSetId}`).set(auth());
+    expect(setRes.status).toBe(200);
+    expect(setRes.body.quizSet.questionCount).toBe(30);
+
+    // 정리
+    expect((await request(ts.url).delete(`/api/quiz-sets/${res.body.quizSetId}`).set(auth())).status).toBe(200);
+    for (const id of res.body.questionIds) {
+      await request(ts.url).delete(`/api/questions/${id}`).set(auth());
+    }
+  });
 });
 
 describe('학생 입장', () => {

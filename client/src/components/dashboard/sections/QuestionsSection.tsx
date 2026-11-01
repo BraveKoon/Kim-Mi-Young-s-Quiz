@@ -1,7 +1,8 @@
-import { Pencil, Plus, Trash2, X, Zap } from 'lucide-react';
+import { FileUp, Pencil, Plus, Sparkles, Trash2, X, Zap } from 'lucide-react';
 import { useState } from 'react';
 import type { QuestionType } from '@shared/types/index';
 import { useToast } from '../../../contexts/ToastContext';
+import { IDIOM_QUIZ_30 } from '../../../data/idiomQuiz30';
 import { useApi } from '../../../hooks/useApi';
 import { api, errorMessage } from '../../../services/api';
 import type { Question } from '../../../types';
@@ -32,6 +33,7 @@ export function QuestionsSection() {
   const toast = useToast();
   const { data, reload } = useApi<{ questions: Question[] }>('/questions');
   const [editing, setEditing] = useState<Partial<Question> | null>(null);
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [del, setDel] = useState<Question | null>(null);
   const [filter, setFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('ALL');
@@ -59,6 +61,9 @@ export function QuestionsSection() {
           <option value="SHORT_ANSWER" className="bg-ink-800">단답형</option>
         </select>
         <input className="input w-56" placeholder="검색 (문제/분류)" value={filter} onChange={(e) => setFilter(e.target.value)} />
+        <button className="btn-ghost" onClick={() => setBulkOpen(true)}>
+          <FileUp className="h-4 w-4" /> JSON 일괄 등록
+        </button>
         <button
           className="btn-primary"
           onClick={() => setEditing({ ...EMPTY, options: [...EMPTY.options], orderNum: (data.questions.at(-1)?.orderNum ?? 0) + 1 })}
@@ -124,6 +129,15 @@ export function QuestionsSection() {
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);
+            reload();
+          }}
+        />
+      )}
+      {bulkOpen && (
+        <BulkQuestionModal
+          onClose={() => setBulkOpen(false)}
+          onSaved={() => {
+            setBulkOpen(false);
             reload();
           }}
         />
@@ -431,6 +445,120 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
           </button>
           <button className="btn-primary" disabled={busy} onClick={save}>
             저장
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function BulkQuestionModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+  const toast = useToast();
+  const [jsonText, setJsonText] = useState('');
+  const [createSet, setCreateSet] = useState(true);
+  const [quizSetTitle, setQuizSetTitle] = useState('중2 고사성어·사자성어 퀴즈 (30문항)');
+  const [replaceExisting, setReplaceExisting] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const loadPreset = () => {
+    setJsonText(JSON.stringify(IDIOM_QUIZ_30, null, 2));
+    setCreateSet(true);
+    setQuizSetTitle('중2 고사성어·사자성어 퀴즈 (30문항)');
+  };
+
+  const submit = async () => {
+    let parsed: unknown;
+    try {
+      const cleaned = jsonText.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+      parsed = JSON.parse(cleaned);
+    } catch {
+      toast('올바른 JSON 배열 형식이 아닙니다. 대괄호([ ... ]) 전체를 붙여넣었는지 확인하세요.', 'error');
+      return;
+    }
+    const questions = Array.isArray(parsed) ? parsed : (parsed as any)?.questions;
+    if (!Array.isArray(questions) || questions.length === 0) {
+      toast('등록할 문제 배열(최소 1개 이상)이 비어 있습니다.', 'error');
+      return;
+    }
+    if (createSet && !quizSetTitle.trim()) {
+      toast('함께 생성할 문제 세트 제목을 입력하세요.', 'error');
+      return;
+    }
+    setBusy(true);
+    try {
+      const r = await api.post('/questions/bulk', {
+        questions,
+        replaceExisting,
+        quizSetTitle: createSet ? quizSetTitle.trim() : null,
+        quizSetDescription: createSet ? `일괄 등록된 ${questions.length}문항 세트` : null,
+        quizSetCategory: createSet ? (questions[0]?.category ?? '고사성어') : null,
+      });
+      toast(
+        r.data.quizSetId
+          ? `${r.data.count}개 문제와 ‘${quizSetTitle.trim()}’ 세트를 등록했습니다.`
+          : `${r.data.count}개 문제를 일괄 등록했습니다.`,
+        'success',
+      );
+      onSaved();
+    } catch (e) {
+      toast(errorMessage(e), 'error');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal open title="JSON 문제 일괄 등록" onClose={onClose} wide>
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-blue-400/25 bg-blue-500/10 px-4 py-3 text-sm">
+          <div className="text-slate-200">
+            검수 완료된 <b>중2 고사성어·사자성어 30문제</b>를 바로 불러오거나 ChatGPT JSON을 붙여넣으세요.
+          </div>
+          <button type="button" className="btn-primary btn-sm shrink-0" onClick={loadPreset}>
+            <Sparkles className="h-4 w-4" /> 고사성어·사자성어 30문제 불러오기
+          </button>
+        </div>
+
+        <div>
+          <label className="label" htmlFor="bulk-questions-json">
+            문제 JSON 배열
+          </label>
+          <textarea
+            id="bulk-questions-json"
+            className="input h-64 font-mono text-xs leading-relaxed"
+            placeholder='[ { "questionType": "MULTIPLE_CHOICE", "questionText": "...", "options": ["..."], "correctIndex": 0, "timeLimit": 20, "isDoublePoints": false } ]'
+            value={jsonText}
+            onChange={(e) => setJsonText(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2.5 rounded-xl border border-white/10 bg-ink-950/60 p-4 text-sm">
+          <label className="flex items-center gap-2 font-semibold text-slate-200">
+            <input type="checkbox" checked={createSet} onChange={(e) => setCreateSet(e.target.checked)} />
+            등록한 문제들로 문제 세트도 함께 만들기
+          </label>
+          {createSet && (
+            <input
+              aria-label="일괄 생성 세트 제목"
+              className="input"
+              placeholder="예) 중2 고사성어·사자성어 퀴즈 (30문항)"
+              value={quizSetTitle}
+              maxLength={100}
+              onChange={(e) => setQuizSetTitle(e.target.value)}
+            />
+          )}
+          <label className="flex items-center gap-2 text-slate-300">
+            <input type="checkbox" checked={replaceExisting} onChange={(e) => setReplaceExisting(e.target.checked)} />
+            기존 등록된 문제(샘플 문제 등)를 목록에서 비우고 새로 교체하기
+          </label>
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <button type="button" className="btn-ghost" onClick={onClose}>
+            취소
+          </button>
+          <button type="button" className="btn-primary" disabled={busy || !jsonText.trim()} onClick={submit}>
+            일괄 등록
           </button>
         </div>
       </div>
