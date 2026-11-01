@@ -16,7 +16,7 @@ import {
   Wifi,
   WifiOff,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import { Logo } from '../components/common/Logo';
 import { FullScreenSpinner } from '../components/common/Spinner';
@@ -87,28 +87,44 @@ function DashboardLayout() {
   const { section = 'overview' } = useParams();
   const { admin, logout } = useAdminAuth();
   const { connected, overview } = useAdminSocket();
+  const activeTabRef = useRef<HTMLAnchorElement | null>(null);
   const menu = MENUS.find((m) => m.key === section) ?? MENUS[0];
   const Section = menu.el;
+
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView?.({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }, [menu.key]);
+
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row">
-      <aside className="glass m-2 flex shrink-0 flex-col gap-1 rounded-3xl p-3 lg:sticky lg:top-2 lg:h-[calc(100vh-1rem)] lg:w-60">
-        <div className="mb-3 px-2 pt-1">
+    <div className="flex min-h-screen w-full max-w-full flex-col overflow-x-clip lg:flex-row">
+      <aside className="glass m-2 flex min-w-0 shrink-0 flex-col gap-1 rounded-3xl p-3 lg:sticky lg:top-2 lg:h-[calc(100vh-1rem)] lg:w-60">
+        <div className="mb-2 flex items-center justify-between px-2 pt-1 lg:mb-3">
           <Logo size="sm" to="/admin/dashboard" />
+          <div className="flex items-center gap-3 text-xs text-white/60 lg:hidden">
+            {connected ? <Wifi className="h-4 w-4 text-lime-300" /> : <WifiOff className="h-4 w-4 text-rose-300" />}
+            <button className="inline-flex items-center gap-1 text-white/70 hover:text-white" onClick={logout}>
+              <LogOut className="h-4 w-4" /> 로그아웃
+            </button>
+          </div>
         </div>
         <nav className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-y-auto lg:pb-0">
-          {MENUS.map((m) => (
-            <NavLink
-              key={m.key}
-              to={`/admin/dashboard/${m.key}`}
-              className={() =>
-                `flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${
-                  m.key === menu.key ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                }`
-              }
-            >
-              <m.icon className="h-4 w-4" /> {m.label}
-            </NavLink>
-          ))}
+          {MENUS.map((m) => {
+            const isActive = m.key === menu.key;
+            return (
+              <NavLink
+                key={m.key}
+                ref={isActive ? activeTabRef : undefined}
+                to={`/admin/dashboard/${m.key}`}
+                className={() =>
+                  `flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${
+                    isActive ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                  }`
+                }
+              >
+                <m.icon className="h-4 w-4" /> {m.label}
+              </NavLink>
+            );
+          })}
         </nav>
         <div className="mt-auto hidden space-y-2 border-t border-white/10 pt-3 text-xs text-white/60 lg:block">
           <div className="flex items-center gap-1.5">
@@ -127,13 +143,7 @@ function DashboardLayout() {
           </div>
         </div>
       </aside>
-      <main className="min-w-0 flex-1 p-3 md:p-6">
-        <div className="mb-3 flex items-center justify-end gap-3 text-xs text-white/60 lg:hidden">
-          {connected ? <Wifi className="h-4 w-4 text-lime-300" /> : <WifiOff className="h-4 w-4 text-rose-300" />}
-          <button className="inline-flex items-center gap-1" onClick={logout}>
-            <LogOut className="h-4 w-4" /> 로그아웃
-          </button>
-        </div>
+      <main className="min-w-0 max-w-full flex-1 p-3 md:p-6">
         <Section />
       </main>
     </div>

@@ -71,9 +71,9 @@ export function QuestionsSection() {
           <Plus className="h-4 w-4" /> 새 문제
         </button>
       </SectionTitle>
-      <div className="grid gap-3">
+      <div className="grid grid-cols-1 gap-3">
         {list.map((q) => (
-          <div key={q.id} className="glass flex flex-col gap-2 p-4 md:flex-row md:items-center">
+          <div key={q.id} className="glass flex min-w-0 flex-col gap-2 p-4 md:flex-row md:items-center">
             <div className="min-w-0 flex-1">
               <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-white/60">
                 <span>#{q.id}</span>

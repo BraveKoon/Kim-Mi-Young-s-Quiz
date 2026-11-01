@@ -39,8 +39,8 @@ export function AnalyticsSection() {
             <Card label="평균 점수" value={num(data.totals.averageScore)} />
             <Card label="참가율(정원 대비)" value={pct(data.totals.participationRate)} />
           </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="glass flex items-center gap-3 p-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="glass flex min-w-0 items-center gap-3 p-4">
               <ThumbsDown className="h-8 w-8 shrink-0 text-rose-300" />
               <div className="min-w-0">
                 <div className="text-xs text-white/60">가장 어려웠던 문제</div>
@@ -48,7 +48,7 @@ export function AnalyticsSection() {
                 <div className="text-sm text-rose-200">정답률 {data.hardest ? pct(data.hardest.correctRateAll) : '-'}</div>
               </div>
             </div>
-            <div className="glass flex items-center gap-3 p-4">
+            <div className="glass flex min-w-0 items-center gap-3 p-4">
               <ThumbsUp className="h-8 w-8 shrink-0 text-lime-300" />
               <div className="min-w-0">
                 <div className="text-xs text-white/60">가장 쉬웠던 문제</div>

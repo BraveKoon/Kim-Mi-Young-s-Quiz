@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QuestionsSection } from '../src/components/dashboard/sections/QuestionsSection';
+import { QuizSetsSection } from '../src/components/dashboard/sections/QuizSetsSection';
 import { AdminAccountsCard } from '../src/components/dashboard/sections/SettingsSection';
 import { ToastProvider } from '../src/contexts/ToastContext';
 import AdminLoginPage from '../src/pages/AdminLoginPage';
@@ -277,5 +278,52 @@ describe('HomePage (학번+이름 자동 닉네임 입장)', () => {
       }),
     );
     expect(await screen.findByText('학급 퀴즈방 진입 완료')).toBeInTheDocument();
+  });
+});
+
+describe('QuizSetsSection (모바일 가로 넘침 방지)', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('긴 문항이 포함된 30문항 세트도 min-w-0 컨테이너 안에서 번호와 함께 말줄임 렌더링된다', async () => {
+    vi.spyOn(api, 'get').mockResolvedValue({
+      data: {
+        quizSets: [
+          {
+            id: 2,
+            title: '중2 고사성어·사자성어 퀴즈 (30문항)',
+            description: '일괄 등록된 30문항 세트',
+            category: '사자성어',
+            questionCount: 30,
+            questions: Array.from({ length: 30 }, (_, i) => ({
+              id: i + 1,
+              questionType: 'MULTIPLE_CHOICE',
+              questionText: `${i + 1}번 매우 긴 지문 — 선생님이 오늘 숙제를 했냐고 물었는데 친구가 갑자기 어제 먹은 급식 이야기를 한다.`,
+              options: ['횡설수설', '동문서답', '이심전심', '언행일치'],
+              correctIndex: 1,
+              timeLimit: 15,
+              isDoublePoints: false,
+              orderNum: i + 1,
+              explanation: null,
+              category: '사자성어',
+            })),
+          },
+        ],
+      },
+    } as any);
+
+    render(
+      <ToastProvider>
+        <QuizSetsSection />
+      </ToastProvider>,
+    );
+
+    const title = await screen.findByText('중2 고사성어·사자성어 퀴즈 (30문항)');
+    const card = title.closest('.glass');
+    expect(card).toHaveClass('min-w-0');
+    expect(screen.getByText('1.')).toBeInTheDocument();
+    expect(screen.getByText('6.')).toBeInTheDocument();
+    expect(screen.getByText('… 외 24문항')).toBeInTheDocument();
   });
 });
