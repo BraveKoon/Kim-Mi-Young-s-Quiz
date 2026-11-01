@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { KeyRound, LogIn } from 'lucide-react';
+import { Home, KeyRound, LogIn } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Logo } from '../components/common/Logo';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { errorMessage } from '../services/api';
@@ -58,6 +58,9 @@ export default function AdminLoginPage() {
           <LogIn className="h-5 w-5" /> {busy ? '로그인 중…' : '로그인'}
         </button>
         <p className="text-center text-xs text-white/40">초기 계정은 최초 로그인 후 비밀번호를 반드시 변경해야 합니다.</p>
+        <Link to="/" className="btn-ghost w-full">
+          <Home className="h-4 w-4" /> 홈으로
+        </Link>
       </motion.form>
     </div>
   );

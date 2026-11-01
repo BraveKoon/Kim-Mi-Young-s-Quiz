@@ -1,9 +1,11 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QuestionsSection } from '../src/components/dashboard/sections/QuestionsSection';
 import { AdminAccountsCard } from '../src/components/dashboard/sections/SettingsSection';
 import { ToastProvider } from '../src/contexts/ToastContext';
+import AdminLoginPage from '../src/pages/AdminLoginPage';
 import { api } from '../src/services/api';
 
 const mockUseAdminAuth = vi.fn();
@@ -179,5 +181,19 @@ describe('AdminAccountsCard (관리자 계정 관리)', () => {
     const btn = await screen.findByRole('button', { name: 'admin 계정 삭제' });
     expect(btn).toBeDisabled();
     expect(btn).toHaveAttribute('title', '마지막 관리자 계정은 삭제할 수 없습니다.');
+  });
+});
+
+describe('AdminLoginPage', () => {
+  it('하단에 홈으로 이동하는 버튼을 렌더링한다', () => {
+    mockUseAdminAuth.mockReturnValue({ admin: null, login: vi.fn() });
+    render(
+      <MemoryRouter initialEntries={['/admin']}>
+        <AdminLoginPage />
+      </MemoryRouter>,
+    );
+    const homeLink = screen.getByRole('link', { name: '홈으로' });
+    expect(homeLink).toBeInTheDocument();
+    expect(homeLink).toHaveAttribute('href', '/');
   });
 });
