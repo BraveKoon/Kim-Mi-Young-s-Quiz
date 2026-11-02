@@ -282,14 +282,14 @@ CLIENT_ORIGIN=https://<계정>.github.io NODE_ENV=production JWT_SECRET=... node
 - **헬스 체크**: `GET /api/health`
 - **로그**: 비정상 상황은 관리자 대시보드 → 활동 로그. 서버 콘솔에는 warning 이상만 출력되며 비밀번호·토큰은 기록하지 않습니다.
 - **새 학기/새 대회**: 대시보드 → 대회 이력 → 새 대회(문제 세트·참가 학급 선택). 이전 대회 기록은 그대로 보존됩니다.
-- **운영 순서 예시**: 문제 관리 → 문제 세트 구성 → 대회 생성(학급 배정) → 교실 프로젝터에서 `/projector/2-1` 열기 → 학생 입장 → 퀴즈 진행 관리에서 시작/결과 공개/다음 문제 → 종료 → 문항별 통계·결과 내보내기.
+- **운영 순서 예시**: 문제 관리(단건 또는 JSON 일괄 등록) → 문제 세트 구성 → 대회 생성(학급 배정) → 교실 프로젝터에서 `/projector/2-1` 열기 → 학생 QR 스캔·입장 → 프로젝터 하단 진행 바(또는 퀴즈 진행 관리)에서 시작/결과 발표/건너뛰기/다음 문제 → 종료 → 문항별 통계·결과 내보내기.
 
 ---
 
 ## 테스트
 
 ```bash
-npm test                 # 서버(46개) + 프론트엔드(17개) 자동 테스트 (Vitest, 총 63개)
+npm test                 # 서버(50개) + 프론트엔드(24개) 자동 테스트 (Vitest, 총 74개)
 npm run typecheck        # 서버·클라이언트(테스트 포함) 타입 검사
 ```
 
@@ -403,7 +403,7 @@ RESULT(마지막) ──next──▶ FINISHED        (어느 상태에서든 fi
 | --- | --- | --- |
 | POST | `/api/admin/login`, `/api/admin/logout`, `/api/admin/change-password` · GET `/api/admin/me`, `/api/admin/overview` | 관리자 |
 | GET/POST/DELETE | `/api/admins[/:id]` (관리자 계정 목록·추가·삭제, 마지막 관리자/본인 삭제 차단) | 관리자 |
-| GET/POST/PUT/DELETE | `/api/questions[/:id]`, `/api/quiz-sets[/:id]` | 관리자 |
+| GET/POST/PUT/DELETE | `/api/questions[/:id]`, `POST /api/questions/bulk`, `/api/quiz-sets[/:id]` | 관리자 |
 | GET | `/api/classes`, `/api/classes/:classId/session` | 공개(인원·상태만) |
 | POST | `/api/classes/:classId/join` | 공개(정원·중복 검사) |
 | GET | `/api/classes/:classId/participants` | 관리자 또는 같은 학급 학생 |
@@ -422,7 +422,7 @@ RESULT(마지막) ──next──▶ FINISHED        (어느 상태에서든 fi
 
 - 연결 인증(`auth`): `{ role: 'admin', token }` / `{ role: 'student', participantId, token }` / `{ role: 'projector', classId }`
 - Room: `room:2-1`(학생), `projector:2-1`, `admin:2-1`(관리자 관전), `admins`, `participant:<id>` — 대상별로 다른 페이로드(학생: 정답 없음, 프로젝터: 이름 마스킹, 관리자: 정답 포함)
-- 관리자 → 서버: `admin:start_quiz`, `admin:pause_quiz`, `admin:resume_quiz`, `admin:next_question`, `admin:show_results`, `admin:finish_quiz`, `admin:reset_class`(`confirm: "RESET"`), `admin:reset_all`(`confirm: "RESET_ALL"`), `admin:watch_class`
+- 관리자 → 서버: `admin:start_quiz`, `admin:pause_quiz`, `admin:resume_quiz`, `admin:next_question`, `admin:skip_question`, `admin:show_results`, `admin:finish_quiz`, `admin:reset_class`(`confirm: "RESET"`), `admin:reset_all`(`confirm: "RESET_ALL"`), `admin:watch_class`
 - 학생 → 서버: `student:join`, `student:submit_answer`, `student:request_state`
 - 서버 → 클라이언트: `quiz:state`, `quiz:started`, `quiz:question`, `quiz:timer`, `quiz:paused`, `quiz:resumed`, `quiz:answer_received`, `quiz:results`, `quiz:my_result`, `quiz:finished`, `quiz:reset`, `leaderboard:updated`, `participants:updated`, `connection:status`, `admin:overview`, `admin:log`
 
