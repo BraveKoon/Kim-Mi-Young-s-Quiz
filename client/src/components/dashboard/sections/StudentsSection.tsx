@@ -42,9 +42,9 @@ export function StudentsSection() {
   return (
     <div>
       <SectionTitle title="학생 관리" desc="학급별 참가 학생과 접속 상태를 확인하고, 필요하면 참가자를 제외합니다. 연결이 끊겨도 기록은 보존되어 재접속할 수 있습니다.">
-        <select className="input w-40" value={classId} onChange={(e) => setClassId(e.target.value)}>
+        <select className="input w-40 font-semibold" value={classId} onChange={(e) => setClassId(e.target.value)}>
           {CLASS_IDS.map((id) => (
-            <option key={id} value={id} className="bg-ink-800">
+            <option key={id} value={id} className="bg-white text-slate-900">
               {classDisplayName(id)}
             </option>
           ))}
@@ -53,8 +53,8 @@ export function StudentsSection() {
           <RefreshCw className="h-4 w-4" />
         </button>
       </SectionTitle>
-      <div className="mb-3 text-sm text-white/70">
-        참가 {list.length}/35명 · 접속 {list.filter((p) => p.connected).length}명 · 미접속 {list.filter((p) => !p.connected).length}명
+      <div className="mb-3 text-sm font-semibold text-slate-600">
+        참가 <b className="text-slate-900">{list.length}</b>/35명 · 접속 <b className="text-teal-700">{list.filter((p) => p.connected).length}</b>명 · 미접속 {list.filter((p) => !p.connected).length}명
       </div>
       <div className="glass overflow-x-auto p-2">
         <table className="table-base">
@@ -73,17 +73,17 @@ export function StudentsSection() {
           <tbody>
             {list.map((p, i) => (
               <tr key={p.id}>
-                <td className="text-white/50">{i + 1}</td>
-                <td className="font-bold">{p.nickname}</td>
-                <td>{p.connected ? <Wifi className="h-4 w-4 text-lime-300" /> : <WifiOff className="h-4 w-4 text-white/30" />}</td>
-                <td>{num(p.totalScore)}</td>
+                <td className="text-slate-400">{i + 1}</td>
+                <td className="font-bold text-slate-900">{p.nickname}</td>
+                <td>{p.connected ? <Wifi className="h-4 w-4 text-teal-600" /> : <WifiOff className="h-4 w-4 text-slate-300" />}</td>
+                <td className="font-semibold">{num(p.totalScore)}</td>
                 <td>
                   {p.correctCount}/{p.answerCount}
                 </td>
-                <td className="text-white/60">{dateTime(p.lastSeenAt)}</td>
-                <td className="text-white/60">{dateTime(p.createdAt)}</td>
+                <td className="text-slate-500">{dateTime(p.lastSeenAt)}</td>
+                <td className="text-slate-500">{dateTime(p.createdAt)}</td>
                 <td>
-                  <button className="btn-ghost btn-sm text-rose-200" onClick={() => setRemove(p)} aria-label={`${p.nickname} 제외`}>
+                  <button className="btn-ghost btn-sm text-rose-600 hover:border-rose-200 hover:bg-rose-50" onClick={() => setRemove(p)} aria-label={`${p.nickname} 제외`}>
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </td>
@@ -91,7 +91,7 @@ export function StudentsSection() {
             ))}
             {!list.length && (
               <tr>
-                <td colSpan={8} className="py-8 text-center text-white/50">
+                <td colSpan={8} className="py-8 text-center text-slate-500">
                   아직 입장한 학생이 없습니다.
                 </td>
               </tr>

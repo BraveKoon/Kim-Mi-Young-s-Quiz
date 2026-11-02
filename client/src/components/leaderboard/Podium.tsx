@@ -15,9 +15,9 @@ export function Podium({ entries, large, confetti = true }: { entries: Leaderboa
     return () => clearTimeout(t);
   }, [confetti, entries.length]);
   const cols = [
-    { list: second, place: 2, h: large ? 'h-48' : 'h-28', color: 'from-slate-200 to-slate-500', delay: 1.0 },
-    { list: first, place: 1, h: large ? 'h-72' : 'h-40', color: 'from-yellow-200 to-amber-500', delay: 2.0 },
-    { list: third, place: 3, h: large ? 'h-36' : 'h-20', color: 'from-orange-300 to-amber-800', delay: 0.2 },
+    { list: second, place: 2, h: large ? 'h-48' : 'h-28', color: 'from-slate-200 to-slate-300 border-slate-300', delay: 1.0 },
+    { list: first, place: 1, h: large ? 'h-72' : 'h-40', color: 'from-yellow-200 to-amber-400 border-amber-300', delay: 2.0 },
+    { list: third, place: 3, h: large ? 'h-36' : 'h-20', color: 'from-orange-200 to-amber-300 border-orange-300', delay: 0.2 },
   ];
   return (
     <div className="flex items-end justify-center gap-3 md:gap-6">
@@ -27,16 +27,16 @@ export function Podium({ entries, large, confetti = true }: { entries: Leaderboa
             {c.list.length ? (
               c.list.map((e) => (
                 <div key={e.participantId}>
-                  <div className={`font-display ${large ? 'text-4xl' : 'text-xl'} break-keep`}>{e.nickname}</div>
-                  <div className={`font-bold text-white/70 ${large ? 'text-2xl' : 'text-sm'}`}>{num(e.totalScore)}점</div>
+                  <div className={`font-display text-slate-900 ${large ? 'text-4xl' : 'text-xl'} break-keep`}>{e.nickname}</div>
+                  <div className={`font-bold text-slate-600 ${large ? 'text-2xl' : 'text-sm'}`}>{num(e.totalScore)}점</div>
                 </div>
               ))
             ) : (
-              <div className="text-white/30">-</div>
+              <div className="text-slate-400">-</div>
             )}
           </div>
-          <div className={`flex w-full ${c.h} items-start justify-center rounded-t-2xl bg-gradient-to-b ${c.color} pt-3`}>
-            <span className={`font-display text-ink-950 ${large ? 'text-7xl' : 'text-4xl'}`}>{c.place}</span>
+          <div className={`flex w-full ${c.h} items-start justify-center rounded-t-2xl border-x border-t bg-gradient-to-b ${c.color} pt-3 shadow-xs`}>
+            <span className={`font-display text-slate-900 ${large ? 'text-7xl' : 'text-4xl'}`}>{c.place}</span>
           </div>
         </motion.div>
       ))}

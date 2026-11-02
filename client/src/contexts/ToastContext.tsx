@@ -31,11 +31,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 10 }}
-                className={`glass-strong pointer-events-auto flex max-w-md items-center gap-2 px-4 py-3 text-sm ${
-                  t.kind === 'error' ? 'border-rose-400/40' : t.kind === 'success' ? 'border-lime-400/40' : ''
+                className={`pointer-events-auto flex max-w-md items-center gap-2.5 rounded-2xl border px-4 py-3 text-sm font-semibold shadow-lg ${
+                  t.kind === 'error'
+                    ? 'border-rose-200 bg-rose-50 text-rose-900'
+                    : t.kind === 'success'
+                      ? 'border-teal-200 bg-teal-50 text-teal-900'
+                      : 'border-sky-200 bg-white text-slate-800'
                 }`}
               >
-                <I className={`h-5 w-5 shrink-0 ${t.kind === 'error' ? 'text-rose-300' : t.kind === 'success' ? 'text-lime-300' : 'text-cyan-300'}`} />
+                <I
+                  className={`h-5 w-5 shrink-0 ${
+                    t.kind === 'error' ? 'text-rose-500' : t.kind === 'success' ? 'text-teal-600' : 'text-[#2563EB]'
+                  }`}
+                />
                 <span>{t.text}</span>
               </motion.div>
             );

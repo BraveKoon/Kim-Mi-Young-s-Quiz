@@ -39,7 +39,7 @@ export function ChangePasswordForm() {
       <input type="password" className="input" placeholder="현재 비밀번호" value={cur} onChange={(e) => setCur(e.target.value)} autoComplete="current-password" required />
       <input type="password" className="input" placeholder="새 비밀번호 (8자 이상)" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" required />
       <input type="password" className="input" placeholder="새 비밀번호 확인" value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" required />
-      {error && <p className="rounded-xl bg-rose-500/15 px-3 py-2 text-sm text-rose-200">{error}</p>}
+      {error && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{error}</p>}
       <button className="btn-primary w-full">
         <KeyRound className="h-4 w-4" /> 비밀번호 변경
       </button>
@@ -82,10 +82,10 @@ export function AdminAccountsCard() {
   return (
     <div className="glass space-y-4 p-5 lg:col-span-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="flex items-center gap-2 font-display text-xl">
-          <ShieldCheck className="h-5 w-5 text-neon-cyan" /> 관리자 계정 관리
+        <h3 className="flex items-center gap-2 font-display text-xl text-slate-900">
+          <ShieldCheck className="h-5 w-5 text-[#2563EB]" /> 관리자 계정 관리
         </h3>
-        <span className="text-xs text-white/50">총 {admins.length}명 · 마지막 관리자 계정은 삭제할 수 없습니다.</span>
+        <span className="text-xs font-medium text-slate-500">총 {admins.length}명 · 마지막 관리자 계정은 삭제할 수 없습니다.</span>
       </div>
 
       {!data ? (
@@ -113,22 +113,22 @@ export function AdminAccountsCard() {
                     : '관리자 계정 삭제';
                 return (
                   <tr key={a.id}>
-                    <td className="font-bold">
+                    <td className="font-bold text-slate-900">
                       {a.username}
-                      {isSelf && <span className="ml-2 rounded-full bg-cyan-400/20 px-2 py-0.5 text-xs text-cyan-200">본인</span>}
+                      {isSelf && <span className="ml-2 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-bold text-[#1D4ED8]">본인</span>}
                     </td>
                     <td>
                       {a.mustChangePassword ? (
-                        <span className="rounded-full bg-amber-400/20 px-2.5 py-0.5 text-xs text-amber-200">초기 비밀번호 변경 대기</span>
+                        <span className="rounded-full border border-amber-300 bg-[#FEF9C3] px-2.5 py-0.5 text-xs font-bold text-amber-900">초기 비밀번호 변경 대기</span>
                       ) : (
-                        <span className="rounded-full bg-lime-400/20 px-2.5 py-0.5 text-xs text-lime-200">사용 중</span>
+                        <span className="rounded-full border border-teal-200 bg-teal-50 px-2.5 py-0.5 text-xs font-bold text-teal-800">사용 중</span>
                       )}
                     </td>
-                    <td className="text-white/60">{dateOnly(a.createdAt)}</td>
+                    <td className="text-slate-500">{dateOnly(a.createdAt)}</td>
                     <td className="text-right">
                       <button
                         type="button"
-                        className="btn-ghost btn-sm text-rose-200"
+                        className="btn-ghost btn-sm text-rose-600 hover:border-rose-200 hover:bg-rose-50"
                         disabled={disableDelete}
                         title={disableReason}
                         aria-label={`${a.username} 계정 삭제`}
@@ -145,11 +145,11 @@ export function AdminAccountsCard() {
         </div>
       )}
 
-      <form onSubmit={addAdmin} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
-        <div className="font-bold text-sm">새 관리자 추가</div>
+      <form onSubmit={addAdmin} className="space-y-3 rounded-2xl border border-sky-100 bg-[#F3F9FF]/70 p-4">
+        <div className="text-sm font-bold text-slate-900">새 관리자 추가</div>
         <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
           <input
-            className="input"
+            className="input bg-white"
             placeholder="아이디 (영문·숫자·._- 3~30자)"
             aria-label="새 관리자 아이디"
             value={username}
@@ -160,7 +160,7 @@ export function AdminAccountsCard() {
           />
           <input
             type="password"
-            className="input"
+            className="input bg-white"
             placeholder="초기 비밀번호 (8자 이상)"
             aria-label="새 관리자 초기 비밀번호"
             value={password}
@@ -173,8 +173,8 @@ export function AdminAccountsCard() {
             <UserPlus className="h-4 w-4" /> 관리자 추가
           </button>
         </div>
-        {formError && <p className="rounded-xl bg-rose-500/15 px-3 py-2 text-sm text-rose-200">{formError}</p>}
-        <p className="text-xs text-white/50">새로 추가한 관리자는 첫 로그인 시 비밀번호 변경이 강제됩니다.</p>
+        {formError && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{formError}</p>}
+        <p className="text-xs font-medium text-slate-500">새로 추가한 관리자는 첫 로그인 시 비밀번호 변경이 강제됩니다.</p>
       </form>
 
       <ConfirmDialog
@@ -224,15 +224,15 @@ export function SettingsSection() {
       <SectionTitle title="설정" />
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="glass space-y-4 p-5">
-          <h3 className="font-display text-xl">프로젝터 · 공개 화면</h3>
+          <h3 className="font-display text-xl text-slate-900">프로젝터 · 공개 화면</h3>
           <div>
             <label className="label">학생 이름 공개 방식</label>
             <select className="input" value={mode} onChange={(e) => setMode(e.target.value)}>
-              <option value="FULL" className="bg-ink-800">닉네임 전체 공개</option>
-              <option value="MASKED" className="bg-ink-800">일부 마스킹 (예: 김*수)</option>
-              <option value="HIDDEN" className="bg-ink-800">비공개 (예: 1위 참가자)</option>
+              <option value="FULL" className="bg-white text-slate-900">닉네임 전체 공개</option>
+              <option value="MASKED" className="bg-white text-slate-900">일부 마스킹 (예: 김*수)</option>
+              <option value="HIDDEN" className="bg-white text-slate-900">비공개 (예: 1위 참가자)</option>
             </select>
-            <p className="mt-1 text-xs text-white/50">프로젝터와 공개 결과 페이지에 적용됩니다. 서버에서 마스킹한 뒤 전송합니다.</p>
+            <p className="mt-1 text-xs font-medium text-slate-500">프로젝터와 공개 결과 페이지에 적용됩니다. 서버에서 마스킹한 뒤 전송합니다.</p>
           </div>
           <div>
             <label className="label">문제별 결과 화면 순위 표시 인원</label>
@@ -243,16 +243,16 @@ export function SettingsSection() {
           </button>
         </div>
         <div className="glass space-y-4 p-5">
-          <h3 className="font-display text-xl">관리자 비밀번호 변경</h3>
+          <h3 className="font-display text-xl text-slate-900">관리자 비밀번호 변경</h3>
           <ChangePasswordForm />
         </div>
         <AdminAccountsCard />
-        <div className="glass space-y-3 border-rose-400/30 p-5 lg:col-span-2">
-          <h3 className="flex items-center gap-2 font-display text-xl text-rose-200">
+        <div className="glass space-y-3 border border-rose-200 bg-rose-50/50 p-5 lg:col-span-2">
+          <h3 className="flex items-center gap-2 font-display text-xl text-rose-700">
             <AlertTriangle className="h-5 w-5" /> 위험 구역
           </h3>
-          <p className="text-sm text-white/70">모든 학급의 현재 세션 답안과 점수를 초기화합니다. 종료된 대회의 학급은 기록 보존을 위해 건너뜁니다.</p>
-          <label className="flex items-center gap-2 text-sm">
+          <p className="text-sm font-medium text-slate-700">모든 학급의 현재 세션 답안과 점수를 초기화합니다. 종료된 대회의 학급은 기록 보존을 위해 건너뜁니다.</p>
+          <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
             <input type="checkbox" checked={removeParticipants} onChange={(e) => setRemove(e.target.checked)} /> 참가 학생 목록도 삭제
           </label>
           <button className="btn-danger" onClick={() => setResetAll(true)}>

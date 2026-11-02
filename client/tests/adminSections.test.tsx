@@ -7,6 +7,7 @@ import { QuizSetsSection } from '../src/components/dashboard/sections/QuizSetsSe
 import { AdminAccountsCard } from '../src/components/dashboard/sections/SettingsSection';
 import { ToastProvider } from '../src/contexts/ToastContext';
 import AdminLoginPage from '../src/pages/AdminLoginPage';
+import ClassPage from '../src/pages/ClassPage';
 import HomePage from '../src/pages/HomePage';
 import { api, studentApi } from '../src/services/api';
 
@@ -328,5 +329,45 @@ describe('QuizSetsSection (모바일 가로 넘침 방지)', () => {
     expect(screen.getByText('1.')).toBeInTheDocument();
     expect(screen.getByText('6.')).toBeInTheDocument();
     expect(screen.getByText('… 외 24문항')).toBeInTheDocument();
+  });
+});
+
+describe('ClassPage (반 직접 접속 화면)', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    localStorage.clear();
+  });
+
+  it('반 직접 링크(/2-5)에서 번호·이름 입력 시 20512 김민수 닉네임 미리보기와 입장하기 버튼이 활성화된다', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(studentApi, 'get').mockResolvedValue({
+      data: {
+        session: {
+          status: 'WAITING',
+          participantCount: 4,
+          capacity: 35,
+          competitionTitle: '11월 퀴즈 대회',
+        },
+      },
+    } as any);
+    render(
+      <MemoryRouter initialEntries={['/2-5']}>
+        <Routes>
+          <Route path="/:classId" element={<ClassPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('heading', { name: '2학년 5반' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /다른 학급 선택하기/ })).toHaveAttribute('href', '/');
+
+    const enterBtn = screen.getByRole('button', { name: /입장하기/ });
+    expect(enterBtn).toBeDisabled();
+
+    await user.selectOptions(screen.getByLabelText('번호'), '12');
+    await user.type(screen.getByLabelText('이름'), '김민수');
+
+    expect(screen.getByText('20512 김민수')).toBeInTheDocument();
+    expect(enterBtn).toBeEnabled();
   });
 });

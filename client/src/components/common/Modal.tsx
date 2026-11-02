@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
+import { ClassroomAccentStrip } from './Logo';
 
 export function Modal({ open, onClose, title, children, wide }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
   useEffect(() => {
@@ -12,24 +13,38 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
   return (
     <AnimatePresence>
       {open && (
-        <motion.div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={onClose}>
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 p-4 backdrop-blur-[2px]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onMouseDown={onClose}
+        >
           <motion.div
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className={`glass-strong max-h-[90vh] w-full overflow-y-auto p-6 ${wide ? 'max-w-3xl' : 'max-w-lg'}`}
-            initial={{ scale: 0.92, y: 20 }}
+            className={`glass-strong max-h-[90vh] w-full overflow-hidden ${wide ? 'max-w-3xl' : 'max-w-lg'}`}
+            initial={{ scale: 0.94, y: 16 }}
             animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0 }}
+            exit={{ scale: 0.96, opacity: 0 }}
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <div className="mb-4 flex items-center justify-between gap-4">
-              <h3 className="font-display text-2xl">{title}</h3>
-              <button className="rounded-full p-1 text-white/60 hover:bg-white/10 hover:text-white" onClick={onClose} aria-label="닫기">
-                <X className="h-5 w-5" />
-              </button>
+            <ClassroomAccentStrip />
+            <div className="max-h-[calc(90vh-6px)] overflow-y-auto p-6">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <h3 className="font-display text-2xl text-slate-900">{title}</h3>
+                <button
+                  type="button"
+                  className="rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                  onClick={onClose}
+                  aria-label="닫기"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              {children}
             </div>
-            {children}
           </motion.div>
         </motion.div>
       )}
@@ -58,11 +73,11 @@ export function ConfirmDialog(props: {
   return (
     <Modal open={props.open} onClose={close} title={props.title}>
       <div className="space-y-4">
-        <div className="text-white/80">{props.message}</div>
+        <div className="text-sm leading-relaxed text-slate-700">{props.message}</div>
         {props.requireTyping && (
           <div>
             <label className="label">
-              확인을 위해 <b className="text-neon-yellow">{props.requireTyping}</b> 을(를) 입력하세요
+              확인을 위해 <b className="rounded bg-amber-100 px-1.5 py-0.5 text-amber-900">{props.requireTyping}</b> 을(를) 입력하세요
             </label>
             <input className="input" value={typed} onChange={(e) => setTyped(e.target.value)} autoFocus />
           </div>

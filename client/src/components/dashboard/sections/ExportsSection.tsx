@@ -37,10 +37,10 @@ export function ExportsSection() {
       {cid && (
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="glass space-y-3 p-5">
-            <h3 className="flex items-center gap-2 font-display text-xl">
-              <FileSpreadsheet className="h-5 w-5 text-lime-300" /> Excel (XLSX)
+            <h3 className="flex items-center gap-2 font-display text-xl text-slate-900">
+              <FileSpreadsheet className="h-5 w-5 text-teal-600" /> Excel (XLSX)
             </h3>
-            <p className="text-sm text-white/60">대회 정보, 개인 순위, 학급 순위, 문항별 통계, 접속 기록이 시트별로 포함됩니다.</p>
+            <p className="text-sm font-medium text-slate-600">대회 정보, 개인 순위, 학급 순위, 문항별 통계, 접속 기록이 시트별로 포함됩니다.</p>
             <div className="flex flex-wrap gap-2">
               <button className="btn-primary" disabled={!!busy} onClick={() => run('xlsx', () => downloadFile(`/exports/${cid}/excel`, `classquiz_${cid}.xlsx`))}>
                 <Download className="h-4 w-4" /> {busy === 'xlsx' ? '생성 중…' : 'Excel 다운로드'}
@@ -60,12 +60,12 @@ export function ExportsSection() {
             </div>
           </div>
           <div className="glass space-y-3 p-5">
-            <h3 className="flex items-center gap-2 font-display text-xl">
-              <FileText className="h-5 w-5 text-cyan-300" /> CSV
+            <h3 className="flex items-center gap-2 font-display text-xl text-slate-900">
+              <FileText className="h-5 w-5 text-[#2563EB]" /> CSV
             </h3>
             <div className="space-y-2">
               {DATASETS.map((d) => (
-                <div key={d.key} className="flex items-center justify-between gap-2 rounded-xl bg-white/5 px-3 py-2 text-sm">
+                <div key={d.key} className="flex items-center justify-between gap-2 rounded-xl border border-sky-100 bg-[#F3F9FF] px-3.5 py-2.5 text-sm font-medium text-slate-800">
                   <span>{d.label}</span>
                   <button className="btn-cyan btn-sm" disabled={!!busy} onClick={() => run(d.key, () => downloadFile(`/exports/${cid}/csv?type=${d.key}`, `classquiz_${cid}_${d.key}.csv`))}>
                     <Download className="h-4 w-4" /> CSV
@@ -77,7 +77,7 @@ export function ExportsSection() {
         </div>
       )}
       <div className="glass mt-6 overflow-x-auto p-2">
-        <h3 className="px-2 py-2 font-bold">내보내기 기록</h3>
+        <h3 className="px-3 py-2 font-bold text-slate-900">내보내기 기록</h3>
         <table className="table-base">
           <thead>
             <tr>
@@ -91,14 +91,14 @@ export function ExportsSection() {
           <tbody>
             {history.data?.exports.map((e) => (
               <tr key={e.id}>
-                <td>{dateTime(e.createdAt)}</td>
-                <td>#{e.competitionId}</td>
-                <td>{e.exportType}</td>
-                <td className="max-w-xs truncate">{e.fileName}</td>
+                <td className="text-slate-500">{dateTime(e.createdAt)}</td>
+                <td className="font-semibold text-[#2563EB]">#{e.competitionId}</td>
+                <td className="font-medium">{e.exportType}</td>
+                <td className="max-w-xs truncate font-medium text-slate-900">{e.fileName}</td>
                 <td>
                   {e.stored && (
                     <button className="btn-ghost btn-sm" onClick={() => run(`f${e.id}`, () => downloadFile(`/exports/files/${e.id}`, e.fileName))}>
-                      <HardDriveDownload className="h-4 w-4" />
+                      <HardDriveDownload className="h-4 w-4 text-[#2563EB]" />
                     </button>
                   )}
                 </td>

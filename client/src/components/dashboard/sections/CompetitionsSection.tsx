@@ -13,7 +13,7 @@ import { Spinner } from '../../common/Spinner';
 import { StatusBadge } from '../../common/StatusBadge';
 import { SectionTitle } from '../CompetitionSelect';
 
-const COLORS = ['#3b82f6', '#38bdf8', '#34d399', '#fbbf24', '#818cf8', '#f97316'];
+const COLORS = ['#2563EB', '#14B8A6', '#F59E0B', '#FB7185', '#6366F1', '#0EA5E9'];
 
 export function CompetitionsSection() {
   const toast = useToast();
@@ -28,7 +28,7 @@ export function CompetitionsSection() {
     <div>
       <SectionTitle title="대회 이력" desc="대회별 참가 학급·문제 세트·결과가 보존됩니다. 현재 퀴즈를 초기화해도 종료된 대회 기록은 유지됩니다.">
         <button className="btn-ghost" disabled={selected.length < 2} onClick={() => setCompare(true)}>
-          <BarChart3 className="h-4 w-4" /> 선택 대회 비교 ({selected.length})
+          <BarChart3 className="h-4 w-4 text-[#2563EB]" /> 선택 대회 비교 ({selected.length})
         </button>
         <button className="btn-primary" onClick={() => setCreating(true)}>
           <Plus className="h-4 w-4" /> 새 대회
@@ -36,7 +36,7 @@ export function CompetitionsSection() {
       </SectionTitle>
       <div className="space-y-3">
         {data.competitions.map((c) => (
-          <div key={c.id} className="glass p-4">
+          <div key={c.id} className="glass p-4 sm:p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <label className="flex items-start gap-3">
                 <input
@@ -47,29 +47,32 @@ export function CompetitionsSection() {
                   aria-label="비교 선택"
                 />
                 <div>
-                  <div className="font-display text-xl">
-                    #{c.id} {c.title} <span className="ml-1 rounded-full bg-white/10 px-2 py-0.5 align-middle font-sans text-xs">{COMPETITION_STATUS_LABEL[c.status]}</span>
+                  <div className="font-display text-xl text-slate-900">
+                    #{c.id} {c.title}{' '}
+                    <span className="ml-1 rounded-full border border-sky-200 bg-[#F3F9FF] px-2.5 py-0.5 align-middle font-sans text-xs font-bold text-sky-900">
+                      {COMPETITION_STATUS_LABEL[c.status]}
+                    </span>
                   </div>
-                  <div className="text-sm text-white/60">
+                  <div className="mt-0.5 text-sm font-medium text-slate-500">
                     생성 {dateOnly(c.createdAt)} · 시작 {dateTime(c.startedAt)} · 종료 {dateTime(c.finishedAt)}
                   </div>
-                  <div className="text-sm text-white/60">문제 세트: {c.quizSets.join(', ') || '-'}</div>
-                  {c.fairnessWarning && <div className="mt-1 text-xs text-amber-200">⚠️ 학급별로 다른 문제 세트 사용 — 전교 순위 비교 주의</div>}
+                  <div className="text-sm font-medium text-slate-600">문제 세트: {c.quizSets.join(', ') || '-'}</div>
+                  {c.fairnessWarning && <div className="mt-1 text-xs font-bold text-amber-800">⚠️ 학급별로 다른 문제 세트 사용 — 전교 순위 비교 주의</div>}
                 </div>
               </label>
               <div className="flex flex-wrap gap-2">
                 <Link to={`/results/${c.id}`} className="btn-ghost btn-sm">
-                  <ExternalLink className="h-4 w-4" /> 결과
+                  <ExternalLink className="h-4 w-4 text-[#2563EB]" /> 결과
                 </Link>
                 <a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/projector/competition/${c.id}`} target="_blank" rel="noreferrer" className="btn-ghost btn-sm">
-                  <Monitor className="h-4 w-4" /> 발표 화면
+                  <Monitor className="h-4 w-4 text-teal-600" /> 발표 화면
                 </a>
                 {c.status !== 'FINISHED' && (
                   <button className="btn-ghost btn-sm" onClick={() => setFinish(c)}>
                     <Flag className="h-4 w-4" /> 대회 종료
                   </button>
                 )}
-                <button className="btn-ghost btn-sm text-rose-200" onClick={() => setDel(c)}>
+                <button className="btn-ghost btn-sm text-rose-600 hover:border-rose-200 hover:bg-rose-50" onClick={() => setDel(c)}>
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -77,8 +80,9 @@ export function CompetitionsSection() {
             {c.sessions.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {c.sessions.map((s) => (
-                  <span key={s.id} className="flex items-center gap-1.5 rounded-xl bg-white/5 px-2 py-1 text-xs">
-                    {s.className.replace('2학년 ', '')} <StatusBadge status={s.status as never} /> {s.participantCount}명{!s.isCurrent && <span className="text-white/40">(이전 세션)</span>}
+                  <span key={s.id} className="flex items-center gap-1.5 rounded-xl border border-sky-100 bg-[#F3F9FF] px-2.5 py-1 text-xs font-semibold text-slate-700">
+                    {s.className.replace('2학년 ', '')} <StatusBadge status={s.status as never} /> {s.participantCount}명
+                    {!s.isCurrent && <span className="text-slate-400">(이전 세션)</span>}
                   </span>
                 ))}
               </div>
@@ -165,9 +169,9 @@ function CreateCompetition({ onClose, onDone }: { onClose: () => void; onDone: (
         <div>
           <label className="label">문제 세트 (모든 참가 학급 공통)</label>
           <select className="input" value={quizSetId} onChange={(e) => setQuizSetId(e.target.value ? Number(e.target.value) : '')}>
-            <option value="" className="bg-ink-800">나중에 학급 관리에서 배정</option>
+            <option value="" className="bg-white text-slate-900">나중에 학급 관리에서 배정</option>
             {sets.data?.quizSets.map((s) => (
-              <option key={s.id} value={s.id} className="bg-ink-800">
+              <option key={s.id} value={s.id} className="bg-white text-slate-900">
                 {s.title} ({s.questionCount}문항)
               </option>
             ))}
@@ -178,7 +182,14 @@ function CreateCompetition({ onClose, onDone }: { onClose: () => void; onDone: (
             <label className="label">참가 학급 (선택한 학급에 새 대기 세션이 생성됩니다)</label>
             <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
               {CLASS_IDS.map((id) => (
-                <label key={id} className={`cursor-pointer rounded-xl border px-2 py-2 text-center text-sm ${classIds.includes(id) ? 'border-blue-400 bg-blue-500/20 text-white' : 'border-white/10 bg-white/5'}`}>
+                <label
+                  key={id}
+                  className={`cursor-pointer rounded-xl border px-2 py-2 text-center text-sm font-bold transition ${
+                    classIds.includes(id)
+                      ? 'border-[#2563EB] bg-blue-50 text-[#1D4ED8]'
+                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-white'
+                  }`}
+                >
                   <input type="checkbox" className="hidden" checked={classIds.includes(id)} onChange={(e) => setClassIds(e.target.checked ? [...classIds, id] : classIds.filter((x) => x !== id))} />
                   {id.replace('2-', '')}반
                 </label>
@@ -209,7 +220,7 @@ function CompareModal({ ids, onClose }: { ids: number[]; onClose: () => void }) 
   const { data, error } = useApi<CompareData>(`/competitions/compare?ids=${ids.join(',')}`);
   return (
     <Modal open onClose={onClose} title="대회 간 성적 비교" wide>
-      {error && <p className="text-rose-200">{error}</p>}
+      {error && <p className="font-semibold text-rose-600">{error}</p>}
       {!data ? (
         <Spinner />
       ) : (
@@ -226,8 +237,8 @@ function CompareModal({ ids, onClose }: { ids: number[]; onClose: () => void }) 
             <tbody>
               {data.competitions.map((c) => (
                 <tr key={c.id}>
-                  <td className="font-bold">{c.title}</td>
-                  <td>{num(c.averageScore)}</td>
+                  <td className="font-bold text-slate-900">{c.title}</td>
+                  <td className="font-semibold text-teal-700">{num(c.averageScore)}</td>
                   <td>{c.participants}명</td>
                   <td>{pct(c.participationRate)}</td>
                 </tr>
@@ -235,13 +246,21 @@ function CompareModal({ ids, onClose }: { ids: number[]; onClose: () => void }) 
             </tbody>
           </table>
           <div>
-            <h4 className="mb-2 font-bold">학급별 평균 점수 변화</h4>
+            <h4 className="mb-2 font-bold text-slate-900">학급별 평균 점수 변화</h4>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={CLASS_IDS.map((cid) => ({ name: cid.replace('2-', '') + '반', ...Object.fromEntries(data.competitions.map((c) => [c.title, c.classes[cid]?.averageScore ?? 0])) }))}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }} />
-                <YAxis tick={{ fill: 'rgba(255,255,255,0.5)' }} />
-                <Tooltip contentStyle={{ background: '#172238', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="name" tick={{ fill: '#334155', fontSize: 12, fontWeight: 600 }} stroke="#94a3b8" />
+                <YAxis tick={{ fill: '#64748b', fontSize: 12 }} stroke="#94a3b8" />
+                <Tooltip
+                  contentStyle={{
+                    background: '#ffffff',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: 12,
+                    color: '#0f172a',
+                    boxShadow: '0 8px 20px rgba(15, 23, 42, 0.08)',
+                  }}
+                />
                 <Legend />
                 {data.competitions.map((c, i) => (
                   <Bar key={c.id} dataKey={c.title} fill={COLORS[i % COLORS.length]} radius={[4, 4, 0, 0]} />
@@ -250,8 +269,8 @@ function CompareModal({ ids, onClose }: { ids: number[]; onClose: () => void }) 
             </ResponsiveContainer>
           </div>
           <div>
-            <h4 className="mb-1 font-bold">개인별 성적 변화</h4>
-            <p className="mb-2 text-xs text-white/50">{data.note}</p>
+            <h4 className="mb-1 font-bold text-slate-900">개인별 성적 변화</h4>
+            <p className="mb-2 text-xs font-medium text-slate-500">{data.note}</p>
             <div className="max-h-64 overflow-y-auto">
               <table className="table-base">
                 <thead>
@@ -267,7 +286,7 @@ function CompareModal({ ids, onClose }: { ids: number[]; onClose: () => void }) 
                   {data.individuals.map((p) => (
                     <tr key={p.classId + p.nickname}>
                       <td>{classDisplayName(p.classId)}</td>
-                      <td>{p.nickname}</td>
+                      <td className="font-semibold text-slate-900">{p.nickname}</td>
                       {p.scores.map((s, i) => (
                         <td key={i}>{s === null ? '-' : `${num(s)} (${p.ranks[i]}위)`}</td>
                       ))}
@@ -275,7 +294,7 @@ function CompareModal({ ids, onClose }: { ids: number[]; onClose: () => void }) 
                   ))}
                   {!data.individuals.length && (
                     <tr>
-                      <td colSpan={2 + data.competitions.length} className="py-4 text-center text-white/50">
+                      <td colSpan={2 + data.competitions.length} className="py-4 text-center text-slate-500">
                         두 대회 이상에 참가한 학생이 없습니다.
                       </td>
                     </tr>

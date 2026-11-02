@@ -4,14 +4,14 @@ import { Link, useParams } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { classDisplayName, type LeaderboardEntry } from '@shared/types/index';
 import { Logo } from '../components/common/Logo';
-import { StatusBadge } from '../components/common/StatusBadge';
 import { FullScreenSpinner } from '../components/common/Spinner';
+import { StatusBadge } from '../components/common/StatusBadge';
 import { Leaderboard } from '../components/leaderboard/Leaderboard';
 import { Podium } from '../components/leaderboard/Podium';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { api, studentApi } from '../services/api';
-import { COMPETITION_STATUS_LABEL, dateTime, num, pct } from '../utils/format';
 import type { ClassRankRow } from '../types';
+import { COMPETITION_STATUS_LABEL, dateTime, num, pct } from '../utils/format';
 import NotFoundPage from './NotFoundPage';
 
 /** 대회 결과 조회. 관리자는 전체 정보, 그 외에는 설정된 이름 공개 방식이 적용된 공개 결과를 본다. */
@@ -70,7 +70,7 @@ export default function ResultsPage() {
   if (!data) return <FullScreenSpinner />;
   return (
     <div className="mx-auto min-h-screen max-w-6xl space-y-6 px-4 py-8">
-      <header className="flex flex-wrap items-center justify-between gap-3">
+      <header className="glass flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <Logo size="sm" />
         <div className="flex gap-2">
           {admin && (
@@ -84,28 +84,33 @@ export default function ResultsPage() {
         </div>
       </header>
       <div className="text-center">
-        <h1 className="font-display text-4xl md:text-5xl">{data.title}</h1>
-        <p className="mt-2 text-white/60">
+        <h1 className="font-display text-4xl text-slate-900 md:text-5xl">{data.title}</h1>
+        <p className="mt-2 text-sm font-medium text-slate-600">
           {COMPETITION_STATUS_LABEL[data.status]} · 시작 {dateTime(data.startedAt)} · 종료 {dateTime(data.finishedAt)}
         </p>
       </div>
-      {data.fairnessWarning && <div className="rounded-2xl bg-amber-400/15 p-3 text-center text-amber-100">⚠️ {data.fairnessWarning}</div>}
+      {data.fairnessWarning && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-center text-sm font-semibold text-amber-900">⚠️ {data.fairnessWarning}</div>
+      )}
       <section className="glass-strong p-6">
-        <h2 className="mb-6 flex items-center gap-2 font-display text-2xl">
-          <Trophy className="h-6 w-6 text-neon-yellow" /> 전체 개인 시상대
+        <h2 className="mb-6 flex items-center gap-2 font-display text-2xl text-slate-900">
+          <Trophy className="h-6 w-6 text-amber-500" /> 전체 개인 시상대
         </h2>
         <Podium entries={data.individuals} />
       </section>
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="glass p-5">
-          <h2 className="mb-3 font-display text-2xl">학급 순위 (평균 점수)</h2>
+          <h2 className="mb-3 font-display text-2xl text-slate-900">학급 순위 (평균 점수)</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.classes.map((c) => ({ name: classDisplayName(c.classId).replace('2학년 ', ''), avg: Math.round(c.averageScore) }))}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-              <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.7)' }} />
-              <YAxis tick={{ fill: 'rgba(255,255,255,0.5)' }} />
-              <Tooltip contentStyle={{ background: '#172238', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} formatter={(v) => [`${v}점`, '평균']} />
-              <Bar dataKey="avg" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="name" tick={{ fill: '#334155', fontSize: 12, fontWeight: 600 }} />
+              <YAxis tick={{ fill: '#64748b', fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 12, color: '#0f172a' }}
+                formatter={(v) => [`${v}점`, '평균']}
+              />
+              <Bar dataKey="avg" fill="#2563eb" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
           <table className="table-base mt-3">
@@ -136,7 +141,7 @@ export default function ResultsPage() {
           </table>
         </section>
         <section className="glass p-5">
-          <h2 className="mb-3 font-display text-2xl">개인 순위 {admin ? '(전체)' : '(상위 10명)'}</h2>
+          <h2 className="mb-3 font-display text-2xl text-slate-900">개인 순위 {admin ? '(전체)' : '(상위 10명)'}</h2>
           <div className="max-h-[560px] overflow-y-auto pr-1">
             <Leaderboard entries={data.individuals} showClass showLast={false} />
           </div>

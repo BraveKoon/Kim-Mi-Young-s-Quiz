@@ -48,7 +48,7 @@ export function ClassControls({ classId, status, questionIndex, totalQuestions, 
         </button>
       )}
       {status !== 'NO_SESSION' && (
-        <button className={`btn-ghost ${sm} text-rose-200`} onClick={() => setConfirm('reset')}>
+        <button className={`btn-ghost ${sm} text-rose-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700`} onClick={() => setConfirm('reset')}>
           <RotateCcw className="h-4 w-4" /> 초기화
         </button>
       )}
@@ -80,7 +80,7 @@ function ResetDialog({ classId, open, onClose }: { classId: string; open: boolea
       message={
         <div className="space-y-3">
           <p>{classId}반의 현재 세션 답안과 점수를 모두 지우고 대기 상태로 되돌립니다. 종료된 대회 기록은 보존되며 초기화할 수 없습니다.</p>
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
             <input type="checkbox" checked={removeParticipants} onChange={(e) => setRemove(e.target.checked)} /> 참가 학생 목록도 삭제 (학생들은 다시 입장해야 함)
           </label>
         </div>

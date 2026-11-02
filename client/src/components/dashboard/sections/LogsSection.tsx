@@ -54,7 +54,11 @@ export const EVENT_LABEL: Record<string, string> = {
   SERVER_RECOVERED: '서버 복구',
 };
 
-const SEV: Record<string, string> = { info: 'text-white/60', warning: 'text-amber-300', critical: 'text-rose-300 font-bold' };
+const SEV: Record<string, string> = {
+  info: 'text-slate-500 font-medium',
+  warning: 'text-amber-700 font-bold',
+  critical: 'text-rose-600 font-extrabold',
+};
 
 export function LogsSection() {
   const toast = useToast();
@@ -93,7 +97,7 @@ export function LogsSection() {
   return (
     <div>
       <SectionTitle title="활동 로그" desc="접속·재접속, 비정상 제출 시도, 권한 위반, 관리자 작업이 기록됩니다. 네트워크 오류나 새로고침은 부정행위로 단정하지 않습니다.">
-        <label className="flex items-center gap-1 text-sm">
+        <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
           <input type="checkbox" checked={live} onChange={(e) => setLive(e.target.checked)} /> 실시간 갱신
         </label>
         <button className="btn-ghost" onClick={reload}>
@@ -110,27 +114,27 @@ export function LogsSection() {
         <input type="date" className="input" value={f.from} onChange={(e) => set('from', e.target.value)} aria-label="시작 날짜" />
         <input type="date" className="input" value={f.to} onChange={(e) => set('to', e.target.value)} aria-label="종료 날짜" />
         <select className="input" value={f.classId} onChange={(e) => set('classId', e.target.value)}>
-          <option value="" className="bg-ink-800">전체 학급</option>
+          <option value="" className="bg-white text-slate-900">전체 학급</option>
           {CLASS_IDS.map((id) => (
-            <option key={id} value={id} className="bg-ink-800">
+            <option key={id} value={id} className="bg-white text-slate-900">
               {classDisplayName(id)}
             </option>
           ))}
         </select>
         <select className="input" value={f.eventType} onChange={(e) => set('eventType', e.target.value)}>
-          <option value="" className="bg-ink-800">전체 이벤트</option>
+          <option value="" className="bg-white text-slate-900">전체 이벤트</option>
           {LOG_EVENT_TYPES.map((t) => (
-            <option key={t} value={t} className="bg-ink-800">
+            <option key={t} value={t} className="bg-white text-slate-900">
               {EVENT_LABEL[t] ?? t}
             </option>
           ))}
         </select>
         <input className="input" placeholder="참가자 ID" inputMode="numeric" value={f.participantId} onChange={(e) => set('participantId', e.target.value.replace(/\D/g, ''))} />
         <select className="input" value={f.severity} onChange={(e) => set('severity', e.target.value)}>
-          <option value="" className="bg-ink-800">전체 수준</option>
-          <option value="info" className="bg-ink-800">정보</option>
-          <option value="warning" className="bg-ink-800">주의</option>
-          <option value="critical" className="bg-ink-800">위험</option>
+          <option value="" className="bg-white text-slate-900">전체 수준</option>
+          <option value="info" className="bg-white text-slate-900">정보</option>
+          <option value="warning" className="bg-white text-slate-900">주의</option>
+          <option value="critical" className="bg-white text-slate-900">위험</option>
         </select>
       </div>
       <div className="glass max-h-[65vh] overflow-auto p-2">
@@ -148,12 +152,12 @@ export function LogsSection() {
           <tbody>
             {data?.logs.map((l) => (
               <tr key={l.id}>
-                <td className="whitespace-nowrap text-white/70">{dateTime(l.createdAt)}</td>
-                <td className="whitespace-nowrap">{l.classId ? classDisplayName(l.classId) : '-'}</td>
-                <td>{l.nickname ?? (l.participantId ? `#${l.participantId}` : '-')}</td>
-                <td className="whitespace-nowrap">{EVENT_LABEL[l.eventType] ?? l.eventType}</td>
+                <td className="whitespace-nowrap text-slate-500">{dateTime(l.createdAt)}</td>
+                <td className="whitespace-nowrap font-medium">{l.classId ? classDisplayName(l.classId) : '-'}</td>
+                <td className="font-semibold text-slate-900">{l.nickname ?? (l.participantId ? `#${l.participantId}` : '-')}</td>
+                <td className="whitespace-nowrap font-semibold text-slate-800">{EVENT_LABEL[l.eventType] ?? l.eventType}</td>
                 <td className={SEV[l.severity]}>{l.severity}</td>
-                <td className="max-w-md truncate font-mono text-xs text-white/60" title={l.details ? JSON.stringify(l.details) : ''}>
+                <td className="max-w-md truncate font-mono text-xs text-slate-500" title={l.details ? JSON.stringify(l.details) : ''}>
                   {l.details ? JSON.stringify(l.details) : ''}
                 </td>
               </tr>
@@ -161,13 +165,13 @@ export function LogsSection() {
           </tbody>
         </table>
       </div>
-      <div className="mt-3 flex items-center justify-between text-sm text-white/60">
+      <div className="mt-3 flex items-center justify-between text-sm font-semibold text-slate-600">
         <span>총 {data?.total ?? 0}건</span>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <button className="btn-ghost btn-sm" disabled={page === 0} onClick={() => setPage(page - 1)}>
             이전
           </button>
-          <span className="px-2 py-1">{page + 1} 페이지</span>
+          <span className="px-2 py-1 text-slate-900">{page + 1} 페이지</span>
           <button className="btn-ghost btn-sm" disabled={!data || (page + 1) * 100 >= data.total} onClick={() => setPage(page + 1)}>
             다음
           </button>

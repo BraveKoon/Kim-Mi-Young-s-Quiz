@@ -24,9 +24,9 @@ const EMPTY: Omit<Question, 'id'> = {
 };
 
 const TYPE_BADGE: Record<QuestionType, string> = {
-  MULTIPLE_CHOICE: 'bg-violet-400/20 text-violet-200',
-  OX: 'bg-cyan-400/20 text-cyan-200',
-  SHORT_ANSWER: 'bg-amber-400/20 text-amber-200',
+  MULTIPLE_CHOICE: 'border border-blue-200 bg-blue-50 text-blue-800',
+  OX: 'border border-teal-200 bg-teal-50 text-teal-800',
+  SHORT_ANSWER: 'border border-amber-200 bg-amber-50 text-amber-800',
 };
 
 export function QuestionsSection() {
@@ -50,19 +50,19 @@ export function QuestionsSection() {
         desc="4지선다형, O/X, 단답형 문제를 만들고 수정합니다. 정답과 해설은 학생에게 결과 공개 전까지 전송되지 않습니다."
       >
         <select
-          className="input w-36"
+          className="input w-36 font-semibold"
           aria-label="유형 필터"
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
         >
-          <option value="ALL" className="bg-ink-800">전체 유형</option>
-          <option value="MULTIPLE_CHOICE" className="bg-ink-800">4지선다</option>
-          <option value="OX" className="bg-ink-800">O/X</option>
-          <option value="SHORT_ANSWER" className="bg-ink-800">단답형</option>
+          <option value="ALL" className="bg-white text-slate-900">전체 유형</option>
+          <option value="MULTIPLE_CHOICE" className="bg-white text-slate-900">4지선다</option>
+          <option value="OX" className="bg-white text-slate-900">O/X</option>
+          <option value="SHORT_ANSWER" className="bg-white text-slate-900">단답형</option>
         </select>
         <input className="input w-56" placeholder="검색 (문제/분류)" value={filter} onChange={(e) => setFilter(e.target.value)} />
         <button className="btn-ghost" onClick={() => setBulkOpen(true)}>
-          <FileUp className="h-4 w-4" /> JSON 일괄 등록
+          <FileUp className="h-4 w-4 text-[#2563EB]" /> JSON 일괄 등록
         </button>
         <button
           className="btn-primary"
@@ -75,26 +75,26 @@ export function QuestionsSection() {
         {list.map((q) => (
           <div key={q.id} className="glass flex min-w-0 flex-col gap-2 p-4 md:flex-row md:items-center">
             <div className="min-w-0 flex-1">
-              <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-white/60">
-                <span>#{q.id}</span>
-                <span className={`rounded-full px-2 py-0.5 font-semibold ${TYPE_BADGE[q.questionType] ?? 'bg-white/10 text-white/80'}`}>
+              <div className="mb-1.5 flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500">
+                <span className="font-bold text-slate-400">#{q.id}</span>
+                <span className={`rounded-full px-2.5 py-0.5 font-bold ${TYPE_BADGE[q.questionType] ?? 'bg-slate-100 text-slate-700'}`}>
                   {QUESTION_TYPE_LABEL[q.questionType] ?? q.questionType}
                 </span>
-                {q.category && <span className="rounded-full bg-white/10 px-2">{q.category}</span>}
+                {q.category && <span className="rounded-full border border-sky-200 bg-[#F3F9FF] px-2.5 py-0.5 font-semibold text-sky-800">{q.category}</span>}
                 <span>{q.timeLimit}초</span>
                 {q.isDoublePoints && (
-                  <span className="inline-flex items-center gap-0.5 rounded-full bg-neon-yellow px-2 font-bold text-ink-950">
+                  <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-300 bg-[#FEF9C3] px-2.5 py-0.5 font-extrabold text-amber-900">
                     <Zap className="h-3 w-3" /> 2배
                   </span>
                 )}
               </div>
-              <div className="font-bold">{q.questionText}</div>
-              <div className="mt-1 flex flex-wrap gap-2 text-sm">
+              <div className="font-bold text-slate-900">{q.questionText}</div>
+              <div className="mt-1.5 flex flex-wrap gap-2 text-sm">
                 {q.questionType === 'SHORT_ANSWER' ? (
                   <>
-                    <span className="text-xs text-white/50 self-center">인정 답안:</span>
+                    <span className="self-center text-xs font-semibold text-slate-500">인정 답안:</span>
                     {q.options.map((ans, i) => (
-                      <span key={i} className="rounded-lg bg-lime-400/25 px-2 py-0.5 text-lime-100 ring-1 ring-lime-300">
+                      <span key={i} className="rounded-lg border border-teal-300 bg-teal-50 px-2.5 py-0.5 font-bold text-teal-900">
                         {ans}
                       </span>
                     ))}
@@ -103,7 +103,11 @@ export function QuestionsSection() {
                   q.options.map((o, i) => (
                     <span
                       key={i}
-                      className={`rounded-lg px-2 py-0.5 ${i === q.correctIndex ? 'bg-lime-400/25 text-lime-100 ring-1 ring-lime-300' : 'bg-white/5 text-white/70'}`}
+                      className={`rounded-lg border px-2.5 py-0.5 font-semibold ${
+                        i === q.correctIndex
+                          ? 'border-teal-300 bg-teal-50 font-bold text-teal-900'
+                          : 'border-slate-200 bg-slate-50 text-slate-600'
+                      }`}
                     >
                       {OPTION_STYLES[i]?.shape} {o}
                     </span>
@@ -111,17 +115,17 @@ export function QuestionsSection() {
                 )}
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex shrink-0 gap-2">
               <button className="btn-ghost btn-sm" onClick={() => setEditing({ ...q, options: [...q.options] })}>
                 <Pencil className="h-4 w-4" /> 수정
               </button>
-              <button className="btn-ghost btn-sm text-rose-200" onClick={() => setDel(q)} aria-label={`문제 #${q.id} 삭제`}>
+              <button className="btn-ghost btn-sm text-rose-600 hover:border-rose-200 hover:bg-rose-50" onClick={() => setDel(q)} aria-label={`문제 #${q.id} 삭제`}>
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
           </div>
         ))}
-        {!list.length && <p className="py-8 text-center text-white/50">문제가 없습니다.</p>}
+        {!list.length && <p className="py-8 text-center text-slate-500">문제가 없습니다.</p>}
       </div>
       {editing && (
         <QuestionForm
@@ -198,7 +202,6 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
         const cleaned = prevType === 'OX' ? [] : prevOpts.filter((x) => x.trim().length > 0).slice(0, 5);
         return { ...cur, questionType: 'SHORT_ANSWER', options: cleaned.length ? cleaned : [''], correctIndex: 0 };
       }
-      // MULTIPLE_CHOICE
       const base = prevType === 'OX' ? ['', '', '', ''] : [...prevOpts.slice(0, 4)];
       while (base.length < 4) base.push('');
       return {
@@ -254,12 +257,12 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                   onClick={() => switchType(t.type)}
                   className={`rounded-xl border px-3 py-2.5 text-left transition ${
                     active
-                      ? 'border-sky-400 bg-sky-500/15 text-white'
-                      : 'border-white/15 bg-white/[0.04] text-white/70 hover:bg-white/[0.08]'
+                      ? 'border-[#2563EB] bg-blue-50 text-slate-900 ring-1 ring-blue-300'
+                      : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-white'
                   }`}
                 >
-                  <div className="font-bold text-sm">{t.label}</div>
-                  <div className="text-xs text-white/50">{t.desc}</div>
+                  <div className={`text-sm font-bold ${active ? 'text-[#1D4ED8]' : 'text-slate-800'}`}>{t.label}</div>
+                  <div className="text-xs text-slate-500">{t.desc}</div>
                 </button>
               );
             })}
@@ -283,7 +286,7 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
             <div className="grid gap-2 sm:grid-cols-2">
               {options.map((o, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <label className={`flex cursor-pointer items-center gap-1 rounded-xl px-2 py-2 ${OPTION_STYLES[i].bg}`} title="정답으로 지정">
+                  <label className={`flex cursor-pointer items-center gap-1 rounded-xl px-2.5 py-2 text-white ${OPTION_STYLES[i].bg}`} title="정답으로 지정">
                     <input type="radio" name="correct" checked={q.correctIndex === i} onChange={() => set('correctIndex', i)} />
                     <span>{OPTION_STYLES[i].shape}</span>
                   </label>
@@ -297,8 +300,8 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                 </div>
               ))}
             </div>
-            <p className="text-xs text-white/50">
-              왼쪽 라디오 버튼으로 정답 보기를 선택합니다. 현재 정답: {OPTION_STYLES[q.correctIndex ?? 0].shape} {OPTION_STYLES[q.correctIndex ?? 0].name}
+            <p className="text-xs text-slate-500">
+              왼쪽 라디오 버튼으로 정답 보기를 선택합니다. 현재 정답: <b>{OPTION_STYLES[q.correctIndex ?? 0].shape} {OPTION_STYLES[q.correctIndex ?? 0].name}</b>
             </p>
           </>
         )}
@@ -314,14 +317,14 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                   <div
                     key={i}
                     className={`rounded-2xl border p-3 transition ${
-                      selected ? 'border-lime-300 bg-lime-400/15 ring-2 ring-lime-300/60' : 'border-white/15 bg-white/5'
+                      selected ? 'border-teal-400 bg-teal-50/70 ring-2 ring-teal-300/60' : 'border-slate-200 bg-slate-50/60'
                     }`}
                   >
                     <div className="mb-2 flex items-center justify-between">
                       <button
                         type="button"
                         onClick={() => set('correctIndex', i)}
-                        className={`inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-bold ${OPTION_STYLES[i].bg}`}
+                        className={`inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-bold text-white ${OPTION_STYLES[i].bg}`}
                       >
                         <input
                           type="radio"
@@ -346,9 +349,6 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                 );
               })}
             </div>
-            <p className="text-xs text-white/50">
-              기본 보기는 O / X 이며 필요 시 &apos;O (맞다)&apos;, &apos;X (틀리다)&apos; 등으로 바꿀 수 있습니다. 현재 정답: {options[q.correctIndex ?? 0] || ((q.correctIndex ?? 0) === 0 ? 'O' : 'X')}
-            </p>
           </div>
         )}
 
@@ -376,7 +376,7 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                   {options.length > 1 && (
                     <button
                       type="button"
-                      className="btn-ghost btn-sm text-rose-200"
+                      className="btn-ghost btn-sm text-rose-600"
                       aria-label={`인정 답안 ${i + 1} 삭제`}
                       onClick={() => set('options', options.filter((_, j) => j !== i))}
                     >
@@ -386,7 +386,7 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                 </div>
               ))}
             </div>
-            <p className="text-xs text-white/50">
+            <p className="text-xs text-slate-500">
               앞뒤·연속 공백과 영문 대소문자는 구분하지 않고 채점합니다. 같은 뜻의 표기가 여러 개라면 최대 5개까지 등록하세요.
             </p>
           </div>
@@ -425,7 +425,7 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
               onChange={(e) => set('orderNum', Number(e.target.value))}
             />
           </div>
-          <label className="mt-6 flex items-center gap-2">
+          <label className="mt-6 flex items-center gap-2 text-sm font-bold text-slate-700">
             <input type="checkbox" checked={!!q.isDoublePoints} onChange={(e) => set('isDoublePoints', e.target.checked)} /> ⚡ 2배 점수
           </label>
         </div>
@@ -510,9 +510,9 @@ function BulkQuestionModal({ onClose, onSaved }: { onClose: () => void; onSaved:
   return (
     <Modal open title="JSON 문제 일괄 등록" onClose={onClose} wide>
       <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-blue-400/25 bg-blue-500/10 px-4 py-3 text-sm">
-          <div className="text-slate-200">
-            검수 완료된 <b>중2 고사성어·사자성어 30문제</b>를 바로 불러오거나 ChatGPT JSON을 붙여넣으세요.
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-sky-200 bg-[#F3F9FF] px-4 py-3 text-sm">
+          <div className="text-slate-700">
+            검수 완료된 <b className="text-slate-900">중2 고사성어·사자성어 30문제</b>를 바로 불러오거나 ChatGPT JSON을 붙여넣으세요.
           </div>
           <button type="button" className="btn-primary btn-sm shrink-0" onClick={loadPreset}>
             <Sparkles className="h-4 w-4" /> 고사성어·사자성어 30문제 불러오기
@@ -532,22 +532,22 @@ function BulkQuestionModal({ onClose, onSaved }: { onClose: () => void; onSaved:
           />
         </div>
 
-        <div className="space-y-2.5 rounded-xl border border-white/10 bg-ink-950/60 p-4 text-sm">
-          <label className="flex items-center gap-2 font-semibold text-slate-200">
+        <div className="space-y-2.5 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm">
+          <label className="flex items-center gap-2 font-bold text-slate-800">
             <input type="checkbox" checked={createSet} onChange={(e) => setCreateSet(e.target.checked)} />
             등록한 문제들로 문제 세트도 함께 만들기
           </label>
           {createSet && (
             <input
               aria-label="일괄 생성 세트 제목"
-              className="input"
+              className="input bg-white"
               placeholder="예) 중2 고사성어·사자성어 퀴즈 (30문항)"
               value={quizSetTitle}
               maxLength={100}
               onChange={(e) => setQuizSetTitle(e.target.value)}
             />
           )}
-          <label className="flex items-center gap-2 text-slate-300">
+          <label className="flex items-center gap-2 font-medium text-slate-600">
             <input type="checkbox" checked={replaceExisting} onChange={(e) => setReplaceExisting(e.target.checked)} />
             기존 등록된 문제(샘플 문제 등)를 목록에서 비우고 새로 교체하기
           </label>

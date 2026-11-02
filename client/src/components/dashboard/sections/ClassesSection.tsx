@@ -39,7 +39,7 @@ export function ClassesSection() {
           <tbody>
             {overview.classes.map((c) => (
               <tr key={c.classId}>
-                <td className="font-bold">{c.className}</td>
+                <td className="font-bold text-slate-900">{c.className}</td>
                 <td>
                   <StatusBadge status={c.status} />
                 </td>
@@ -110,9 +110,9 @@ function AssignSessionModal({ initial, onClose }: { initial: string[]; onClose: 
         <div>
           <label className="label">대회</label>
           <select className="input" value={competitionId} onChange={(e) => setCompetitionId(e.target.value === 'new' ? 'new' : Number(e.target.value))}>
-            <option value="new" className="bg-ink-800">+ 새 대회 만들기</option>
+            <option value="new" className="bg-white text-slate-900">+ 새 대회 만들기</option>
             {comps.data?.competitions.map((c) => (
-              <option key={c.id} value={c.id} className="bg-ink-800">
+              <option key={c.id} value={c.id} className="bg-white text-slate-900">
                 #{c.id} {c.title}
               </option>
             ))}
@@ -122,25 +122,32 @@ function AssignSessionModal({ initial, onClose }: { initial: string[]; onClose: 
         <div>
           <label className="label">문제 세트</label>
           <select className="input" value={quizSetId ?? ''} onChange={(e) => setQuizSetId(Number(e.target.value))}>
-            <option value="" className="bg-ink-800">선택하세요</option>
+            <option value="" className="bg-white text-slate-900">선택하세요</option>
             {sets.data?.quizSets.map((s) => (
-              <option key={s.id} value={s.id} className="bg-ink-800" disabled={!s.questionCount}>
+              <option key={s.id} value={s.id} className="bg-white text-slate-900" disabled={!s.questionCount}>
                 {s.title} ({s.questionCount}문항)
               </option>
             ))}
           </select>
-          <p className="mt-1 text-xs text-white/50">전교 순위를 공정하게 비교하려면 같은 대회의 모든 학급에 같은 문제 세트를 사용하세요.</p>
+          <p className="mt-1 text-xs text-slate-500">전교 순위를 공정하게 비교하려면 같은 대회의 모든 학급에 같은 문제 세트를 사용하세요.</p>
         </div>
         <div>
           <div className="mb-1 flex items-center justify-between">
             <label className="label">학급</label>
-            <button className="text-xs text-cyan-200" onClick={() => setClassIds(classIds.length === 12 ? [] : [...CLASS_IDS])}>
+            <button type="button" className="text-xs font-bold text-[#2563EB] hover:underline" onClick={() => setClassIds(classIds.length === 12 ? [] : [...CLASS_IDS])}>
               {classIds.length === 12 ? '전체 해제' : '전체 선택'}
             </button>
           </div>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {CLASS_IDS.map((id) => (
-              <label key={id} className={`cursor-pointer rounded-xl border px-2 py-2 text-center text-sm ${classIds.includes(id) ? 'border-blue-400 bg-blue-500/20 text-white' : 'border-white/10 bg-white/5'}`}>
+              <label
+                key={id}
+                className={`cursor-pointer rounded-xl border px-2 py-2 text-center text-sm font-bold transition ${
+                  classIds.includes(id)
+                    ? 'border-[#2563EB] bg-blue-50 text-[#1D4ED8]'
+                    : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-white'
+                }`}
+              >
                 <input type="checkbox" className="hidden" checked={classIds.includes(id)} onChange={(e) => setClassIds(e.target.checked ? [...classIds, id] : classIds.filter((x) => x !== id))} />
                 {classDisplayName(id).replace('2학년 ', '')}
               </label>

@@ -5,10 +5,10 @@ import { classDisplayName } from '@shared/types/index';
 import { useApi } from '../../../hooks/useApi';
 import type { QuestionStat } from '../../../types';
 import { QUESTION_TYPE_LABEL, num, pct, seconds } from '../../../utils/format';
-import { Modal } from '../../common/Modal';
-import { Spinner } from '../../common/Spinner';
 import { DistributionChart } from '../../charts/DistributionChart';
 import { RateChart } from '../../charts/RateChart';
+import { Modal } from '../../common/Modal';
+import { Spinner } from '../../common/Spinner';
 import { CompetitionSelect, SectionTitle } from '../CompetitionSelect';
 
 interface Analytics {
@@ -32,7 +32,7 @@ export function AnalyticsSection() {
         <Spinner />
       ) : (
         <div className="space-y-4">
-          {data.classRanking.fairnessWarning && <div className="rounded-2xl bg-amber-400/15 p-3 text-sm text-amber-100">⚠️ {data.classRanking.fairnessWarning}</div>}
+          {data.classRanking.fairnessWarning && <div className="rounded-2xl border border-amber-300 bg-[#FEF9C3]/80 p-3 text-sm font-semibold text-amber-950">⚠️ {data.classRanking.fairnessWarning}</div>}
           <div className="grid gap-3 md:grid-cols-4">
             <Card label="참가 학급" value={`${data.totals.classes}개`} />
             <Card label="참가 학생" value={`${data.totals.participants}명`} />
@@ -41,19 +41,23 @@ export function AnalyticsSection() {
           </div>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div className="glass flex min-w-0 items-center gap-3 p-4">
-              <ThumbsDown className="h-8 w-8 shrink-0 text-rose-300" />
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-500">
+                <ThumbsDown className="h-5 w-5" />
+              </span>
               <div className="min-w-0">
-                <div className="text-xs text-white/60">가장 어려웠던 문제</div>
-                <div className="truncate font-bold">{data.hardest?.text ?? '-'}</div>
-                <div className="text-sm text-rose-200">정답률 {data.hardest ? pct(data.hardest.correctRateAll) : '-'}</div>
+                <div className="text-xs font-bold text-slate-500">가장 어려웠던 문제</div>
+                <div className="truncate font-bold text-slate-900">{data.hardest?.text ?? '-'}</div>
+                <div className="text-sm font-bold text-rose-600">정답률 {data.hardest ? pct(data.hardest.correctRateAll) : '-'}</div>
               </div>
             </div>
             <div className="glass flex min-w-0 items-center gap-3 p-4">
-              <ThumbsUp className="h-8 w-8 shrink-0 text-lime-300" />
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-teal-200 bg-teal-50 text-teal-600">
+                <ThumbsUp className="h-5 w-5" />
+              </span>
               <div className="min-w-0">
-                <div className="text-xs text-white/60">가장 쉬웠던 문제</div>
-                <div className="truncate font-bold">{data.easiest?.text ?? '-'}</div>
-                <div className="text-sm text-lime-200">정답률 {data.easiest ? pct(data.easiest.correctRateAll) : '-'}</div>
+                <div className="text-xs font-bold text-slate-500">가장 쉬웠던 문제</div>
+                <div className="truncate font-bold text-slate-900">{data.easiest?.text ?? '-'}</div>
+                <div className="text-sm font-bold text-teal-700">정답률 {data.easiest ? pct(data.easiest.correctRateAll) : '-'}</div>
               </div>
             </div>
           </div>
@@ -77,17 +81,17 @@ export function AnalyticsSection() {
                   </thead>
                   <tbody>
                     {data.questions.map((q) => (
-                      <tr key={q.questionId} className="cursor-pointer hover:bg-white/5" onClick={() => setDetail(q)}>
-                        <td>{q.order}</td>
-                        <td className="max-w-md truncate font-bold">
+                      <tr key={q.questionId} className="cursor-pointer hover:bg-sky-50/70" onClick={() => setDetail(q)}>
+                        <td className="font-bold text-[#2563EB]">{q.order}</td>
+                        <td className="max-w-md truncate font-bold text-slate-900">
                           {q.isDoublePoints && '⚡ '}
                           {q.text}
                         </td>
                         <td>
                           {q.answeredCount}/{q.participantCount}
                         </td>
-                        <td>{pct(q.correctRateAnswered)}</td>
-                        <td>{pct(q.correctRateAll)}</td>
+                        <td className="font-semibold text-teal-700">{pct(q.correctRateAnswered)}</td>
+                        <td className="font-semibold">{pct(q.correctRateAll)}</td>
                         <td>{seconds(q.averageElapsedMs)}</td>
                         <td>{num(q.averageScore)}</td>
                       </tr>
@@ -97,7 +101,7 @@ export function AnalyticsSection() {
               </div>
             </>
           ) : (
-            <p className="glass p-8 text-center text-white/50">아직 진행된 문제가 없습니다.</p>
+            <p className="glass p-8 text-center font-medium text-slate-500">아직 진행된 문제가 없습니다.</p>
           )}
         </div>
       )}
@@ -106,12 +110,12 @@ export function AnalyticsSection() {
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               {detail.questionType && (
-                <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs">{QUESTION_TYPE_LABEL[detail.questionType] ?? detail.questionType}</span>
+                <span className="rounded-full border border-sky-200 bg-[#F3F9FF] px-2.5 py-0.5 text-xs font-bold text-sky-900">{QUESTION_TYPE_LABEL[detail.questionType] ?? detail.questionType}</span>
               )}
-              <p className="text-lg font-bold">{detail.text}</p>
+              <p className="text-lg font-bold text-slate-900">{detail.text}</p>
             </div>
             {detail.acceptedAnswers && (
-              <div className="rounded-xl bg-lime-400/15 px-3 py-2 text-sm text-lime-100">
+              <div className="rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900">
                 인정 답안: <b>{detail.acceptedAnswers.join(' / ')}</b>
               </div>
             )}
@@ -123,27 +127,36 @@ export function AnalyticsSection() {
               <Card label="평균 시간 · 점수" value={`${seconds(detail.averageElapsedMs)} · ${num(detail.averageScore)}`} />
             </div>
             <div>
-              <h4 className="mb-2 font-bold">오답 선택 인원</h4>
+              <h4 className="mb-2 font-bold text-slate-900">오답 선택 인원</h4>
               <ul className="space-y-1 text-sm">
                 {detail.options.map((o, i) =>
                   i === detail.correctIndex ? null : (
-                    <li key={i} className="flex justify-between rounded-lg bg-white/5 px-3 py-1">
+                    <li key={i} className="flex justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-700">
                       <span>{o}</span>
-                      <b>{detail.distribution[i]}명</b>
+                      <b className="text-slate-900">{detail.distribution[i]}명</b>
                     </li>
                   ),
                 )}
               </ul>
             </div>
             <div>
-              <h4 className="mb-2 font-bold">학급별 정답률 (전체 참가자 기준)</h4>
+              <h4 className="mb-2 font-bold text-slate-900">학급별 정답률 (전체 참가자 기준)</h4>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={detail.byClass.map((c) => ({ name: classDisplayName(c.classId).replace('2학년 ', ''), rate: Math.round(c.correctRateAll * 100) }))}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                  <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.7)', fontSize: 12 }} />
-                  <YAxis domain={[0, 100]} unit="%" tick={{ fill: 'rgba(255,255,255,0.5)' }} />
-                  <Tooltip contentStyle={{ background: '#172238', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12 }} formatter={(v) => `${v}%`} />
-                  <Bar dataKey="rate" name="정답률" fill="#38bdf8" radius={[6, 6, 0, 0]} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fill: '#334155', fontSize: 12, fontWeight: 600 }} stroke="#94a3b8" />
+                  <YAxis domain={[0, 100]} unit="%" tick={{ fill: '#64748b', fontSize: 12 }} stroke="#94a3b8" />
+                  <Tooltip
+                    contentStyle={{
+                      background: '#ffffff',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: 12,
+                      color: '#0f172a',
+                      boxShadow: '0 8px 20px rgba(15, 23, 42, 0.08)',
+                    }}
+                    formatter={(v) => `${v}%`}
+                  />
+                  <Bar dataKey="rate" name="정답률" fill="#14B8A6" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -156,9 +169,9 @@ export function AnalyticsSection() {
 
 function Card({ label, value }: { label: string; value: string }) {
   return (
-    <div className="glass p-3">
-      <div className="text-xs text-white/60">{label}</div>
-      <div className="font-display text-xl">{value}</div>
+    <div className="glass p-3.5">
+      <div className="text-xs font-bold text-slate-500">{label}</div>
+      <div className="font-display text-xl text-slate-900">{value}</div>
     </div>
   );
 }

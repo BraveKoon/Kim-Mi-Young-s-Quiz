@@ -12,25 +12,25 @@ export function AnswerButton(props: { index: number; text: string; mode: Mode; d
       type="button"
       disabled={props.disabled}
       onClick={props.onClick}
-      whileHover={props.disabled ? undefined : { scale: 1.03, y: -2 }}
-      whileTap={props.disabled ? undefined : { scale: 0.9 }}
-      animate={props.mode === 'selected' ? { scale: [1, 1.08, 0.97, 1.02, 1] } : props.mode === 'correct' ? { scale: [1, 1.06, 1] } : { scale: 1 }}
+      whileHover={props.disabled ? undefined : { scale: 1.02, y: -2 }}
+      whileTap={props.disabled ? undefined : { scale: 0.95 }}
+      animate={props.mode === 'selected' ? { scale: [1, 1.05, 0.98, 1.01, 1] } : props.mode === 'correct' ? { scale: [1, 1.04, 1] } : { scale: 1 }}
       transition={
         props.mode === 'selected' || props.mode === 'correct'
-          ? { duration: 0.4, ease: 'easeOut' }
-          : { type: 'spring', stiffness: 400, damping: 12 }
+          ? { duration: 0.35, ease: 'easeOut' }
+          : { type: 'spring', stiffness: 400, damping: 14 }
       }
-      className={`relative flex w-full items-center gap-3 overflow-hidden rounded-2xl ${s.bg} px-4 text-left font-bold text-white shadow-[0_6px_0_rgba(0,0,0,0.35)] transition
+      className={`relative flex w-full items-center gap-3 overflow-hidden rounded-2xl ${s.bg} px-4 text-left font-bold text-white shadow-[0_5px_0_rgba(15,23,42,0.18)] transition
         ${props.large ? 'min-h-28 py-5 text-2xl md:text-4xl' : 'min-h-20 py-4 text-lg md:text-2xl'}
-        ${props.mode === 'selected' ? `ring-4 ${s.ring} ring-offset-2 ring-offset-ink-900` : ''}
-        ${props.mode === 'correct' ? 'ring-4 ring-lime-300 ring-offset-2 ring-offset-ink-900' : ''}
-        ${dim ? 'opacity-35 saturate-50' : ''}
+        ${props.mode === 'selected' ? `ring-4 ${s.ring} ring-offset-2 ring-offset-white` : ''}
+        ${props.mode === 'correct' ? 'ring-4 ring-lime-300 ring-offset-2 ring-offset-white' : ''}
+        ${dim ? 'opacity-40 saturate-50' : ''}
         disabled:cursor-default`}
       aria-label={`${props.index + 1}번 ${s.name}: ${props.text}`}
     >
-      <span className={`grid shrink-0 place-items-center rounded-xl bg-black/20 ${props.large ? 'h-16 w-16 text-4xl' : 'h-12 w-12 text-2xl'}`}>{s.shape}</span>
+      <span className={`grid shrink-0 place-items-center rounded-xl bg-black/15 ${props.large ? 'h-16 w-16 text-4xl' : 'h-12 w-12 text-2xl'}`}>{s.shape}</span>
       <span className="flex-1 break-keep">{props.text}</span>
-      {props.count !== undefined && <span className="rounded-full bg-black/25 px-3 py-1 text-base">{props.count}명</span>}
+      {props.count !== undefined && <span className="rounded-full bg-black/20 px-3 py-1 text-base">{props.count}명</span>}
       {props.mode === 'correct' && <Check className="h-8 w-8 shrink-0" strokeWidth={4} />}
       {props.mode === 'wrong' && <X className="h-8 w-8 shrink-0" strokeWidth={4} />}
     </motion.button>

@@ -10,12 +10,12 @@ export const STATUS_LABEL: Record<SessionStatus | 'NO_SESSION', string> = {
 };
 
 export const STATUS_COLOR: Record<SessionStatus | 'NO_SESSION', string> = {
-  WAITING: 'bg-sky-400/20 text-sky-200 border-sky-300/30',
-  PLAYING: 'bg-lime-400/20 text-lime-200 border-lime-300/30',
-  RESULT: 'bg-indigo-500/15 text-indigo-200 border-indigo-400/30',
-  PAUSED: 'bg-amber-400/20 text-amber-200 border-amber-300/30',
-  FINISHED: 'bg-white/10 text-white/60 border-white/20',
-  NO_SESSION: 'bg-white/5 text-white/40 border-white/10',
+  WAITING: 'bg-teal-50 text-teal-800 border-teal-200',
+  PLAYING: 'bg-blue-50 text-blue-800 border-blue-200',
+  RESULT: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+  PAUSED: 'bg-amber-50 text-amber-800 border-amber-200',
+  FINISHED: 'bg-slate-100 text-slate-600 border-slate-200',
+  NO_SESSION: 'bg-amber-50/70 text-amber-700 border-amber-200/80',
 };
 
 export const COMPETITION_STATUS_LABEL: Record<string, string> = { READY: '준비', ACTIVE: '진행 중', FINISHED: '종료' };

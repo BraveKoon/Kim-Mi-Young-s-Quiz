@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { NavLink, useNavigate, useParams } from 'react-router-dom';
-import { Logo } from '../components/common/Logo';
+import { ClassroomAccentStrip, Logo } from '../components/common/Logo';
 import { FullScreenSpinner } from '../components/common/Spinner';
 import { AnalyticsSection } from '../components/dashboard/sections/AnalyticsSection';
 import { ClassesSection } from '../components/dashboard/sections/ClassesSection';
@@ -62,15 +62,20 @@ export default function AdminDashboard() {
 
   if (admin.mustChangePassword) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <div className="glass-strong w-full max-w-md space-y-4 p-8">
-          <Logo size="sm" />
-          <h1 className="font-display text-2xl">초기 비밀번호 변경</h1>
-          <p className="text-sm text-amber-100">보안을 위해 초기 비밀번호를 변경해야 관리자 기능을 사용할 수 있습니다.</p>
-          <ChangePasswordForm />
-          <button className="btn-ghost w-full" onClick={logout}>
-            로그아웃
-          </button>
+      <div className="flex min-h-dvh items-center justify-center p-4">
+        <div className="glass-strong w-full max-w-md overflow-hidden">
+          <ClassroomAccentStrip />
+          <div className="space-y-4 p-7 sm:p-8">
+            <Logo size="sm" />
+            <h1 className="font-display text-2xl text-slate-900">초기 비밀번호 변경</h1>
+            <p className="rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-sm font-medium text-amber-900">
+              보안을 위해 초기 비밀번호를 변경해야 관리자 기능을 사용할 수 있습니다.
+            </p>
+            <ChangePasswordForm />
+            <button className="btn-ghost w-full" onClick={logout}>
+              로그아웃
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -96,50 +101,58 @@ function DashboardLayout() {
   }, [menu.key]);
 
   return (
-    <div className="flex min-h-screen w-full max-w-full flex-col overflow-x-clip lg:flex-row">
-      <aside className="glass m-2 flex min-w-0 shrink-0 flex-col gap-1 rounded-3xl p-3 lg:sticky lg:top-2 lg:h-[calc(100vh-1rem)] lg:w-60">
-        <div className="mb-2 flex items-center justify-between px-2 pt-1 lg:mb-3">
-          <Logo size="sm" to="/admin/dashboard" />
-          <div className="flex items-center gap-3 text-xs text-white/60 lg:hidden">
-            {connected ? <Wifi className="h-4 w-4 text-lime-300" /> : <WifiOff className="h-4 w-4 text-rose-300" />}
-            <button className="inline-flex items-center gap-1 text-white/70 hover:text-white" onClick={logout}>
-              <LogOut className="h-4 w-4" /> 로그아웃
-            </button>
-          </div>
-        </div>
-        <nav className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-y-auto lg:pb-0">
-          {MENUS.map((m) => {
-            const isActive = m.key === menu.key;
-            return (
-              <NavLink
-                key={m.key}
-                ref={isActive ? activeTabRef : undefined}
-                to={`/admin/dashboard/${m.key}`}
-                className={() =>
-                  `flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${
-                    isActive ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                  }`
-                }
-              >
-                <m.icon className="h-4 w-4" /> {m.label}
-              </NavLink>
-            );
-          })}
-        </nav>
-        <div className="mt-auto hidden space-y-2 border-t border-white/10 pt-3 text-xs text-white/60 lg:block">
-          <div className="flex items-center gap-1.5">
-            {connected ? <Wifi className="h-4 w-4 text-lime-300" /> : <WifiOff className="h-4 w-4 text-rose-300" />} 실시간 연결 {connected ? '정상' : '끊김'}
-          </div>
-          {overview && (
-            <div>
-              전체 접속 {overview.totals.connected}/{overview.totals.capacity}명
+    <div className="flex min-h-dvh w-full max-w-full flex-col overflow-x-clip lg:flex-row">
+      <aside className="glass m-2 flex min-w-0 shrink-0 flex-col overflow-hidden rounded-3xl lg:sticky lg:top-2 lg:h-[calc(100vh-1rem)] lg:w-64">
+        <ClassroomAccentStrip />
+        <div className="flex flex-1 flex-col gap-1 overflow-hidden p-3">
+          <div className="mb-2 flex items-center justify-between px-2 pt-1 lg:mb-3">
+            <Logo size="sm" to="/admin/dashboard" />
+            <div className="flex items-center gap-3 text-xs text-slate-600 lg:hidden">
+              {connected ? <Wifi className="h-4 w-4 text-teal-600" /> : <WifiOff className="h-4 w-4 text-rose-500" />}
+              <button className="inline-flex items-center gap-1 font-semibold text-slate-600 hover:text-slate-900" onClick={logout}>
+                <LogOut className="h-4 w-4" /> 로그아웃
+              </button>
             </div>
-          )}
-          <div className="flex items-center justify-between">
-            <span>{admin?.username}</span>
-            <button className="inline-flex items-center gap-1 text-white/70 hover:text-white" onClick={logout}>
-              <LogOut className="h-4 w-4" /> 로그아웃
-            </button>
+          </div>
+
+          <nav className="flex gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-y-auto lg:pb-0">
+            {MENUS.map((m) => {
+              const isActive = m.key === menu.key;
+              return (
+                <NavLink
+                  key={m.key}
+                  ref={isActive ? activeTabRef : undefined}
+                  to={`/admin/dashboard/${m.key}`}
+                  className={() =>
+                    `flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-bold transition ${
+                      isActive
+                        ? 'bg-[#2563EB] text-white shadow-[0_4px_12px_-3px_rgba(37,99,235,0.4)]'
+                        : 'text-slate-600 hover:bg-sky-50 hover:text-slate-900'
+                    }`
+                  }
+                >
+                  <m.icon className="h-4 w-4" /> {m.label}
+                </NavLink>
+              );
+            })}
+          </nav>
+
+          <div className="mt-auto hidden space-y-2 border-t border-slate-200/90 pt-3 text-xs text-slate-600 lg:block">
+            <div className="flex items-center gap-1.5 font-semibold">
+              {connected ? <Wifi className="h-4 w-4 text-teal-600" /> : <WifiOff className="h-4 w-4 text-rose-500" />}
+              <span>실시간 연결 {connected ? '정상' : '끊김'}</span>
+            </div>
+            {overview && (
+              <div className="rounded-xl border border-sky-100 bg-[#F3F9FF] px-3 py-2 font-semibold text-slate-700">
+                전체 접속 <b className="text-[#1D4ED8]">{overview.totals.connected}</b>/{overview.totals.capacity}명
+              </div>
+            )}
+            <div className="flex items-center justify-between pt-1">
+              <span className="font-bold text-slate-800">{admin?.username}</span>
+              <button className="inline-flex items-center gap-1 font-semibold text-slate-500 hover:text-slate-900" onClick={logout}>
+                <LogOut className="h-4 w-4" /> 로그아웃
+              </button>
+            </div>
           </div>
         </div>
       </aside>

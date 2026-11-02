@@ -3,31 +3,37 @@
 @theme {
   --font-sans: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   --font-display: "Jua", "Noto Sans KR", system-ui, sans-serif;
-  --color-ink-950: #0b1120;
-  --color-ink-900: #131c2e;
-  --color-ink-800: #172238;
-  --color-ink-700: #24324d;
-  --color-neon-pink: #f43f5e;
-  --color-neon-cyan: #38bdf8;
-  --color-neon-lime: #34d399;
-  --color-neon-yellow: #fbbf24;
-  --color-opt-red: #dc2626;
+  --color-ink-950: #0f172a;
+  --color-ink-900: #f8fafc;
+  --color-ink-800: #ffffff;
+  --color-ink-700: #e2e8f0;
+  --color-neon-pink: #fb7185;
+  --color-neon-cyan: #0ea5e9;
+  --color-neon-lime: #10b981;
+  --color-neon-yellow: #f59e0b;
+  --color-opt-red: #ef4444;
   --color-opt-blue: #2563eb;
-  --color-opt-yellow: #d97706;
+  --color-opt-yellow: #eab308;
   --color-opt-green: #16a34a;
 }
 
 html, body, #root { min-height: 100%; }
 body {
-  @apply bg-ink-950 text-slate-100 font-sans antialiased;
+  @apply text-slate-900 font-sans antialiased;
+  background-color: #fcfbf6;
+  background-image:
+    radial-gradient(rgba(37, 99, 235, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, #eff7ff 0%, #fcfbf6 52%, #faf6ec 100%);
+  background-size: 24px 24px, 100% 100%;
+  background-attachment: fixed;
 }
 
 @utility glass {
-  @apply rounded-2xl border border-white/10 bg-ink-900;
+  @apply rounded-2xl border border-slate-200/90 bg-white shadow-[0_6px_22px_-10px_rgba(15,23,42,0.07),0_1px_4px_rgba(15,23,42,0.03)];
 }
 
 @utility glass-strong {
-  @apply rounded-2xl border border-white/12 bg-ink-800 shadow-sm;
+  @apply rounded-3xl border border-slate-200/90 bg-white shadow-[0_16px_40px_-14px_rgba(15,23,42,0.09),0_2px_10px_-3px_rgba(15,23,42,0.04)];
 }
 
 @utility neon-text {
@@ -35,31 +41,31 @@ body {
 }
 
 @utility input {
-  @apply w-full rounded-xl border border-white/15 bg-ink-950 px-4 py-2.5 text-white placeholder-white/40 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20;
+  @apply w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition hover:border-slate-300 hover:bg-white focus:border-[#2563EB] focus:bg-white focus:ring-3 focus:ring-blue-500/15 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400;
 }
 
 @utility label {
-  @apply mb-1 block text-sm font-medium text-white/70;
+  @apply mb-1.5 block text-xs font-bold text-slate-600;
 }
 
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40;
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-bold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45;
 }
 
 @utility btn-primary {
-  @apply btn bg-blue-600 text-white hover:bg-blue-500;
+  @apply btn bg-[#2563EB] text-white shadow-[0_6px_16px_-4px_rgba(37,99,235,0.4)] hover:bg-[#1D4ED8] disabled:shadow-none;
 }
 
 @utility btn-cyan {
-  @apply btn bg-sky-500 text-slate-950 hover:bg-sky-400;
+  @apply btn bg-[#0D9488] text-white shadow-[0_6px_16px_-4px_rgba(13,148,136,0.35)] hover:bg-[#0F766E] disabled:shadow-none;
 }
 
 @utility btn-ghost {
-  @apply btn border border-white/12 bg-white/[0.04] text-white hover:bg-white/[0.08];
+  @apply btn border border-slate-200 bg-white text-slate-700 shadow-2xs hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900;
 }
 
 @utility btn-danger {
-  @apply btn bg-rose-600 text-white hover:bg-rose-500;
+  @apply btn bg-rose-500 text-white shadow-[0_6px_16px_-4px_rgba(244,63,94,0.35)] hover:bg-rose-600 disabled:shadow-none;
 }
 
 @utility btn-sm {
@@ -69,12 +75,13 @@ body {
 @utility table-base {
   @apply w-full text-left text-sm;
   & th {
-    @apply sticky top-0 bg-ink-800 px-3 py-2 font-semibold text-white/70;
+    @apply sticky top-0 border-b border-slate-200 bg-slate-50/95 px-3 py-2.5 text-xs font-bold text-slate-600;
   }
   & td {
-    @apply border-t border-white/5 px-3 py-2;
+    @apply border-t border-slate-100 px-3 py-2.5 text-slate-800;
   }
 }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.16); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.28); }
