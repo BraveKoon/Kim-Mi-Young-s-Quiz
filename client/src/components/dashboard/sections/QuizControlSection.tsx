@@ -1,4 +1,4 @@
-import { Monitor, Users, Wifi } from 'lucide-react';
+import { Monitor, QrCode as QrCodeIcon, Users, Wifi } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CLASS_IDS, EVENTS, classDisplayName, type ClassState, type ParticipantSummary } from '@shared/types/index';
@@ -6,6 +6,7 @@ import { useAdminSocket } from '../../../contexts/AdminSocketContext';
 import { useCountdown } from '../../../hooks/useCountdown';
 import { OPTION_STYLES, QUESTION_TYPE_LABEL, pct, seconds } from '../../../utils/format';
 import { DistributionChart } from '../../charts/DistributionChart';
+import { JoinQrModal } from '../../common/QrCode';
 import { Spinner } from '../../common/Spinner';
 import { StatusBadge } from '../../common/StatusBadge';
 import { Leaderboard } from '../../leaderboard/Leaderboard';
@@ -23,6 +24,8 @@ export function QuizControlSection() {
   const [participants, setParticipants] = useState<ParticipantSummary[]>([]);
   const [answered, setAnswered] = useState(0);
   const [sync, setSync] = useState<number | null>(null);
+  const [qrOpen, setQrOpen] = useState(false);
+  const joinUrl = `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}/${classId}`;
 
   useEffect(() => {
     if (!socket || !connected) return;
@@ -64,10 +67,20 @@ export function QuizControlSection() {
             </option>
           ))}
         </select>
+        <button type="button" className="btn-ghost" onClick={() => setQrOpen(true)}>
+          <QrCodeIcon className="h-4 w-4 text-[#2563EB]" /> 참가 QR
+        </button>
         <a className="btn-ghost" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/projector/${classId}`} target="_blank" rel="noreferrer">
           <Monitor className="h-4 w-4 text-teal-600" /> 프로젝터
         </a>
       </SectionTitle>
+      <JoinQrModal
+        open={qrOpen}
+        onClose={() => setQrOpen(false)}
+        title={`${classDisplayName(classId)} 참가 QR 코드`}
+        subtitle="스마트폰 카메라로 스캔하면 반 입장 화면이 바로 열립니다"
+        url={joinUrl}
+      />
       {!state ? (
         <Spinner />
       ) : (

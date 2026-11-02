@@ -1,8 +1,10 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, render, renderHook, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { classDisplayName, formatStudentNickname, isValidClassId } from '@shared/types/index';
+import { QrCode } from '../src/components/common/QrCode';
 import { useCountdown } from '../src/hooks/useCountdown';
 import { QUESTION_TYPE_LABEL, num, pct, seconds } from '../src/utils/format';
+import { encodeQrMatrix } from '../src/utils/qrcode';
 
 describe('포맷 유틸 및 공용 학급 헬퍼', () => {
   it('점수·백분율·시간·문제 유형 레이블을 올바르게 포맷한다', () => {
@@ -72,5 +74,25 @@ describe('useCountdown', () => {
       vi.advanceTimersByTime(5000);
     });
     expect(result.current.remainingMs).toBe(12300);
+  });
+});
+
+describe('QR 코드 인코더 및 QrCode 컴포넌트', () => {
+  it('학급 참가 URL에 대해 정사각형 QR 행렬과 3곳 파인더 패턴·SVG 경로를 생성한다', () => {
+    const url = 'https://classquiz.bravekoon.workers.dev/2-3';
+    const matrix = encodeQrMatrix(url);
+    expect(matrix.length).toBe(33); // Version 4 (33x33)
+    expect(matrix.every((row) => row.length === matrix.length)).toBe(true);
+
+    // 좌상단·우상단·좌하단 7x7 파인더 중심(3, 3)은 항상 어두운 모듈
+    const n = matrix.length;
+    expect(matrix[3][3]).toBe(true);
+    expect(matrix[3][n - 4]).toBe(true);
+    expect(matrix[n - 4][3]).toBe(true);
+
+    render(<QrCode value={url} size={220} label="2학년 3반 참가 QR 코드" />);
+    const svg = screen.getByRole('img', { name: '2학년 3반 참가 QR 코드' });
+    expect(svg).toHaveAttribute('viewBox', `0 0 ${n + 8} ${n + 8}`);
+    expect(svg.querySelector('path')?.getAttribute('d')).toMatch(/^M/);
   });
 });

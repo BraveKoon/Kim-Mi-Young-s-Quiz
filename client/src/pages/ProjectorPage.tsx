@@ -1,10 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Maximize, Minimize, PauseCircle, Trophy, Users, Wifi, WifiOff } from 'lucide-react';
+import { Check, Copy, Maximize, Minimize, PauseCircle, QrCode as QrCodeIcon, Trophy, Users, Wifi, WifiOff, ZoomIn } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { EVENTS, classDisplayName, isValidClassId, type ClassState, type ParticipantSummary } from '@shared/types/index';
 import { DistributionChart } from '../components/charts/DistributionChart';
 import { ClassroomAccentStrip, Logo } from '../components/common/Logo';
+import { JoinQrModal, QrCode } from '../components/common/QrCode';
 import { FullScreenSpinner } from '../components/common/Spinner';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { Leaderboard } from '../components/leaderboard/Leaderboard';
@@ -53,6 +54,8 @@ function ClassProjector({ classId }: { classId: string }) {
   const [participants, setParticipants] = useState<ParticipantSummary[]>([]);
   const [answered, setAnswered] = useState<number | null>(null);
   const [timerSync, setTimerSync] = useState<number | null>(null);
+  const [qrOpen, setQrOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const s = createSocket({ role: 'projector', classId });
@@ -80,35 +83,96 @@ function ClassProjector({ classId }: { classId: string }) {
   if (!state) return <FullScreenSpinner label="프로젝터 화면을 준비하는 중…" />;
   const joinUrl = `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}/${classId}`;
 
+  const copyJoinUrl = async () => {
+    try {
+      await navigator.clipboard?.writeText(joinUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // 클립보드 미지원 환경에서는 무시
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col p-4 md:p-8">
-      <header className="glass mb-6 flex items-center justify-between gap-4 px-5 py-3">
-        <div className="flex items-center gap-4">
+      <header className="glass mb-6 flex flex-wrap items-center justify-between gap-4 px-5 py-3">
+        <div className="flex flex-wrap items-center gap-4">
           <Logo size="sm" />
           <span className="h-5 w-px bg-slate-200" aria-hidden="true" />
           <span className="font-display text-3xl text-slate-900 md:text-4xl">{state.className}</span>
           <StatusBadge status={state.status} className="text-base" />
         </div>
-        <div className="flex items-center gap-3 text-slate-600">
+        <div className="flex flex-wrap items-center gap-2.5 text-slate-600">
           {connected ? <Wifi className="h-5 w-5 text-teal-600" /> : <WifiOff className="h-5 w-5 text-rose-500" />}
           <span className="flex items-center gap-1 text-lg font-bold text-slate-800">
             <Users className="h-5 w-5 text-teal-600" /> {state.connectedCount || participants.filter((p) => p.connected).length}/{state.participantCount || participants.length}
           </span>
+          <button type="button" className="btn-ghost btn-sm" onClick={() => setQrOpen(true)}>
+            <QrCodeIcon className="h-4 w-4 text-[#2563EB]" /> 참가 QR
+          </button>
           <FullscreenButton />
         </div>
       </header>
 
       <main className="flex flex-1 flex-col">
         {state.status === 'WAITING' && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-7 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-[#FEF9C3] px-5 py-1.5 text-lg font-bold text-amber-900">
-              <span>★ 스마트폰으로 아래 주소에 접속하세요</span>
+          <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-[#FEF9C3] px-5 py-1.5 text-base font-bold text-amber-900 md:text-lg">
+              <span>★ 스마트폰 카메라로 QR 코드를 스캔하거나 아래 주소로 접속하세요</span>
             </div>
-            <div className="glass-strong overflow-hidden">
+
+            <div className="glass-strong w-full max-w-4xl overflow-hidden text-left">
               <ClassroomAccentStrip />
-              <div className="px-8 py-5 font-display text-4xl tracking-wide text-[#2563EB] md:text-6xl">{joinUrl.replace(/^https?:\/\//, '')}</div>
+              <div className="grid items-center gap-6 p-6 md:grid-cols-[auto_1fr] md:gap-8 md:p-8">
+                {/* QR 코드 영역 */}
+                <div className="flex flex-col items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setQrOpen(true)}
+                    className="group relative rounded-2xl border-2 border-sky-200 bg-white p-3 shadow-[0_10px_28px_-10px_rgba(37,99,235,0.2)] transition hover:-translate-y-0.5 hover:border-[#2563EB]"
+                    title="QR 코드 크게 보기"
+                  >
+                    <QrCode value={joinUrl} size={216} label={`${state.className} 참가 QR 코드`} />
+                    <span className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-xl bg-[#F3F9FF] py-1.5 text-xs font-bold text-[#1D4ED8] transition group-hover:bg-blue-100/80">
+                      <ZoomIn className="h-3.5 w-3.5" /> 클릭해서 크게 보기
+                    </span>
+                  </button>
+                </div>
+
+                {/* 접속 안내 영역 */}
+                <div className="min-w-0 space-y-4 text-center md:text-left">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-[#F3F9FF] px-3.5 py-1 text-xs font-extrabold text-[#1D4ED8]">
+                    <QrCodeIcon className="h-3.5 w-3.5" />
+                    <span>{state.className} 바로 입장 링크</span>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-bold text-slate-500">접속 주소</div>
+                    <div className="mt-1 break-all font-display text-3xl tracking-wide text-[#2563EB] md:text-5xl">
+                      {joinUrl.replace(/^https?:\/\//, '')}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm font-semibold text-slate-700 md:text-base">
+                    <div>1. 카메라로 <b>QR 코드 스캔</b> 또는 위 주소 접속</div>
+                    <div>2. <b>번호 · 이름</b>을 입력하고 바로 입장해요!</div>
+                  </div>
+
+                  <div className="flex flex-wrap justify-center gap-2 md:justify-start">
+                    <button type="button" className="btn-primary btn-sm" onClick={() => setQrOpen(true)}>
+                      <ZoomIn className="h-4 w-4" /> QR 크게 보기
+                    </button>
+                    <button type="button" className="btn-ghost btn-sm" onClick={copyJoinUrl}>
+                      {copied ? <Check className="h-4 w-4 text-teal-600" /> : <Copy className="h-4 w-4 text-[#2563EB]" />}
+                      {copied ? '주소 복사됨!' : '접속 주소 복사'}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="font-display text-5xl text-slate-900 md:text-6xl">학번과 이름을 입력하고 입장하세요!</div>
+
+            <div className="font-display text-3xl text-slate-900 md:text-5xl">번호와 이름을 입력하고 입장하세요!</div>
+
             <div className="flex max-w-6xl flex-wrap justify-center gap-3">
               <AnimatePresence>
                 {participants.map((p) => (
@@ -125,7 +189,7 @@ function ClassProjector({ classId }: { classId: string }) {
                 ))}
               </AnimatePresence>
             </div>
-            <div className="rounded-full border border-teal-200 bg-teal-50 px-6 py-2 text-3xl font-extrabold text-teal-900">
+            <div className="rounded-full border border-teal-200 bg-teal-50 px-6 py-2 text-2xl font-extrabold text-teal-900 md:text-3xl">
               현재 {participants.length || state.participantCount}명 입장 완료
             </div>
           </div>
@@ -180,6 +244,14 @@ function ClassProjector({ classId }: { classId: string }) {
         )}
         {state.status === 'NO_SESSION' && <div className="flex flex-1 items-center justify-center text-3xl font-bold text-slate-500">준비된 퀴즈가 없습니다.</div>}
       </main>
+
+      <JoinQrModal
+        open={qrOpen}
+        onClose={() => setQrOpen(false)}
+        title={`${state.className} 참가 QR 코드`}
+        subtitle="스마트폰 기본 카메라로 스캔하면 반 입장 화면이 바로 열립니다"
+        url={joinUrl}
+      />
     </div>
   );
 }
@@ -243,6 +315,7 @@ export function CompetitionProjectorPage() {
   const [data, setData] = useState<PublicResults | null>(null);
   const [error, setError] = useState(false);
   const [view, setView] = useState<'class' | 'individual'>('class');
+  const [qrOpen, setQrOpen] = useState(false);
   const load = () =>
     studentApi
       .get(`/public/competitions/${Number(competitionId)}/results`)
@@ -257,13 +330,17 @@ export function CompetitionProjectorPage() {
 
   if (error && !data) return <NotFoundPage />;
   if (!data) return <FullScreenSpinner />;
+  const resultsUrl = `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}/results/${competitionId}`;
   const podium = data.top.slice(0, 5).map((t, i) => ({ ...t, participantId: i, prevRank: null, correctCount: 0, lastAwarded: 0, lastCorrect: null }));
   return (
     <div className="flex min-h-screen flex-col gap-6 p-6 md:p-10">
-      <header className="glass flex items-center justify-between px-5 py-3">
+      <header className="glass flex flex-wrap items-center justify-between gap-3 px-5 py-3">
         <Logo size="sm" />
         <h1 className="font-display text-3xl text-slate-900 md:text-5xl">{data.competition.title}</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <button type="button" className="btn-ghost btn-sm" onClick={() => setQrOpen(true)}>
+            <QrCodeIcon className="h-4 w-4 text-[#2563EB]" /> 결과 QR
+          </button>
           <button className="btn-ghost btn-sm" onClick={() => setView(view === 'class' ? 'individual' : 'class')}>
             {view === 'class' ? '개인 순위 보기' : '학급 순위 보기'}
           </button>
@@ -304,6 +381,14 @@ export function CompetitionProjectorPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <JoinQrModal
+        open={qrOpen}
+        onClose={() => setQrOpen(false)}
+        title={`${data.competition.title} 결과 QR 코드`}
+        subtitle="스마트폰으로 스캔하면 대회 공개 결과 페이지를 확인할 수 있습니다"
+        url={resultsUrl}
+      />
     </div>
   );
 }
