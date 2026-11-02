@@ -1,10 +1,36 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Copy, Maximize, Minimize, PauseCircle, QrCode as QrCodeIcon, Trophy, Users, Wifi, WifiOff, ZoomIn } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import {
+  Check,
+  CheckSquare,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  FastForward,
+  Flag,
+  KeyRound,
+  LogIn,
+  Maximize,
+  Minimize,
+  Pause,
+  PauseCircle,
+  Play,
+  QrCode as QrCodeIcon,
+  RotateCcw,
+  ShieldCheck,
+  SkipForward,
+  Trophy,
+  Users,
+  Wifi,
+  WifiOff,
+  ZoomIn,
+} from 'lucide-react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import type { Socket } from 'socket.io-client';
 import { EVENTS, classDisplayName, isValidClassId, type ClassState, type ParticipantSummary } from '@shared/types/index';
 import { DistributionChart } from '../components/charts/DistributionChart';
 import { ClassroomAccentStrip, Logo } from '../components/common/Logo';
+import { ConfirmDialog, Modal } from '../components/common/Modal';
 import { JoinQrModal, QrCode } from '../components/common/QrCode';
 import { FullScreenSpinner } from '../components/common/Spinner';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -13,10 +39,12 @@ import { Podium } from '../components/leaderboard/Podium';
 import { AnswerButton } from '../components/quiz/AnswerButton';
 import { DoublePointsBanner } from '../components/quiz/DoublePointsBanner';
 import { TimerBar } from '../components/quiz/TimerBar';
+import { useOptionalAdminAuth } from '../contexts/AdminAuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { useCountdown } from '../hooks/useCountdown';
 import { useInterval } from '../hooks/useInterval';
-import { studentApi } from '../services/api';
-import { createSocket } from '../socket';
+import { errorMessage, studentApi } from '../services/api';
+import { createSocket, emitAck } from '../socket';
 import { celebrate } from '../utils/confetti';
 import { num, pct } from '../utils/format';
 import NotFoundPage from './NotFoundPage';
@@ -41,7 +69,61 @@ function FullscreenButton() {
   );
 }
 
-/** 학급 프로젝터: 공개 가능한 데이터만 수신(이름 공개 방식은 서버 설정을 따름) */
+/** 프로젝터 전용 관리자 제어 소켓 (인증된 교사 토큰이 있을 때만 연결) */
+function useProjectorAdminControls(token: string | null, enabled: boolean) {
+  const toast = useToast();
+  const socketRef = useRef<Socket | null>(null);
+  const [adminConnected, setAdminConnected] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!token || !enabled) {
+      setAdminConnected(false);
+      return;
+    }
+    const s = createSocket({ role: 'admin', token });
+    socketRef.current = s;
+    s.on('connect', () => setAdminConnected(true));
+    s.on('disconnect', () => setAdminConnected(false));
+    s.on('connect_error', (e) => {
+      setAdminConnected(false);
+      if (e.message === 'UNAUTHORIZED' || e.message === 'PASSWORD_CHANGE_REQUIRED') s.disconnect();
+    });
+    return () => {
+      s.removeAllListeners();
+      s.disconnect();
+      socketRef.current = null;
+      setAdminConnected(false);
+    };
+  }, [token, enabled]);
+
+  const sendCommand = useCallback(
+    async (event: string, payload: Record<string, unknown>, successMsg?: string) => {
+      const s = socketRef.current;
+      if (!s?.connected) {
+        toast('관리자 제어 연결 중입니다. 잠시 후 다시 눌러 주세요.', 'error');
+        return { ok: false };
+      }
+      setBusy(true);
+      try {
+        const r = await emitAck<{ ok: boolean; message?: string }>(s, event, payload, 15000);
+        if (!r.ok) toast(r.message ?? '명령을 실행하지 못했습니다.', 'error');
+        else if (successMsg) toast(successMsg, 'success');
+        return r;
+      } catch {
+        toast('서버 응답이 없습니다.', 'error');
+        return { ok: false };
+      } finally {
+        setBusy(false);
+      }
+    },
+    [toast],
+  );
+
+  return { adminConnected, busy, sendCommand };
+}
+
+/** 학급 프로젝터: 공개 가능한 데이터만 수신하며, 교사 로그인 시 화면에서 바로 진행 제어 가능 */
 export default function ProjectorPage() {
   const { classId = '' } = useParams();
   if (!isValidClassId(classId)) return <NotFoundPage />;
@@ -49,13 +131,19 @@ export default function ProjectorPage() {
 }
 
 function ClassProjector({ classId }: { classId: string }) {
+  const auth = useOptionalAdminAuth();
   const [state, setState] = useState<ClassState | null>(null);
   const [connected, setConnected] = useState(false);
   const [participants, setParticipants] = useState<ParticipantSummary[]>([]);
   const [answered, setAnswered] = useState<number | null>(null);
   const [timerSync, setTimerSync] = useState<number | null>(null);
   const [qrOpen, setQrOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [dockVisible, setDockVisible] = useState(true);
   const [copied, setCopied] = useState(false);
+
+  const canControl = Boolean(auth?.admin && auth?.token && !auth.admin.mustChangePassword);
+  const { adminConnected, busy, sendCommand } = useProjectorAdminControls(auth?.token ?? null, canControl);
 
   useEffect(() => {
     const s = createSocket({ role: 'projector', classId });
@@ -110,6 +198,22 @@ function ClassProjector({ classId }: { classId: string }) {
           <button type="button" className="btn-ghost btn-sm" onClick={() => setQrOpen(true)}>
             <QrCodeIcon className="h-4 w-4 text-[#2563EB]" /> 참가 QR
           </button>
+          {auth &&
+            (canControl ? (
+              <button
+                type="button"
+                className="btn-ghost btn-sm border-blue-200 bg-blue-50/70 text-[#1D4ED8]"
+                onClick={() => setDockVisible((v) => !v)}
+              >
+                <ShieldCheck className="h-4 w-4 text-[#2563EB]" />
+                {dockVisible ? '진행 바 접기' : '진행 바 펼치기'}
+                {dockVisible ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+              </button>
+            ) : (
+              <button type="button" className="btn-ghost btn-sm" onClick={() => setAuthModalOpen(true)}>
+                <KeyRound className="h-4 w-4 text-[#2563EB]" /> 선생님 진행 모드
+              </button>
+            ))}
           <FullscreenButton />
         </div>
       </header>
@@ -189,8 +293,20 @@ function ClassProjector({ classId }: { classId: string }) {
                 ))}
               </AnimatePresence>
             </div>
-            <div className="rounded-full border border-teal-200 bg-teal-50 px-6 py-2 text-2xl font-extrabold text-teal-900 md:text-3xl">
-              현재 {participants.length || state.participantCount}명 입장 완료
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="rounded-full border border-teal-200 bg-teal-50 px-6 py-2 text-2xl font-extrabold text-teal-900 md:text-3xl">
+                현재 {participants.length || state.participantCount}명 입장 완료
+              </div>
+              {canControl && (
+                <button
+                  type="button"
+                  disabled={busy || !adminConnected}
+                  onClick={() => sendCommand(EVENTS.ADMIN_START, { classId }, '퀴즈를 시작했습니다.')}
+                  className="btn-primary h-12 rounded-full px-7 text-xl font-extrabold"
+                >
+                  <Play className="h-5 w-5" /> 지금 퀴즈 시작
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -242,8 +358,29 @@ function ClassProjector({ classId }: { classId: string }) {
             )}
           </div>
         )}
-        {state.status === 'NO_SESSION' && <div className="flex flex-1 items-center justify-center text-3xl font-bold text-slate-500">준비된 퀴즈가 없습니다.</div>}
+        {state.status === 'NO_SESSION' && (
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+            <div className="text-3xl font-bold text-slate-500">준비된 퀴즈가 없습니다.</div>
+            {canControl && (
+              <Link to="/admin/dashboard/classes" className="btn-primary">
+                관리자 학급 관리에서 세션 배정하기
+              </Link>
+            )}
+          </div>
+        )}
       </main>
+
+      {canControl && dockVisible && (
+        <ProjectorControlDock
+          classId={classId}
+          state={state}
+          answered={answered}
+          username={auth!.admin!.username}
+          adminConnected={adminConnected}
+          busy={busy}
+          sendCommand={sendCommand}
+        />
+      )}
 
       <JoinQrModal
         open={qrOpen}
@@ -252,7 +389,379 @@ function ClassProjector({ classId }: { classId: string }) {
         subtitle="스마트폰 기본 카메라로 스캔하면 반 입장 화면이 바로 열립니다"
         url={joinUrl}
       />
+
+      {auth && (
+        <ProjectorAdminAuthModal
+          open={authModalOpen}
+          onClose={() => setAuthModalOpen(false)}
+          onActivated={() => {
+            setAuthModalOpen(false);
+            setDockVisible(true);
+          }}
+        />
+      )}
     </div>
+  );
+}
+
+/** 프로젝터 화면 하단 선생님 진행 컨트롤 도크 */
+function ProjectorControlDock({
+  classId,
+  state,
+  answered,
+  username,
+  adminConnected,
+  busy,
+  sendCommand,
+}: {
+  classId: string;
+  state: ClassState;
+  answered: number | null;
+  username: string;
+  adminConnected: boolean;
+  busy: boolean;
+  sendCommand: (event: string, payload: Record<string, unknown>, successMsg?: string) => Promise<{ ok: boolean }>;
+}) {
+  const [confirm, setConfirm] = useState<'finish' | 'reset' | null>(null);
+  const [removeParticipants, setRemoveParticipants] = useState(false);
+
+  const isLast = state.questionIndex + 1 >= state.totalQuestions;
+  const disabled = busy || !adminConnected;
+
+  const summary =
+    state.status === 'WAITING'
+      ? `대기 중 · 총 ${state.totalQuestions}문항 준비됨`
+      : state.status === 'PLAYING' || state.status === 'PAUSED'
+        ? `문제 ${state.questionIndex + 1} / ${state.totalQuestions} · 제출 ${answered ?? state.answeredCount}/${state.participantCount}명`
+        : state.status === 'RESULT'
+          ? `문제 ${state.questionIndex + 1} / ${state.totalQuestions} 결과 발표 중`
+          : state.status === 'FINISHED'
+            ? '퀴즈 종료 · 최종 순위 화면'
+            : '세션 없음';
+
+  return (
+    <div
+      className="glass-strong sticky bottom-3 z-30 mt-6 overflow-hidden"
+      role="region"
+      aria-label="프로젝터 퀴즈 진행 컨트롤"
+    >
+      <ClassroomAccentStrip />
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
+        <div className="flex flex-wrap items-center gap-2.5 text-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-extrabold text-[#1D4ED8]">
+            <span className={`h-2 w-2 rounded-full ${adminConnected ? 'bg-teal-500' : 'bg-amber-400'}`} />
+            선생님 진행 모드 ({username})
+          </span>
+          <span className="font-semibold text-slate-600">{summary}</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {state.status === 'WAITING' && (
+            <>
+              <button
+                type="button"
+                className="btn-primary"
+                disabled={disabled}
+                onClick={() => sendCommand(EVENTS.ADMIN_START, { classId }, '퀴즈를 시작했습니다.')}
+              >
+                <Play className="h-4 w-4" /> 퀴즈 시작
+              </button>
+              <button type="button" className="btn-ghost" disabled={disabled} onClick={() => setConfirm('finish')}>
+                <Flag className="h-4 w-4" /> 종료
+              </button>
+              <button
+                type="button"
+                className="btn-ghost text-rose-600 hover:border-rose-200 hover:bg-rose-50"
+                disabled={disabled}
+                onClick={() => setConfirm('reset')}
+              >
+                <RotateCcw className="h-4 w-4" /> 초기화
+              </button>
+            </>
+          )}
+
+          {state.status === 'PLAYING' && (
+            <>
+              <button
+                type="button"
+                className="btn-ghost"
+                disabled={disabled}
+                onClick={() => sendCommand(EVENTS.ADMIN_PAUSE, { classId })}
+              >
+                <Pause className="h-4 w-4" /> 일시정지
+              </button>
+              <button
+                type="button"
+                className="btn-cyan"
+                disabled={disabled}
+                onClick={() => sendCommand(EVENTS.ADMIN_SHOW_RESULTS, { classId })}
+              >
+                <CheckSquare className="h-4 w-4" /> 결과 발표
+              </button>
+              <button
+                type="button"
+                className="btn-ghost"
+                disabled={disabled}
+                onClick={() => sendCommand(EVENTS.ADMIN_SKIP, { classId }, isLast ? '마지막 문제를 건너뛰고 종료했습니다.' : '다음 문제로 건너뛰었습니다.')}
+              >
+                <FastForward className="h-4 w-4 text-[#2563EB]" /> 건너뛰기
+              </button>
+              <button type="button" className="btn-ghost" disabled={disabled} onClick={() => setConfirm('finish')}>
+                <Flag className="h-4 w-4" /> 종료
+              </button>
+            </>
+          )}
+
+          {state.status === 'PAUSED' && (
+            <>
+              <button
+                type="button"
+                className="btn-primary"
+                disabled={disabled}
+                onClick={() => sendCommand(EVENTS.ADMIN_RESUME, { classId })}
+              >
+                <Play className="h-4 w-4" /> 재개
+              </button>
+              <button
+                type="button"
+                className="btn-cyan"
+                disabled={disabled}
+                onClick={() => sendCommand(EVENTS.ADMIN_SHOW_RESULTS, { classId })}
+              >
+                <CheckSquare className="h-4 w-4" /> 결과 발표
+              </button>
+              <button
+                type="button"
+                className="btn-ghost"
+                disabled={disabled}
+                onClick={() => sendCommand(EVENTS.ADMIN_SKIP, { classId }, isLast ? '마지막 문제를 건너뛰고 종료했습니다.' : '다음 문제로 건너뛰었습니다.')}
+              >
+                <FastForward className="h-4 w-4 text-[#2563EB]" /> 건너뛰기
+              </button>
+              <button type="button" className="btn-ghost" disabled={disabled} onClick={() => setConfirm('finish')}>
+                <Flag className="h-4 w-4" /> 종료
+              </button>
+            </>
+          )}
+
+          {state.status === 'RESULT' && (
+            <>
+              <button
+                type="button"
+                className="btn-primary"
+                disabled={disabled}
+                onClick={() => sendCommand(EVENTS.ADMIN_NEXT, { classId })}
+              >
+                {isLast ? <Trophy className="h-4 w-4" /> : <SkipForward className="h-4 w-4" />}
+                {isLast ? '최종 순위 발표' : '다음 문제'}
+              </button>
+              <button type="button" className="btn-ghost" disabled={disabled} onClick={() => setConfirm('finish')}>
+                <Flag className="h-4 w-4" /> 종료
+              </button>
+            </>
+          )}
+
+          {state.status === 'FINISHED' && (
+            <button
+              type="button"
+              className="btn-ghost text-rose-600 hover:border-rose-200 hover:bg-rose-50"
+              disabled={disabled}
+              onClick={() => setConfirm('reset')}
+            >
+              <RotateCcw className="h-4 w-4" /> 대기 화면으로 초기화
+            </button>
+          )}
+        </div>
+      </div>
+
+      <ConfirmDialog
+        open={confirm === 'finish'}
+        title="퀴즈 종료"
+        message={`${state.className} 퀴즈를 지금 종료할까요? 현재까지의 점수로 최종 순위가 발표됩니다.`}
+        confirmText="종료"
+        onClose={() => setConfirm(null)}
+        onConfirm={async () => {
+          await sendCommand(EVENTS.ADMIN_FINISH, { classId }, '퀴즈를 종료했습니다.');
+        }}
+      />
+
+      <ConfirmDialog
+        open={confirm === 'reset'}
+        danger
+        title="학급 진행 상태 초기화"
+        requireTyping="RESET"
+        confirmText="초기화"
+        onClose={() => setConfirm(null)}
+        onConfirm={async () => {
+          await sendCommand(EVENTS.ADMIN_RESET_CLASS, { classId, confirm: 'RESET', removeParticipants }, '초기화했습니다.');
+        }}
+        message={
+          <div className="space-y-3">
+            <p>{state.className}의 현재 세션 답안과 점수를 모두 지우고 대기 상태로 되돌립니다.</p>
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <input
+                type="checkbox"
+                checked={removeParticipants}
+                onChange={(e) => setRemoveParticipants(e.target.checked)}
+              />
+              참가 학생 목록도 함께 비우기 (학생들이 다시 입장해야 함)
+            </label>
+          </div>
+        }
+      />
+    </div>
+  );
+}
+
+/** 프로젝터 화면을 벗어나지 않고 바로 선생님 진행 권한을 켜는 모달 */
+function ProjectorAdminAuthModal({
+  open,
+  onClose,
+  onActivated,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onActivated: () => void;
+}) {
+  const auth = useOptionalAdminAuth()!;
+  const toast = useToast();
+  const [username, setUsername] = useState('admin');
+  const [password, setPassword] = useState('');
+  const [curPw, setCurPw] = useState('');
+  const [nextPw, setNextPw] = useState('');
+  const [confirmPw, setConfirmPw] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const needPwChange = Boolean(auth.admin?.mustChangePassword);
+
+  const submitLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setBusy(true);
+    try {
+      const info = await auth.login(username.trim(), password);
+      setCurPw(password);
+      setPassword('');
+      if (!info.mustChangePassword) {
+        toast('선생님 진행 모드가 켜졌습니다.', 'success');
+        onActivated();
+      }
+    } catch (err) {
+      setError(errorMessage(err, '로그인하지 못했습니다.'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const submitChangePw = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (nextPw.length < 8) return setError('새 비밀번호는 8자 이상이어야 합니다.');
+    if (nextPw !== confirmPw) return setError('새 비밀번호 확인이 일치하지 않습니다.');
+    setBusy(true);
+    try {
+      await auth.changePassword(curPw, nextPw);
+      setCurPw('');
+      setNextPw('');
+      setConfirmPw('');
+      toast('비밀번호 변경 완료! 선생님 진행 모드가 켜졌습니다.', 'success');
+      onActivated();
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={onClose} title={needPwChange ? '초기 비밀번호 변경' : '선생님 진행 모드 로그인'}>
+      {needPwChange ? (
+        <form onSubmit={submitChangePw} className="space-y-3.5">
+          <p className="rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-sm font-medium text-amber-900">
+            보안을 위해 초기 비밀번호를 변경하면 프로젝터 화면에서 바로 퀴즈를 진행할 수 있습니다.
+          </p>
+          <div>
+            <label className="label" htmlFor="proj-cur-pw">현재 비밀번호</label>
+            <input
+              id="proj-cur-pw"
+              type="password"
+              className="input"
+              value={curPw}
+              onChange={(e) => setCurPw(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="label" htmlFor="proj-next-pw">새 비밀번호 (8자 이상)</label>
+            <input
+              id="proj-next-pw"
+              type="password"
+              className="input"
+              value={nextPw}
+              onChange={(e) => setNextPw(e.target.value)}
+              minLength={8}
+              required
+            />
+          </div>
+          <div>
+            <label className="label" htmlFor="proj-confirm-pw">새 비밀번호 확인</label>
+            <input
+              id="proj-confirm-pw"
+              type="password"
+              className="input"
+              value={confirmPw}
+              onChange={(e) => setConfirmPw(e.target.value)}
+              minLength={8}
+              required
+            />
+          </div>
+          {error && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{error}</p>}
+          <button className="btn-primary w-full" disabled={busy}>
+            <KeyRound className="h-4 w-4" /> 비밀번호 변경 후 진행 시작
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={submitLogin} className="space-y-3.5">
+          <p className="rounded-xl border border-sky-100 bg-[#F3F9FF] px-3.5 py-2.5 text-sm font-medium text-slate-700">
+            선생님 계정으로 인증하면 이 프로젝터 화면에서 <b>시작 · 일시정지 · 결과 발표 · 건너뛰기 · 다음 문제</b>를 바로 조작할 수 있습니다.
+          </p>
+          <div>
+            <label className="label" htmlFor="proj-admin-id">관리자 아이디</label>
+            <input
+              id="proj-admin-id"
+              className="input"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
+              required
+            />
+          </div>
+          <div>
+            <label className="label" htmlFor="proj-admin-pw">비밀번호</label>
+            <input
+              id="proj-admin-pw"
+              type="password"
+              className="input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              autoFocus
+              required
+            />
+          </div>
+          {error && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{error}</p>}
+          <div className="flex justify-end gap-2 pt-1">
+            <button type="button" className="btn-ghost" onClick={onClose}>
+              취소
+            </button>
+            <button className="btn-primary" disabled={busy}>
+              <LogIn className="h-4 w-4" /> 진행 모드 켜기
+            </button>
+          </div>
+        </form>
+      )}
+    </Modal>
   );
 }
 

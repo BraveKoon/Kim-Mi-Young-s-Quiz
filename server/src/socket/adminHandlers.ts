@@ -54,6 +54,7 @@ export function registerAdminHandlers(_io: Server, socket: AppSocket, ctx: AppCo
   handle(EVENTS.ADMIN_PAUSE, (p) => ctx.sessions.pauseQuiz(classOf(p)));
   handle(EVENTS.ADMIN_RESUME, (p) => ctx.sessions.resumeQuiz(classOf(p)));
   handle(EVENTS.ADMIN_NEXT, (p) => ctx.sessions.nextQuestion(classOf(p)));
+  handle(EVENTS.ADMIN_SKIP, (p) => ctx.sessions.skipQuestion(classOf(p)));
   handle(EVENTS.ADMIN_SHOW_RESULTS, (p) => ctx.sessions.showResults(classOf(p)));
   handle(EVENTS.ADMIN_FINISH, (p) => ctx.sessions.finishQuiz(classOf(p)));
   handle(EVENTS.ADMIN_RESET_CLASS, (p) => {

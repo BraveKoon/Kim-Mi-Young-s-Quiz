@@ -68,3 +68,7 @@ export function useAdminAuth() {
   if (!ctx) throw new Error('AdminAuthProvider missing');
   return ctx;
 }
+
+export function useOptionalAdminAuth() {
+  return useContext(AdminAuthContext);
+}

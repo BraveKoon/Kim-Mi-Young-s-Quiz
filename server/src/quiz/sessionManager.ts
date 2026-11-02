@@ -487,6 +487,23 @@ export class SessionManager {
     this.startQuestion(classId, s.id, next);
   }
 
+  /** 진행 중(PLAYING/PAUSED)이거나 결과(RESULT) 상태인 현재 문제를 건너뛰고 즉시 다음 문제(마지막이면 종료)로 이동한다. */
+  skipQuestion(classId: string) {
+    const s = this.requireSession(classId);
+    if (!ACTIVE_STATUSES.includes(s.status)) {
+      throw conflict('진행 중이거나 결과 화면일 때만 문제를 건너뛸 수 있습니다.', 'INVALID_STATE');
+    }
+    this.timers.clear(classId);
+    this.logger.log('QUESTION_SKIPPED', {
+      classId,
+      sessionId: s.id,
+      details: { skippedIndex: s.current_question_index, questionId: s.current_question_id, fromStatus: s.status },
+    });
+    const next = s.current_question_index + 1;
+    if (next >= s.question_count) return this.finishQuiz(classId);
+    this.startQuestion(classId, s.id, next);
+  }
+
   pauseQuiz(classId: string) {
     const s = this.requireSession(classId);
     if (s.status !== 'PLAYING') throw conflict('진행 중인 문제만 일시정지할 수 있습니다.', 'INVALID_STATE');

@@ -43,6 +43,7 @@ export const EVENT_LABEL: Record<string, string> = {
   QUIZ_PAUSED: '일시정지',
   QUIZ_RESUMED: '재개',
   QUESTION_STARTED: '문제 출제',
+  QUESTION_SKIPPED: '문제 건너뛰기',
   RESULTS_SHOWN: '결과 공개',
   QUIZ_FINISHED: '퀴즈 종료',
   SESSION_CREATED: '세션 생성',

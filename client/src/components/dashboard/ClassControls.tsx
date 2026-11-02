@@ -1,4 +1,4 @@
-import { CheckSquare, Flag, Pause, Play, RotateCcw, SkipForward } from 'lucide-react';
+import { CheckSquare, FastForward, Flag, Pause, Play, RotateCcw, SkipForward } from 'lucide-react';
 import { useState } from 'react';
 import { EVENTS, type SessionStatus } from '@shared/types/index';
 import { useAdminSocket } from '../../contexts/AdminSocketContext';
@@ -25,6 +25,9 @@ export function ClassControls({ classId, status, questionIndex, totalQuestions, 
           <button className={`btn-cyan ${sm}`} onClick={() => command(EVENTS.ADMIN_SHOW_RESULTS, { classId })}>
             <CheckSquare className="h-4 w-4" /> 결과 공개
           </button>
+          <button className={`btn-ghost ${sm}`} onClick={() => command(EVENTS.ADMIN_SKIP, { classId })}>
+            <FastForward className="h-4 w-4" /> 건너뛰기
+          </button>
         </>
       )}
       {status === 'PAUSED' && (
@@ -34,6 +37,9 @@ export function ClassControls({ classId, status, questionIndex, totalQuestions, 
           </button>
           <button className={`btn-cyan ${sm}`} onClick={() => command(EVENTS.ADMIN_SHOW_RESULTS, { classId })}>
             <CheckSquare className="h-4 w-4" /> 결과 공개
+          </button>
+          <button className={`btn-ghost ${sm}`} onClick={() => command(EVENTS.ADMIN_SKIP, { classId })}>
+            <FastForward className="h-4 w-4" /> 건너뛰기
           </button>
         </>
       )}

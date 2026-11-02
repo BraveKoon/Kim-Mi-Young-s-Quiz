@@ -495,3 +495,48 @@ describe('O/X 및 단답형 실시간 진행', () => {
     expect(qCsv.text).toContain('H2O / 물');
   });
 });
+
+describe('프로젝터·관리자 문제 건너뛰기(admin:skip_question)', () => {
+  it('권한 없는 프로젝터 소켓의 제어 이벤트는 차단하고, 인증된 관리자 소켓은 결과 공개 없이 즉시 다음 문제·종료로 건너뛴다', async () => {
+    const classId = '2-6';
+    const proj = await connect(ts, { role: 'projector', classId });
+    sockets.push(proj);
+    const [s1] = await students(classId, 1, '건너뛰기학생');
+
+    // 일반 프로젝터 소켓에서 admin:skip_question 직접 전송 시 차단
+    const forbidden = await emitAck(proj, 'admin:skip_question', { classId });
+    expect(forbidden).toMatchObject({ ok: false, error: 'FORBIDDEN' });
+
+    // 대기(WAITING) 상태에서는 건너뛰기 불가
+    expect(await emitAck(admin, 'admin:skip_question', { classId })).toMatchObject({
+      ok: false,
+      error: 'INVALID_STATE',
+    });
+
+    // 퀴즈 시작(Q0) → 결과 발표 없이 바로 건너뛰기 → Q1 즉시 출제
+    const q0P = waitFor<any>(proj, 'quiz:question', (p) => p.state.questionIndex === 0);
+    expect((await emitAck(admin, 'admin:start_quiz', { classId })).ok).toBe(true);
+    const q0 = await q0P;
+    const total = q0.state.totalQuestions;
+    expect(total).toBeGreaterThanOrEqual(2);
+
+    const q1ProjP = waitFor<any>(proj, 'quiz:question', (p) => p.state.questionIndex === 1);
+    const q1StuP = waitFor<any>(s1.socket, 'quiz:question', (p) => p.state.questionIndex === 1);
+    expect((await emitAck(admin, 'admin:skip_question', { classId })).ok).toBe(true);
+    const [q1Proj, q1Stu] = await Promise.all([q1ProjP, q1StuP]);
+    expect(q1Proj.state.status).toBe('PLAYING');
+    expect(q1Stu.state.questionIndex).toBe(1);
+
+    // 남은 문제를 끝까지 건너뛰면 FINISHED로 전환
+    for (let idx = 1; idx < total - 1; idx++) {
+      const nextP = waitFor<any>(proj, 'quiz:question', (p) => p.state.questionIndex === idx + 1);
+      expect((await emitAck(admin, 'admin:skip_question', { classId })).ok).toBe(true);
+      await nextP;
+    }
+    const finP = waitFor<any>(proj, 'quiz:finished');
+    expect((await emitAck(admin, 'admin:skip_question', { classId })).ok).toBe(true);
+    const fin = await finP;
+    expect(fin.state.status).toBe('FINISHED');
+    expect(ts.server.ctx.repos.logs.query({ eventType: 'QUESTION_SKIPPED', classId }).total).toBe(total);
+  });
+});
