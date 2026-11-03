@@ -1,17 +1,19 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
 import type { Socket } from 'socket.io-client';
-import { adminToken, connect, connectStudent, emitAck, sleep, startServer, studentSocket, waitFor, type TestServer } from './helpers.js';
+import { adminToken, connect, useSampleQuiz, connectStudent, emitAck, sleep, startServer, studentSocket, waitFor, type TestServer } from './helpers.js';
 
 let ts: TestServer;
 let token: string;
 let admin: Socket;
+let sampleSetId: number;
 const sockets: Socket[] = [];
 const auth = () => ({ Authorization: `Bearer ${token}` });
 
 beforeAll(async () => {
   ts = await startServer();
   token = await adminToken(ts);
+  sampleSetId = useSampleQuiz(ts);
   admin = await connect(ts, { role: 'admin', token });
   sockets.push(admin);
 });
@@ -39,8 +41,8 @@ async function waitUntilStarted(state: any) {
 describe('최초 완성 시나리오: 2학년 1반 5명 전체 퀴즈 흐름', () => {
   it('로그인 → 입장 → 시작 → 제출 → 채점 → 결과 → 다음 → 최종 → 통계 → 이력 → 내보내기', async () => {
     const classId = '2-1';
-    // 2. 2학년 1반 퀴즈(세션) 생성: 새 대회 + 샘플 문제 세트
-    const comp = await request(ts.url).post('/api/competitions').set(auth()).send({ title: '시나리오 대회', quizSetId: 1, classIds: [classId] });
+    // 2. 2학년 1반 퀴즈(세션) 생성: 새 대회 + 테스트 5문항 세트
+    const comp = await request(ts.url).post('/api/competitions').set(auth()).send({ title: '시나리오 대회', quizSetId: sampleSetId, classIds: [classId] });
     expect(comp.status).toBe(201);
     const competitionId = comp.body.competition.id;
     const watch = await emitAck(admin, 'admin:watch_class', { classId });
@@ -345,6 +347,7 @@ describe('답안 검증 · 타이머 · 재접속', () => {
 describe('서버 재시작 복구', () => {
   it('진행 중이던 세션의 문제·남은 시간·점수가 DB 기준으로 복구된다', async () => {
     const t1 = await startServer();
+    useSampleQuiz(t1);
     const tok = await adminToken(t1);
     const adm = await connect(t1, { role: 'admin', token: tok });
     const st = await studentSocket(t1, '2-10', '복구학생');
@@ -378,7 +381,7 @@ describe('서버 재시작 복구', () => {
     t3.server.ctx.sessions.recover();
     expect((await request(t3.url).get('/api/classes/2-11/session')).body.session.status).toBe('RESULT');
     const total = t3.server.ctx.repos.participants.find(st.participantId)!.total_score;
-    expect(total).toBeGreaterThan(0); // 샘플 1번 문제 정답 = 1(서울)
+    expect(total).toBeGreaterThan(0); // 5문항 세트 1번 문제 정답 = 1(서울)
     await t3.close();
   }, 60000);
 });

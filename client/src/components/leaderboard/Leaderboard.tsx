@@ -45,7 +45,7 @@ export function Leaderboard({
               transition={{ type: 'spring', stiffness: 260, damping: 26, delay: Math.min(i * 0.03, 0.4) }}
               className={`flex items-center gap-3 rounded-xl border px-3 ${large ? 'py-3 text-2xl' : 'py-2'} ${
                 e.participantId === highlightId
-                  ? 'border-neon-cyan bg-sky-50/95 ring-1 ring-sky-300/60'
+                  ? 'border-sky-500 bg-sky-50/95 ring-1 ring-sky-300/60'
                   : 'border-slate-200/90 bg-slate-50/70'
               }`}
             >

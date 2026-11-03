@@ -1,0 +1,48 @@
+/** 테스트 전용 5문항(4지선다) — 기본 시드는 고사성어 30문항이므로, 진행 흐름 테스트는 이 고정 세트를 사용한다. */
+export const SAMPLE_QUESTIONS = [
+  {
+    questionText: '대한민국의 수도는 어디일까요?',
+    options: ['부산', '서울', '대전', '인천'],
+    correctIndex: 1,
+    timeLimit: 20,
+    isDoublePoints: false,
+    explanation: '대한민국의 수도는 서울특별시입니다.',
+    category: '사회',
+  },
+  {
+    questionText: '물의 화학식으로 옳은 것은?',
+    options: ['CO₂', 'O₂', 'H₂O', 'NaCl'],
+    correctIndex: 2,
+    timeLimit: 20,
+    isDoublePoints: false,
+    explanation: '물은 수소 원자 2개와 산소 원자 1개로 이루어진 H₂O입니다.',
+    category: '과학',
+  },
+  {
+    questionText: '일차함수 y = 2x + 3 의 그래프에서 y절편은?',
+    options: ['2', '-3', '3', '-2'],
+    correctIndex: 2,
+    timeLimit: 25,
+    isDoublePoints: true,
+    explanation: 'x = 0일 때 y = 3 이므로 y절편은 3입니다.',
+    category: '수학',
+  },
+  {
+    questionText: '훈민정음을 창제한 조선의 왕은?',
+    options: ['태조', '세종대왕', '정조', '영조'],
+    correctIndex: 1,
+    timeLimit: 20,
+    isDoublePoints: false,
+    explanation: '세종대왕은 1443년 훈민정음을 창제하고 1446년에 반포했습니다.',
+    category: '역사',
+  },
+  {
+    questionText: "다음 중 'apple'의 뜻으로 알맞은 것은?",
+    options: ['바나나', '포도', '사과', '오렌지'],
+    correctIndex: 2,
+    timeLimit: 15,
+    isDoublePoints: false,
+    explanation: "'apple'은 과일 '사과'를 뜻합니다.",
+    category: '영어',
+  },
+];

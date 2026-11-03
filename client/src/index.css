@@ -7,10 +7,6 @@
   --color-ink-900: #f8fafc;
   --color-ink-800: #ffffff;
   --color-ink-700: #e2e8f0;
-  --color-neon-pink: #fb7185;
-  --color-neon-cyan: #0ea5e9;
-  --color-neon-lime: #10b981;
-  --color-neon-yellow: #f59e0b;
   --color-opt-red: #ef4444;
   --color-opt-blue: #2563eb;
   --color-opt-yellow: #eab308;
@@ -34,10 +30,6 @@ body {
 
 @utility glass-strong {
   @apply rounded-3xl border border-slate-200/90 bg-white shadow-[0_16px_40px_-14px_rgba(15,23,42,0.09),0_2px_10px_-3px_rgba(15,23,42,0.04)];
-}
-
-@utility neon-text {
-  text-shadow: none;
 }
 
 @utility input {
