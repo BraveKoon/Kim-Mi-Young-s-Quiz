@@ -16,6 +16,6 @@ export function errorHandler(isProduction: boolean) {
   };
 }
 
-export function notFoundHandler(req: Request, res: Response) {
+export function notFoundHandler(_req: Request, res: Response) {
   res.status(404).json({ error: 'NOT_FOUND', message: '요청한 API를 찾을 수 없습니다.' });
 }

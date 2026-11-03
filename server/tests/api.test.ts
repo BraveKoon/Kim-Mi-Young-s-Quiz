@@ -15,13 +15,19 @@ afterAll(async () => {
 });
 
 describe('초기화 및 시드', () => {
-  it('12개 학급과 기본 세션, 샘플 문제 5개가 생성된다', async () => {
+  it('12개 학급과 기본 세션, 고사성어·사자성어 기본 문제 30개가 생성된다', async () => {
     const res = await request(ts.url).get('/api/classes');
     expect(res.status).toBe(200);
     expect(res.body.classes).toHaveLength(12);
     expect(res.body.classes[0]).toMatchObject({ classId: '2-1', className: '2학년 1반', capacity: 35, status: 'WAITING' });
     expect(res.body.totals.capacity).toBe(420);
-    expect(ts.server.ctx.repos.questions.count()).toBe(5);
+    expect(ts.server.ctx.repos.questions.count()).toBe(30);
+    expect(res.body.classes.every((c: any) => c.status === 'WAITING')).toBe(true);
+    const sets = ts.server.ctx.repos.quizSets.list();
+    expect(sets).toHaveLength(1);
+    expect(sets[0]).toMatchObject({ title: '중2 고사성어·사자성어 퀴즈 (30문항)', question_count: 30 });
+    const types = new Set(ts.server.ctx.repos.questions.list().map((q) => q.question_type));
+    expect([...types].sort()).toEqual(['MULTIPLE_CHOICE', 'OX', 'SHORT_ANSWER']);
   });
   it('관리자 비밀번호는 bcrypt 해시로 저장된다', () => {
     const a = ts.server.ctx.repos.admins.findByUsername('admin')!;

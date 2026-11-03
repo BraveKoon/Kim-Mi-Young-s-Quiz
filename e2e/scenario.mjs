@@ -44,6 +44,30 @@ try {
   await shot(admin, '02-admin-dashboard');
   console.log('✓ 관리자 로그인 및 비밀번호 변경');
 
+  // 기본 문제(고사성어 30문항)는 유형이 섞여 있으므로, 이 시나리오는 4지선다 5문항 세트를 만들어 2-1반에 배정한다.
+  const competitionId = await admin.evaluate(async () => {
+    const token = sessionStorage.getItem('classquiz.adminToken');
+    const call = async (path, body) => {
+      const r = await fetch(`/api${path}`, { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
+      if (!r.ok) throw new Error(`${path} ${r.status}`);
+      return r.json();
+    };
+    const items = [
+      ['대한민국의 수도는 어디일까요?', ['부산', '서울', '대전', '인천'], 1, false],
+      ['물의 화학식으로 옳은 것은?', ['CO₂', 'O₂', 'H₂O', 'NaCl'], 2, false],
+      ['일차함수 y = 2x + 3 의 그래프에서 y절편은?', ['2', '-3', '3', '-2'], 2, true],
+      ['훈민정음을 창제한 조선의 왕은?', ['태조', '세종대왕', '정조', '영조'], 1, false],
+      ["다음 중 'apple'의 뜻으로 알맞은 것은?", ['바나나', '포도', '사과', '오렌지'], 2, false],
+    ];
+    const ids = [];
+    for (const [questionText, options, correctIndex, isDoublePoints] of items) {
+      ids.push((await call('/questions', { questionText, options, correctIndex, isDoublePoints, timeLimit: 20 })).question.id);
+    }
+    const set = await call('/quiz-sets', { title: 'E2E 5문항', questionIds: ids });
+    const comp = await call('/competitions', { title: 'E2E 대회', quizSetId: set.quizSet.id, classIds: ['2-1'] });
+    return comp.competition.id;
+  });
+
   // ── 로비
   const lobbyCtx = await browser.newContext({ viewport: { width: 1280, height: 860 } });
   const lobby = await lobbyCtx.newPage();
@@ -153,9 +177,9 @@ try {
   await admin.getByRole('cell', { name: '퀴즈 종료' }).first().waitFor();
   await shot(admin, '15-admin-logs');
   await admin.goto(`${BASE}/admin/dashboard/competitions`);
-  await admin.getByText('기본 대회').waitFor();
+  await admin.getByText('E2E 대회').waitFor();
   await shot(admin, '16-admin-competitions');
-  await admin.goto(`${BASE}/results/1`);
+  await admin.goto(`${BASE}/results/${competitionId}`);
   await admin.getByText('전체 개인 시상대').waitFor();
   await admin.waitForTimeout(2500);
   await shot(admin, '17-results-page');

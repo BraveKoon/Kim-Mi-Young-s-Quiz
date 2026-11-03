@@ -6,6 +6,7 @@ import request from 'supertest';
 import { io as ioc, type Socket } from 'socket.io-client';
 import { loadConfig, type AppConfig } from '../src/config/index.js';
 import { createServer } from '../src/server.js';
+import { SAMPLE_QUESTIONS } from './fixtures.js';
 
 export const NEW_PASSWORD = 'teacher-pass-2026!';
 
@@ -109,3 +110,18 @@ export async function connectStudent(ts: TestServer, participantId: number, toke
 }
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * 테스트 전용 5문항(4지선다) 세트를 만들고, 대기 중인 모든 학급 세션을 이 세트로 바꾼다.
+ * 기본 시드(고사성어 30문항)는 유형이 섞여 있어 정답 인덱스·제한시간이 고정된 진행 흐름 테스트에 맞지 않는다.
+ */
+export function useSampleQuiz(ts: TestServer): number {
+  const { repos } = ts.server.ctx;
+  const now = Date.now();
+  const ids = SAMPLE_QUESTIONS.map((q, i) => repos.questions.create({ ...q, questionType: 'MULTIPLE_CHOICE', orderNum: 1000 + i }, now));
+  const setId = repos.quizSets.create({ title: '테스트 5문항', description: null, category: null, questionIds: ids }, now);
+  repos.db
+    .prepare("UPDATE class_sessions SET quiz_set_id = ?, quiz_set_title = '테스트 5문항', question_count = ? WHERE status = 'WAITING'")
+    .run(setId, ids.length);
+  return setId;
+}

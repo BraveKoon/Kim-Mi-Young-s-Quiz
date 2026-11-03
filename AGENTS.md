@@ -59,7 +59,7 @@
 ## 4. 현재 구현 완료 기능 요약 (`v1.0.0` ~ `v1.5.0`)
 
 - **3종 문제 유형**: 4지선다(`MULTIPLE_CHOICE`), O/X(`OX`), 단답형(`SHORT_ANSWER` — 최대 5개 복수 인정 답안, NFC·공백·영문 대소문자 정규화 채점, 결과 공개 전 정답 비노출)
-- **문제 일괄 등록 & 기본 프리셋**: `POST /api/questions/bulk` 단일 트랜잭션 일괄 등록 API + 중학교 2학년 고사성어·사자성어 30문항 검수 프리셋(`IDIOM_QUIZ_30`)
+- **문제 일괄 등록 & 기본 프리셋**: `POST /api/questions/bulk` 단일 트랜잭션 일괄 등록 API + 중학교 2학년 고사성어·사자성어 30문항 검수 프리셋(`IDIOM_QUIZ_30`, 원본 `shared/data/idiomQuiz30.ts`) — 서버 최초 실행 시 **기본 문제·문제 세트로 시드**됨(샘플 5문항은 제거, 기존 DB는 시작 시 1회 자동 전환)
 - **학급별 독립 실시간 제어**: `admin:start_quiz`, `admin:pause_quiz`, `admin:resume_quiz`, `admin:show_results`, `admin:next_question`, `admin:skip_question`(`QUESTION_SKIPPED` 로그 기록), `admin:finish_quiz`, `admin:reset_session`
 - **관리자 대시보드 13개 탭**: 대시보드, 학급 관리, 학생 관리, 문제 관리, 문제 세트 관리, 퀴즈 진행 관리, 개인 순위, 학급 순위, 문항별 통계, 활동 로그, 대회 이력, 결과 내보내기(UTF-8 BOM CSV / XLSX), 설정(다중 관리자 계정 추가·삭제 포함)
 
