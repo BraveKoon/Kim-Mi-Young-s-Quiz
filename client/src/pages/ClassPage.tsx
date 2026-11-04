@@ -271,6 +271,8 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
 function QuizRoom({ classId, creds, onInvalid }: { classId: string; creds: StudentCreds; onInvalid: (r: string) => void }) {
   const q = useStudentQuiz(classId, creds, onInvalid);
   const { state, conn } = q;
+  // 문제 진행 중의 등수는 서버가 현재 문제 점수를 뺀 "직전 문제까지" 기준이라 정답 여부가 드러나지 않는다. 첫 문제 전에는 등수가 의미 없으므로 숨긴다.
+  const hasRank = !!state && (state.questionIndex > 0 || ['RESULT', 'FINISHED'].includes(state.status));
 
   if (conn === 'replaced') {
     return (
@@ -297,10 +299,10 @@ function QuizRoom({ classId, creds, onInvalid }: { classId: string; creds: Stude
           <span className="font-display text-lg text-slate-900 md:text-xl">{state.className}</span>
           <StatusBadge status={state.status} />
         </div>
-        <div className="flex items-center gap-2.5 rounded-full border border-sky-200/90 bg-[#F3F9FF] px-3.5 py-1.5 text-sm">
+        <div className="flex items-center gap-2.5 rounded-full border border-sky-200/90 bg-[#F3F9FF] px-3.5 py-1.5 text-sm" aria-label="내 점수와 등수">
           <span className="max-w-44 truncate font-bold text-slate-800">{creds.nickname}</span>
           <span className="font-display text-base text-[#1D4ED8] tabular-nums">{num(q.myTotal)}점</span>
-          {q.myRank && state.status !== 'PLAYING' && state.status !== 'PAUSED' && (
+          {q.myRank && hasRank && (
             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-extrabold text-amber-900">{q.myRank}위</span>
           )}
         </div>
@@ -330,7 +332,7 @@ function QuizRoom({ classId, creds, onInvalid }: { classId: string; creds: Stude
           </Centered>
         )}
         {(state.status === 'PLAYING' || state.status === 'PAUSED') && state.question && (
-          <QuestionScreen state={state} answered={q.answered} mySubmit={q.mySubmit} submit={q.submit} timerSync={q.timerSync} />
+          <QuestionScreen state={state} answered={q.answered} mySubmit={q.mySubmit} submit={q.submit} timerSync={q.timerSync} myRank={hasRank ? q.myRank : null} myTotal={q.myTotal} />
         )}
         {state.status === 'RESULT' && <ResultScreen state={state} myResult={q.myResult} mySubmit={q.mySubmit} me={creds.participantId} />}
         {state.status === 'FINISHED' && <FinalScreen state={state} me={creds.participantId} myTotal={q.myTotal} myRank={q.myRank} />}
@@ -396,12 +398,16 @@ function QuestionScreen({
   mySubmit,
   submit,
   timerSync,
+  myRank,
+  myTotal,
 }: {
   state: ClassState;
   answered: { answeredCount: number; participantCount: number } | null;
   mySubmit: MySubmission | null;
   submit: (qid: number, answer: number | string) => Promise<{ ok: boolean; message?: string }>;
   timerSync: { serverNow: number; endTime: number } | null;
+  myRank: number | null;
+  myTotal: number;
 }) {
   const toast = useToast();
   const question = state.question!;
@@ -502,6 +508,17 @@ function QuestionScreen({
               submitted.selectedIndex !== null && (
                 <AnswerButton index={submitted.selectedIndex} text={question.options[submitted.selectedIndex]} mode="selected" disabled />
               )
+            )}
+            {myRank !== null && (
+              <div className="flex items-center gap-3 rounded-2xl border border-amber-300 bg-[#FEF9C3] px-5 py-3 text-amber-900" data-testid="my-rank-card">
+                <Trophy className="h-6 w-6 text-amber-600" />
+                <div className="text-left leading-tight">
+                  <div className="text-xs font-bold">내 등수 (직전 문제까지)</div>
+                  <div className="font-display text-2xl tabular-nums">
+                    {myRank}위 <span className="text-base font-bold text-amber-800">/ {state.participantCount}명 · {num(myTotal)}점</span>
+                  </div>
+                </div>
+              </div>
             )}
             <p className="text-sm font-medium text-slate-600">
               다른 친구들을 기다리는 중이에요… {answered && `(${answered.answeredCount}/${answered.participantCount}명 제출)`}
