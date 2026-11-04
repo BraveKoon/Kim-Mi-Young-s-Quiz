@@ -1,9 +1,10 @@
-import { Download, FileSpreadsheet, FileText, HardDriveDownload, Save } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, HardDriveDownload, Save, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '../../../contexts/ToastContext';
 import { useApi } from '../../../hooks/useApi';
 import { api, downloadFile, errorMessage } from '../../../services/api';
 import { dateTime } from '../../../utils/format';
+import { ConfirmDialog } from '../../common/Modal';
 import { CompetitionSelect, SectionTitle } from '../CompetitionSelect';
 
 const DATASETS = [
@@ -15,6 +16,7 @@ const DATASETS = [
 
 export function ExportsSection() {
   const toast = useToast();
+  const [resetOpen, setResetOpen] = useState(false);
   const [cid, setCid] = useState<number | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const history = useApi<{ exports: { id: number; competitionId: number; exportType: string; fileName: string; stored: boolean; createdAt: number }[] }>('/exports');
@@ -77,7 +79,12 @@ export function ExportsSection() {
         </div>
       )}
       <div className="glass mt-6 overflow-x-auto p-2">
-        <h3 className="px-3 py-2 font-bold text-slate-900">내보내기 기록</h3>
+        <div className="flex items-center justify-between gap-2 px-3 py-2">
+          <h3 className="font-bold text-slate-900">내보내기 기록</h3>
+          <button className="btn-ghost btn-sm text-rose-700" disabled={!history.data?.exports.length} onClick={() => setResetOpen(true)}>
+            <Trash2 className="h-4 w-4" /> 기록 초기화
+          </button>
+        </div>
         <table className="table-base">
           <thead>
             <tr>
@@ -107,6 +114,24 @@ export function ExportsSection() {
           </tbody>
         </table>
       </div>
+      <ConfirmDialog
+        open={resetOpen}
+        danger
+        title="내보내기 기록 초기화"
+        requireTyping="RESET"
+        confirmText="전체 삭제"
+        message="내보내기 기록을 모두 지우고, 서버에 저장해 둔 내보내기 파일도 함께 삭제합니다. 이미 내려받은 파일에는 영향이 없습니다."
+        onClose={() => setResetOpen(false)}
+        onConfirm={async () => {
+          try {
+            const r = await api.delete('/exports', { data: { confirm: 'RESET' } });
+            toast(`내보내기 기록 ${r.data.deleted}건(저장 파일 ${r.data.filesDeleted}개)을 삭제했습니다.`, 'success');
+            history.reload();
+          } catch (e) {
+            toast(errorMessage(e), 'error');
+          }
+        }}
+      />
     </div>
   );
 }

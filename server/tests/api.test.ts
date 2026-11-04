@@ -401,4 +401,36 @@ describe('대회 관리', () => {
     expect(r.body.comparable).toBe(false);
     expect(r.body.fairnessWarning).toContain('공정한 비교가 아닐 수 있습니다');
   });
+
+  it('활동 로그와 내보내기 기록을 초기화할 수 있다 (확인 문구 필수, 초기화 사실은 로그로 남음)', async () => {
+    const comp = await request(ts.url).post('/api/competitions').set(auth()).send({ title: '내보내기 기록 대회', quizSetId: 1, classIds: ['2-8'] });
+    const cid = comp.body.competition.id;
+    const saved = await request(ts.url).post(`/api/exports/${cid}`).set(auth()).send({ format: 'csv' });
+    expect(saved.status).toBe(201);
+    const filePath = ts.server.ctx.repos.exports.list(cid)[0].file_path!;
+    const fs = await import('node:fs');
+    expect(fs.existsSync(filePath)).toBe(true);
+    expect((await request(ts.url).get('/api/exports').set(auth())).body.exports.length).toBeGreaterThan(0);
+
+    // 학생·비로그인·확인 문구 누락은 거부
+    expect((await request(ts.url).delete('/api/exports').send({ confirm: 'RESET' })).status).toBe(401);
+    expect((await request(ts.url).delete('/api/exports').set(auth()).send({})).status).toBe(400);
+    expect((await request(ts.url).delete('/api/logs').set(auth()).send({ confirm: 'reset' })).status).toBe(400);
+    expect(fs.existsSync(filePath)).toBe(true);
+
+    const ex = await request(ts.url).delete('/api/exports').set(auth()).send({ confirm: 'RESET' });
+    expect(ex.status).toBe(200);
+    expect(ex.body.deleted).toBeGreaterThan(0);
+    expect(ex.body.filesDeleted).toBe(1);
+    expect(fs.existsSync(filePath)).toBe(false);
+    expect((await request(ts.url).get('/api/exports').set(auth())).body.exports).toEqual([]);
+
+    const logs = await request(ts.url).delete('/api/logs').set(auth()).send({ confirm: 'RESET' });
+    expect(logs.status).toBe(200);
+    expect(logs.body.deleted).toBeGreaterThan(0);
+    const after = await request(ts.url).get('/api/logs').set(auth());
+    // 남아 있는 로그는 "초기화했다"는 기록 1건뿐이어야 한다
+    expect(after.body.logs.map((l: any) => l.eventType)).toEqual(['LOGS_RESET']);
+    expect(ts.server.ctx.repos.logs.query({ eventType: 'EXPORTS_RESET' }).total).toBe(0);
+  });
 });

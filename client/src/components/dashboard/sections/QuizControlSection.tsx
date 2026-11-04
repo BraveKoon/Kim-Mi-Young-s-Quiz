@@ -2,6 +2,7 @@ import { Monitor, QrCode as QrCodeIcon, Users, Wifi } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CLASS_IDS, EVENTS, classDisplayName, type ClassState, type ParticipantSummary } from '@shared/types/index';
+import { openProjector } from '../../../utils/projector';
 import { useAdminSocket } from '../../../contexts/AdminSocketContext';
 import { useCountdown } from '../../../hooks/useCountdown';
 import { OPTION_STYLES, QUESTION_TYPE_LABEL, pct, seconds } from '../../../utils/format';
@@ -70,9 +71,9 @@ export function QuizControlSection() {
         <button type="button" className="btn-ghost" onClick={() => setQrOpen(true)}>
           <QrCodeIcon className="h-4 w-4 text-[#2563EB]" /> 참가 QR
         </button>
-        <a className="btn-ghost" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/projector/${classId}`} target="_blank" rel="noreferrer">
+        <button type="button" className="btn-ghost" onClick={() => openProjector(classId)}>
           <Monitor className="h-4 w-4 text-teal-600" /> 프로젝터
-        </a>
+        </button>
       </SectionTitle>
       <JoinQrModal
         open={qrOpen}

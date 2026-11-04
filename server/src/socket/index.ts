@@ -4,14 +4,14 @@ import { EVENTS, isValidClassId } from '@shared/types/index.js';
 import type { AppContext } from '../context.js';
 import type { Broadcaster } from '../quiz/sessionManager.js';
 import { TokenBucket } from '../security/eventRateLimiter.js';
-import { registerAdminHandlers } from './adminHandlers.js';
+import { PROJECTOR_CONTROL_EVENTS, registerAdminHandlers, registerProjectorControlHandlers } from './adminHandlers.js';
 import { rooms } from './roomManager.js';
 import { registerStudentHandlers } from './studentHandlers.js';
 
 export type SocketData =
   | { role: 'admin'; adminId: number; username: string; token: string }
   | { role: 'student'; participantId: number; classId: string; sessionId: number; nickname: string }
-  | { role: 'projector'; classId: string };
+  | { role: 'projector'; classId: string; controlKey?: string };
 
 export type AppSocket = Socket<any, any, any, SocketData>;
 
@@ -78,7 +78,9 @@ export function createSocketServer(httpServer: HttpServer, ctx: AppContext) {
       }
       if (auth.role === 'projector') {
         if (!isValidClassId(auth.classId)) return next(new Error('INVALID_CLASS'));
-        socket.data = { role: 'projector', classId: auth.classId };
+        // 대시보드에서 발급한 진행 컨트롤 키가 유효할 때만 컨트롤을 허용한다(없거나 잘못되면 보기 전용).
+        const controlKey = ctx.auth.verifyProjectorKey(auth.controlKey, auth.classId) !== null ? String(auth.controlKey) : undefined;
+        socket.data = { role: 'projector', classId: auth.classId, controlKey };
         return next();
       }
       return next(new Error('UNAUTHORIZED'));
@@ -103,7 +105,9 @@ export function createSocketServer(httpServer: HttpServer, ctx: AppContext) {
         ack?.({ ok: false, error: 'RATE_LIMITED', message: '요청이 너무 많습니다.' });
         return;
       }
-      if (typeof event === 'string' && event.startsWith('admin:') && d.role !== 'admin') {
+      const projectorControl =
+        d.role === 'projector' && !!d.controlKey && typeof event === 'string' && PROJECTOR_CONTROL_EVENTS.has(event);
+      if (typeof event === 'string' && event.startsWith('admin:') && d.role !== 'admin' && !projectorControl) {
         ctx.logger.log('UNAUTHORIZED_ADMIN_EVENT', { ...who, severity: 'critical', details: { event, role: d.role } });
         ack?.({ ok: false, error: 'FORBIDDEN', message: '권한이 없습니다.' });
         return;
@@ -123,6 +127,8 @@ export function createSocketServer(httpServer: HttpServer, ctx: AppContext) {
       socket.join(rooms.projector(classId));
       socket.emit(EVENTS.STATE, { state: ctx.sessions.getClassState(classId, 'projector') });
       socket.emit(EVENTS.PARTICIPANTS, ctx.sessions.participantsPayload(classId, 'projector'));
+      socket.emit(EVENTS.PROJECTOR_CONTROL, { enabled: !!d.controlKey });
+      registerProjectorControlHandlers(socket, ctx);
       socket.on(EVENTS.PROJECTOR_REQUEST_STATE, (_p: unknown, ack?: (r: unknown) => void) => {
         const state = ctx.sessions.getClassState(classId, 'projector');
         if (typeof ack === 'function') ack({ ok: true, state });
