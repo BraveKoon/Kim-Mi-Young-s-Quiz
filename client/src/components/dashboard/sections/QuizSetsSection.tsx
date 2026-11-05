@@ -42,10 +42,10 @@ export function QuizSetsSection() {
               </div>
             </div>
             {s.description && <p className="mt-2 text-sm text-slate-600 break-words">{s.description}</p>}
-            <ol className="mt-3 space-y-1.5 rounded-2xl border border-sky-100 bg-[#F3F9FF]/80 p-3 text-sm text-slate-700">
+            <ol className="mt-3 space-y-1.5 rounded-2xl border border-slate-100 bg-slate-50/80 p-3 text-sm text-slate-700">
               {s.questions.slice(0, 6).map((q, idx) => (
                 <li key={q.id} className="flex min-w-0 items-baseline gap-2">
-                  <span className="shrink-0 text-xs font-extrabold text-[#2563EB]">{idx + 1}.</span>
+                  <span className="shrink-0 text-xs font-extrabold text-brand-600">{idx + 1}.</span>
                   <span className="min-w-0 flex-1 truncate font-medium">{q.questionText}</span>
                 </li>
               ))}
@@ -136,7 +136,7 @@ function QuizSetForm({ initial, onClose, onSaved }: { initial: Partial<QuizSet>;
             <ol className="max-h-80 space-y-1.5 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50/70 p-2">
               {ids.map((id, i) => (
                 <li key={id} className="flex min-w-0 items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-sm shadow-2xs">
-                  <span className="w-6 shrink-0 font-bold text-[#2563EB]">{i + 1}.</span>
+                  <span className="w-6 shrink-0 font-bold text-brand-600">{i + 1}.</span>
                   <span className="min-w-0 flex-1 truncate font-medium text-slate-800">{byId.get(id)?.questionText ?? `#${id}`}</span>
                   <button disabled={i === 0} onClick={() => move(i, -1)} className="shrink-0 rounded p-1 text-slate-500 hover:bg-slate-100 disabled:opacity-25" aria-label="위로">
                     <ArrowUp className="h-4 w-4" />
@@ -160,10 +160,10 @@ function QuizSetForm({ initial, onClose, onSaved }: { initial: Partial<QuizSet>;
                   <li key={q.id} className="min-w-0">
                     <button
                       type="button"
-                      className="block w-full truncate rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-left text-sm font-medium text-slate-800 transition hover:border-blue-300 hover:bg-blue-50/60"
+                      className="block w-full truncate rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-left text-sm font-medium text-slate-800 transition hover:border-brand-300 hover:bg-brand-50/60"
                       onClick={() => setIds([...ids, q.id])}
                     >
-                      + <span className="font-bold text-[#2563EB]">[{QUESTION_TYPE_LABEL[q.questionType] ?? q.questionType}]</span>{' '}
+                      + <span className="font-bold text-brand-600">[{QUESTION_TYPE_LABEL[q.questionType] ?? q.questionType}]</span>{' '}
                       {q.category && <span className="text-slate-500">[{q.category}] </span>}
                       {q.questionText}
                     </button>

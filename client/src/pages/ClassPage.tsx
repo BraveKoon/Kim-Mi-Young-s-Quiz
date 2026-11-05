@@ -17,7 +17,7 @@ import {
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { CLASS_CAPACITY, classDisplayName, formatStudentNickname, isValidClassId, type ClassState } from '@shared/types/index';
-import { ClassroomAccentStrip, Logo } from '../components/common/Logo';
+import { Logo } from '../components/common/Logo';
 import { FullScreenSpinner } from '../components/common/Spinner';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { Leaderboard } from '../components/leaderboard/Leaderboard';
@@ -126,7 +126,7 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
   return (
     <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-4 py-8 sm:px-6">
       <header className="mb-6 flex flex-col items-center text-center">
-        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-amber-200/90 bg-[#FEF9C3] px-3.5 py-1 text-xs font-bold text-amber-900 shadow-2xs">
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-amber-200/90 bg-amber-50 px-3.5 py-1 text-xs font-bold text-amber-900 shadow-2xs">
           <span>★ {classDisplayName(classId)} 퀴즈 교실</span>
         </div>
         <Logo size="lg" />
@@ -139,32 +139,31 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
         animate={{ opacity: 1, y: 0 }}
         className="glass-strong w-full overflow-hidden"
       >
-        <ClassroomAccentStrip />
 
         <div className="space-y-5 p-5 sm:p-7">
           {/* 학급 현황 박스 */}
-          <div className="rounded-2xl border border-sky-100 bg-[#F3F9FF] px-4 py-3.5">
+          <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <span className="block text-[11px] font-bold text-sky-700">입장할 학급</span>
+                <span className="block text-[11px] font-bold text-slate-700">입장할 학급</span>
                 <h1 className="font-display text-2xl text-slate-900">{classDisplayName(classId)}</h1>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {info && <StatusBadge status={info.status} />}
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-200/90 bg-white px-3 py-1 text-xs font-bold text-slate-700">
-                  <Users className="h-3.5 w-3.5 text-teal-600" />
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-3 py-1 text-xs font-bold text-slate-700">
+                  <Users className="h-3.5 w-3.5 text-emerald-600" />
                   <span>참가</span>
-                  <b className={full ? 'text-rose-600' : 'text-blue-700'}>
+                  <b className={full ? 'text-rose-600' : 'text-brand-700'}>
                     {participantCount}/{capacity}명
                   </b>
                 </span>
               </div>
             </div>
             {info?.competitionTitle && <p className="mt-1.5 text-xs font-medium text-slate-600">{info.competitionTitle}</p>}
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-sky-200/60" aria-hidden="true">
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200/60" aria-hidden="true">
               <div
                 className={`h-full rounded-full transition-[width] duration-300 ${
-                  full ? 'bg-[#FB7185]' : 'bg-gradient-to-r from-[#2563EB] to-[#14B8A6]'
+                  full ? 'bg-rose-400' : 'bg-brand-600'
                 }`}
                 style={{ width: `${Math.min(100, Math.round((participantCount / Math.max(1, capacity)) * 100))}%` }}
               />
@@ -185,7 +184,7 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
               <div className="relative">
                 <select
                   id="join-studentNum"
-                  className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-[#2563EB] focus:bg-white focus:ring-3 focus:ring-blue-500/15 disabled:cursor-not-allowed disabled:bg-slate-100"
+                  className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15 disabled:cursor-not-allowed disabled:bg-slate-100"
                   value={studentNum}
                   onChange={(e) => {
                     setStudentNum(Number(e.target.value));
@@ -207,10 +206,10 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
                 이름
               </label>
               <div className="relative">
-                <PencilLine className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#FB7185]" />
+                <PencilLine className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-rose-400" />
                 <input
                   id="join-studentName"
-                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 pr-4 pl-10 text-base font-bold text-slate-900 placeholder-slate-400 outline-none transition hover:border-slate-300 hover:bg-white focus:border-[#2563EB] focus:bg-white focus:ring-3 focus:ring-blue-500/15 disabled:cursor-not-allowed disabled:bg-slate-100"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 pr-4 pl-10 text-base font-bold text-slate-900 placeholder-slate-400 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15 disabled:cursor-not-allowed disabled:bg-slate-100"
                   placeholder="예) 홍길동"
                   value={studentName}
                   maxLength={14}
@@ -228,13 +227,13 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
 
           <div
             className={`flex flex-wrap items-center justify-between gap-2 rounded-2xl border px-4 py-3 ${
-              generatedNickname ? 'border-amber-200 bg-[#FFFDF2]' : 'border-slate-200/90 bg-slate-50/90'
+              generatedNickname ? 'border-amber-200 bg-amber-50' : 'border-slate-200/90 bg-slate-50/90'
             }`}
           >
             <span className="text-xs font-bold text-slate-700">내 퀴즈 이름표 (자동 생성)</span>
             <span
               className={`rounded-xl border bg-white px-3 py-1 font-mono text-sm font-extrabold ${
-                generatedNickname ? 'border-blue-200 text-[#1D4ED8]' : 'border-slate-200 text-slate-400'
+                generatedNickname ? 'border-brand-200 text-brand-700' : 'border-slate-200 text-slate-400'
               }`}
             >
               {generatedNickname || `${studentIdPrefix} 홍길동`}
@@ -299,9 +298,9 @@ function QuizRoom({ classId, creds, onInvalid }: { classId: string; creds: Stude
           <span className="font-display text-lg text-slate-900 md:text-xl">{state.className}</span>
           <StatusBadge status={state.status} />
         </div>
-        <div className="flex items-center gap-2.5 rounded-full border border-sky-200/90 bg-[#F3F9FF] px-3.5 py-1.5 text-sm" aria-label="내 점수와 등수">
+        <div className="flex items-center gap-2.5 rounded-full border border-slate-200/90 bg-slate-50 px-3.5 py-1.5 text-sm" aria-label="내 점수와 등수">
           <span className="max-w-44 truncate font-bold text-slate-800">{creds.nickname}</span>
-          <span className="font-display text-base text-[#1D4ED8] tabular-nums">{num(q.myTotal)}점</span>
+          <span className="font-display text-base text-brand-700 tabular-nums">{num(q.myTotal)}점</span>
           {q.myRank && hasRank && (
             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-extrabold text-amber-900">{q.myRank}위</span>
           )}
@@ -348,7 +347,7 @@ function Centered({ children }: { children: React.ReactNode }) {
 function WaitingRoom({ state, participants, me }: { state: ClassState; participants: { id: number; nickname: string; connected: boolean }[]; me: number }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-5 py-6 text-center">
-      <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-[#FEF9C3] px-3.5 py-1 text-xs font-bold text-amber-900">
+      <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3.5 py-1 text-xs font-bold text-amber-900">
         <span>★ 입장 완료! 잠시만 기다려 주세요</span>
       </div>
       <div className="font-display text-4xl text-slate-900 md:text-5xl">곧 퀴즈가 시작돼요!</div>
@@ -357,10 +356,9 @@ function WaitingRoom({ state, participants, me }: { state: ClassState; participa
       </p>
 
       <div className="glass-strong w-full overflow-hidden">
-        <ClassroomAccentStrip />
         <div className="p-5 sm:p-6">
           <div className="mb-4 flex items-center justify-center gap-2 text-sm font-extrabold text-slate-800">
-            <Users className="h-5 w-5 text-teal-600" /> 함께 모인 우리 반 친구들 ({participants.length || state.participantCount}/{state.capacity}명)
+            <Users className="h-5 w-5 text-emerald-600" /> 함께 모인 우리 반 친구들 ({participants.length || state.participantCount}/{state.capacity}명)
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             <AnimatePresence>
@@ -373,8 +371,8 @@ function WaitingRoom({ state, participants, me }: { state: ClassState; participa
                   exit={{ scale: 0 }}
                   className={`rounded-full border px-3.5 py-1.5 text-sm font-bold transition ${
                     p.id === me
-                      ? 'border-[#2563EB] bg-[#2563EB] text-white shadow-xs'
-                      : 'border-sky-200 bg-[#F3F9FF] text-slate-800'
+                      ? 'border-brand-600 bg-brand-600 text-white shadow-xs'
+                      : 'border-slate-200 bg-slate-50 text-slate-800'
                   } ${p.connected ? '' : 'opacity-45'}`}
                 >
                   {p.nickname}
@@ -386,7 +384,7 @@ function WaitingRoom({ state, participants, me }: { state: ClassState; participa
       </div>
 
       <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600 shadow-2xs">
-        <Loader2 className="h-4 w-4 animate-spin text-[#2563EB]" /> 선생님이 퀴즈를 시작하기를 기다리는 중이에요
+        <Loader2 className="h-4 w-4 animate-spin text-brand-600" /> 선생님이 퀴즈를 시작하기를 기다리는 중이에요
       </div>
     </div>
   );
@@ -458,12 +456,12 @@ function QuestionScreen({
         </span>
         <div className="flex items-center gap-2">
           {question.isDoublePoints && (
-            <span className="rounded-full border border-amber-300 bg-[#FEF9C3] px-3 py-0.5 text-xs font-extrabold text-amber-900">
+            <span className="rounded-full border border-amber-300 bg-amber-50 px-3 py-0.5 text-xs font-extrabold text-amber-900">
               ⚡ 2배 점수 찬스
             </span>
           )}
           {question.category && (
-            <span className="rounded-full border border-sky-200 bg-[#F3F9FF] px-3 py-0.5 text-xs font-bold text-sky-800">
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-0.5 text-xs font-bold text-slate-800">
               {question.category}
             </span>
           )}
@@ -476,7 +474,6 @@ function QuestionScreen({
         animate={{ opacity: 1, y: 0 }}
         className="glass-strong overflow-hidden text-center"
       >
-        <ClassroomAccentStrip />
         <div className="p-5 md:p-8">
           <h2 className="break-keep text-2xl font-black leading-snug text-slate-900 md:text-4xl">{question.text}</h2>
         </div>
@@ -498,11 +495,11 @@ function QuestionScreen({
             animate={{ scale: 1, opacity: 1 }}
             className="glass-strong flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center"
           >
-            <CheckCircle2 className="h-20 w-20 text-teal-500" />
+            <CheckCircle2 className="h-20 w-20 text-emerald-500" />
             <div className="font-display text-3xl text-slate-900 md:text-4xl">답안 제출 완료!</div>
             {isShort ? (
-              <div className="w-full max-w-md rounded-2xl border border-sky-200 bg-[#F3F9FF] px-5 py-4 text-xl font-bold text-slate-800">
-                내 답안: <span className="text-[#1D4ED8]">{submitted.answerText ?? ''}</span>
+              <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-xl font-bold text-slate-800">
+                내 답안: <span className="text-brand-700">{submitted.answerText ?? ''}</span>
               </div>
             ) : (
               submitted.selectedIndex !== null && (
@@ -510,7 +507,7 @@ function QuestionScreen({
               )
             )}
             {myRank !== null && (
-              <div className="flex items-center gap-3 rounded-2xl border border-amber-300 bg-[#FEF9C3] px-5 py-3 text-amber-900" data-testid="my-rank-card">
+              <div className="flex items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3 text-amber-900" data-testid="my-rank-card">
                 <Trophy className="h-6 w-6 text-amber-600" />
                 <div className="text-left leading-tight">
                   <div className="text-xs font-bold">내 등수 (직전 문제까지)</div>
@@ -598,17 +595,17 @@ function ResultScreen({ state, myResult, mySubmit, me }: { state: ClassState; my
         initial={{ scale: 0.94, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.25 }}
-        className={`flex flex-col items-center gap-2 rounded-3xl border p-6 text-center shadow-xs ${
-          correct ? 'border-teal-200 bg-teal-50/90 text-teal-950' : 'border-rose-200 bg-rose-50/90 text-rose-950'
+        className={`flex flex-col items-center gap-2 rounded-2xl border p-6 text-center shadow-xs ${
+          correct ? 'border-emerald-200 bg-emerald-50/90 text-emerald-950' : 'border-rose-200 bg-rose-50/90 text-rose-950'
         }`}
       >
-        {correct ? <CheckCircle2 className="h-16 w-16 text-teal-600" /> : <XCircle className="h-16 w-16 text-rose-500" />}
+        {correct ? <CheckCircle2 className="h-16 w-16 text-emerald-600" /> : <XCircle className="h-16 w-16 text-rose-500" />}
         <div className="font-display text-4xl">{correct ? '정답이에요!' : submitted ? '아쉬워요!' : '시간이 지났어요'}</div>
         {mine && (
           <div className="text-lg font-semibold text-slate-800 sm:text-xl">
-            <b className="text-[#1D4ED8]">+{num(mine.awardedScore ?? 0)}점</b> · 총 {num(mine.totalScore)}점 · <b>{mine.rank}위</b>
+            <b className="text-brand-700">+{num(mine.awardedScore ?? 0)}점</b> · 총 {num(mine.totalScore)}점 · <b>{mine.rank}위</b>
             {mine.prevRank != null && mine.prevRank !== mine.rank && (
-              <span className={mine.prevRank > mine.rank ? 'ml-2 font-extrabold text-teal-700' : 'ml-2 font-extrabold text-rose-600'}>
+              <span className={mine.prevRank > mine.rank ? 'ml-2 font-extrabold text-emerald-700' : 'ml-2 font-extrabold text-rose-600'}>
                 ({mine.prevRank > mine.rank ? '▲' : '▼'}
                 {Math.abs(mine.prevRank - mine.rank)})
               </span>
@@ -621,13 +618,13 @@ function ResultScreen({ state, myResult, mySubmit, me }: { state: ClassState; my
         <p className="mb-3 text-center text-lg font-extrabold text-slate-900">{question.text}</p>
         {isShort ? (
           <div className="space-y-2 text-center">
-            <div className="rounded-2xl border border-teal-300 bg-teal-50 px-4 py-3 text-lg font-extrabold text-teal-900">
+            <div className="rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-lg font-extrabold text-emerald-900">
               정답: {(r.acceptedAnswers ?? []).join(' / ')}
             </div>
             {submitted && (
               <div
                 className={`rounded-2xl border px-4 py-2 text-base font-bold ${
-                  correct ? 'border-teal-200 bg-teal-50/60 text-teal-800' : 'border-rose-200 bg-rose-50 text-rose-800'
+                  correct ? 'border-emerald-200 bg-emerald-50/60 text-emerald-800' : 'border-rose-200 bg-rose-50 text-rose-800'
                 }`}
               >
                 내 답안: {myAnswerText ?? '-'}
@@ -642,7 +639,7 @@ function ResultScreen({ state, myResult, mySubmit, me }: { state: ClassState; my
           </div>
         )}
         {r.explanation && (
-          <p className="mt-3 rounded-2xl border border-amber-200 bg-[#FFFDF2] p-3.5 text-sm leading-relaxed font-medium text-slate-800">
+          <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3.5 text-sm leading-relaxed font-medium text-slate-800">
             💡 {r.explanation}
           </p>
         )}
@@ -664,15 +661,14 @@ function FinalScreen({ state, me, myTotal, myRank }: { state: ClassState; me: nu
   return (
     <div className="flex flex-1 flex-col gap-6 py-4">
       <div className="text-center">
-        <PartyPopper className="mx-auto h-10 w-10 text-[#FB7185]" />
+        <PartyPopper className="mx-auto h-10 w-10 text-rose-400" />
         <h2 className="mt-1 font-display text-4xl text-slate-900 md:text-5xl">최종 결과 발표</h2>
       </div>
       <Podium entries={state.leaderboard} />
       <div className="glass-strong overflow-hidden text-center">
-        <ClassroomAccentStrip />
         <div className="p-6">
           <div className="text-sm font-bold text-slate-500">나의 최종 기록</div>
-          <div className="mt-1 font-display text-5xl text-[#2563EB]">{num(mine?.totalScore ?? myTotal)}점</div>
+          <div className="mt-1 font-display text-5xl text-brand-600">{num(mine?.totalScore ?? myTotal)}점</div>
           <div className="mt-1 text-lg font-extrabold text-slate-800">
             {mine?.rank ?? myRank ?? '-'}위 / {state.participantCount}명 · 정답 {mine?.correctCount ?? 0}/{state.totalQuestions}
           </div>

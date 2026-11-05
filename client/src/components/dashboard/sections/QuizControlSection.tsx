@@ -69,10 +69,10 @@ export function QuizControlSection() {
           ))}
         </select>
         <button type="button" className="btn-ghost" onClick={() => setQrOpen(true)}>
-          <QrCodeIcon className="h-4 w-4 text-[#2563EB]" /> 참가 QR
+          <QrCodeIcon className="h-4 w-4 text-brand-600" /> 참가 QR
         </button>
         <button type="button" className="btn-ghost" onClick={() => openProjector(classId)}>
-          <Monitor className="h-4 w-4 text-teal-600" /> 프로젝터
+          <Monitor className="h-4 w-4 text-emerald-600" /> 프로젝터
         </button>
       </SectionTitle>
       <JoinQrModal
@@ -108,14 +108,14 @@ export function QuizControlSection() {
           <div className="space-y-4">
             <div className="glass p-4">
               <h3 className="mb-2 flex items-center gap-2 font-bold text-slate-900">
-                <Users className="h-4 w-4 text-[#2563EB]" /> 참가자 {participants.length}/35 <Wifi className="ml-2 h-4 w-4 text-teal-600" /> {participants.filter((p) => p.connected).length}
+                <Users className="h-4 w-4 text-brand-600" /> 참가자 {participants.length}/35 <Wifi className="ml-2 h-4 w-4 text-emerald-600" /> {participants.filter((p) => p.connected).length}
               </h3>
               <div className="flex max-h-48 flex-wrap gap-1.5 overflow-y-auto">
                 {participants.map((p) => (
                   <span
                     key={p.id}
                     className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-                      p.connected ? 'border-teal-200 bg-teal-50 text-teal-900' : 'border-slate-200 bg-slate-100 text-slate-400 line-through'
+                      p.connected ? 'border-emerald-200 bg-emerald-50 text-emerald-900' : 'border-slate-200 bg-slate-100 text-slate-400 line-through'
                     }`}
                   >
                     {p.nickname}
@@ -148,11 +148,11 @@ function AdminQuestion({ state, answered, sync }: { state: ClassState; answered:
     <div className="glass space-y-4 p-5">
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-slate-600">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="font-display text-lg text-[#1D4ED8]">
+          <span className="font-display text-lg text-brand-700">
             문제 {q.index + 1}/{state.totalQuestions}
           </span>
-          <span className="rounded-full border border-sky-200 bg-[#F3F9FF] px-2.5 py-0.5 text-xs font-bold text-sky-900">{QUESTION_TYPE_LABEL[q.questionType] ?? q.questionType}</span>
-          {q.isDoublePoints && <span className="rounded-full border border-amber-300 bg-[#FEF9C3] px-2.5 py-0.5 text-xs font-extrabold text-amber-950">⚡ 2배</span>}
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-bold text-slate-900">{QUESTION_TYPE_LABEL[q.questionType] ?? q.questionType}</span>
+          {q.isDoublePoints && <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-extrabold text-amber-950">⚡ 2배</span>}
         </div>
         <span className="font-semibold">
           제출 {state.status === 'RESULT' ? state.results?.answeredCount : answered}/{state.participantCount}명
@@ -161,8 +161,8 @@ function AdminQuestion({ state, answered, sync }: { state: ClassState; answered:
       <h3 className="text-2xl font-black text-slate-900">{q.text}</h3>
       {playing && <TimerBar remainingMs={remainingMs} totalMs={q.timeLimit * 1000} />}
       {isShort ? (
-        <div className="rounded-2xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm">
-          <span className="font-semibold text-teal-800">인정 답안: </span>
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm">
+          <span className="font-semibold text-emerald-800">인정 답안: </span>
           <b className="text-base text-slate-900">{acceptedAnswers.join(' / ')}</b>
         </div>
       ) : (
@@ -185,15 +185,15 @@ function AdminQuestion({ state, answered, sync }: { state: ClassState; answered:
             correctIndex={isShort ? 0 : state.results.correctIndex}
           />
           <div className="grid grid-cols-3 gap-2 text-center text-sm">
-            <div className="rounded-xl border border-sky-100 bg-[#F3F9FF] p-2.5 font-medium text-slate-600">
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-2.5 font-medium text-slate-600">
               정답률(응답자)
               <div className="font-display text-xl text-slate-900">{state.results.answeredCount ? pct(state.results.correctCount / state.results.answeredCount) : '-'}</div>
             </div>
-            <div className="rounded-xl border border-sky-100 bg-[#F3F9FF] p-2.5 font-medium text-slate-600">
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-2.5 font-medium text-slate-600">
               정답률(전체)
               <div className="font-display text-xl text-slate-900">{state.results.participantCount ? pct(state.results.correctCount / state.results.participantCount) : '-'}</div>
             </div>
-            <div className="rounded-xl border border-sky-100 bg-[#F3F9FF] p-2.5 font-medium text-slate-600">
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-2.5 font-medium text-slate-600">
               평균 응답 시간
               <div className="font-display text-xl text-slate-900">{seconds(state.results.averageElapsedMs)}</div>
             </div>

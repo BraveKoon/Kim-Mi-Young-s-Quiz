@@ -32,7 +32,7 @@ export function AnalyticsSection() {
         <Spinner />
       ) : (
         <div className="space-y-4">
-          {data.classRanking.fairnessWarning && <div className="rounded-2xl border border-amber-300 bg-[#FEF9C3]/80 p-3 text-sm font-semibold text-amber-950">⚠️ {data.classRanking.fairnessWarning}</div>}
+          {data.classRanking.fairnessWarning && <div className="rounded-2xl border border-amber-300 bg-amber-50/80 p-3 text-sm font-semibold text-amber-950">⚠️ {data.classRanking.fairnessWarning}</div>}
           <div className="grid gap-3 md:grid-cols-4">
             <Card label="참가 학급" value={`${data.totals.classes}개`} />
             <Card label="참가 학생" value={`${data.totals.participants}명`} />
@@ -51,13 +51,13 @@ export function AnalyticsSection() {
               </div>
             </div>
             <div className="glass flex min-w-0 items-center gap-3 p-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-teal-200 bg-teal-50 text-teal-600">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-600">
                 <ThumbsUp className="h-5 w-5" />
               </span>
               <div className="min-w-0">
                 <div className="text-xs font-bold text-slate-500">가장 쉬웠던 문제</div>
                 <div className="truncate font-bold text-slate-900">{data.easiest?.text ?? '-'}</div>
-                <div className="text-sm font-bold text-teal-700">정답률 {data.easiest ? pct(data.easiest.correctRateAll) : '-'}</div>
+                <div className="text-sm font-bold text-emerald-700">정답률 {data.easiest ? pct(data.easiest.correctRateAll) : '-'}</div>
               </div>
             </div>
           </div>
@@ -81,8 +81,8 @@ export function AnalyticsSection() {
                   </thead>
                   <tbody>
                     {data.questions.map((q) => (
-                      <tr key={q.questionId} className="cursor-pointer hover:bg-sky-50/70" onClick={() => setDetail(q)}>
-                        <td className="font-bold text-[#2563EB]">{q.order}</td>
+                      <tr key={q.questionId} className="cursor-pointer hover:bg-slate-50/70" onClick={() => setDetail(q)}>
+                        <td className="font-bold text-brand-600">{q.order}</td>
                         <td className="max-w-md truncate font-bold text-slate-900">
                           {q.isDoublePoints && '⚡ '}
                           {q.text}
@@ -90,7 +90,7 @@ export function AnalyticsSection() {
                         <td>
                           {q.answeredCount}/{q.participantCount}
                         </td>
-                        <td className="font-semibold text-teal-700">{pct(q.correctRateAnswered)}</td>
+                        <td className="font-semibold text-emerald-700">{pct(q.correctRateAnswered)}</td>
                         <td className="font-semibold">{pct(q.correctRateAll)}</td>
                         <td>{seconds(q.averageElapsedMs)}</td>
                         <td>{num(q.averageScore)}</td>
@@ -110,12 +110,12 @@ export function AnalyticsSection() {
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               {detail.questionType && (
-                <span className="rounded-full border border-sky-200 bg-[#F3F9FF] px-2.5 py-0.5 text-xs font-bold text-sky-900">{QUESTION_TYPE_LABEL[detail.questionType] ?? detail.questionType}</span>
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-bold text-slate-900">{QUESTION_TYPE_LABEL[detail.questionType] ?? detail.questionType}</span>
               )}
               <p className="text-lg font-bold text-slate-900">{detail.text}</p>
             </div>
             {detail.acceptedAnswers && (
-              <div className="rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900">
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
                 인정 답안: <b>{detail.acceptedAnswers.join(' / ')}</b>
               </div>
             )}

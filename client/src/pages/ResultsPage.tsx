@@ -99,7 +99,7 @@ export default function ResultsPage() {
         <Podium entries={data.individuals} />
       </section>
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="glass p-5">
+        <section className="glass min-w-0 p-5">
           <h2 className="mb-3 font-display text-2xl text-slate-900">학급 순위 (평균 점수)</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.classes.map((c) => ({ name: classDisplayName(c.classId).replace('2학년 ', ''), avg: Math.round(c.averageScore) }))}>
@@ -113,7 +113,8 @@ export default function ResultsPage() {
               <Bar dataKey="avg" fill="#2563eb" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-          <table className="table-base mt-3">
+          <div className="mt-3 overflow-x-auto">
+          <table className="table-base">
             <thead>
               <tr>
                 <th>순위</th>
@@ -139,8 +140,9 @@ export default function ResultsPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </section>
-        <section className="glass p-5">
+        <section className="glass min-w-0 p-5">
           <h2 className="mb-3 font-display text-2xl text-slate-900">개인 순위 {admin ? '(전체)' : '(상위 10명)'}</h2>
           <div className="max-h-[560px] overflow-y-auto pr-1">
             <Leaderboard entries={data.individuals} showClass showLast={false} />

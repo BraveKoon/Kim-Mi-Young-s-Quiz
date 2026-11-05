@@ -134,7 +134,7 @@ function AssignSessionModal({ initial, onClose }: { initial: string[]; onClose: 
         <div>
           <div className="mb-1 flex items-center justify-between">
             <label className="label">학급</label>
-            <button type="button" className="text-xs font-bold text-[#2563EB] hover:underline" onClick={() => setClassIds(classIds.length === 12 ? [] : [...CLASS_IDS])}>
+            <button type="button" className="text-xs font-bold text-brand-600 hover:underline" onClick={() => setClassIds(classIds.length === 12 ? [] : [...CLASS_IDS])}>
               {classIds.length === 12 ? '전체 해제' : '전체 선택'}
             </button>
           </div>
@@ -144,7 +144,7 @@ function AssignSessionModal({ initial, onClose }: { initial: string[]; onClose: 
                 key={id}
                 className={`cursor-pointer rounded-xl border px-2 py-2 text-center text-sm font-bold transition ${
                   classIds.includes(id)
-                    ? 'border-[#2563EB] bg-blue-50 text-[#1D4ED8]'
+                    ? 'border-brand-600 bg-brand-50 text-brand-700'
                     : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-white'
                 }`}
               >

@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
-import { ClassroomAccentStrip } from './Logo';
 
 export function Modal({ open, onClose, title, children, wide }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
   useEffect(() => {
@@ -14,7 +13,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 p-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -30,7 +29,6 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
             exit={{ scale: 0.96, opacity: 0 }}
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <ClassroomAccentStrip />
             <div className="max-h-[calc(90vh-6px)] overflow-y-auto p-6">
               <div className="mb-4 flex items-center justify-between gap-4">
                 <h3 className="font-display text-2xl text-slate-900">{title}</h3>

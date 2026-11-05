@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ClassroomAccentStrip, Logo } from '../components/common/Logo';
+import { Logo } from '../components/common/Logo';
 
 export default function NotFoundPage() {
   return (
@@ -12,9 +12,8 @@ export default function NotFoundPage() {
         animate={{ scale: 1, opacity: 1 }}
         className="glass-strong w-full max-w-md overflow-hidden"
       >
-        <ClassroomAccentStrip />
         <div className="space-y-4 p-8">
-          <div className="font-display text-7xl text-[#2563EB]">404</div>
+          <div className="font-display text-7xl text-brand-600">404</div>
           <p className="text-base font-medium text-slate-600">페이지를 찾을 수 없어요. 학급 주소(예: /2-1)를 다시 확인해 주세요.</p>
           <Link to="/" className="btn-primary w-full">
             <Home className="h-5 w-5" /> 처음 화면으로

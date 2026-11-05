@@ -28,7 +28,7 @@ export function CompetitionsSection() {
     <div>
       <SectionTitle title="대회 이력" desc="대회별 참가 학급·문제 세트·결과가 보존됩니다. 현재 퀴즈를 초기화해도 종료된 대회 기록은 유지됩니다.">
         <button className="btn-ghost" disabled={selected.length < 2} onClick={() => setCompare(true)}>
-          <BarChart3 className="h-4 w-4 text-[#2563EB]" /> 선택 대회 비교 ({selected.length})
+          <BarChart3 className="h-4 w-4 text-brand-600" /> 선택 대회 비교 ({selected.length})
         </button>
         <button className="btn-primary" onClick={() => setCreating(true)}>
           <Plus className="h-4 w-4" /> 새 대회
@@ -49,7 +49,7 @@ export function CompetitionsSection() {
                 <div>
                   <div className="font-display text-xl text-slate-900">
                     #{c.id} {c.title}{' '}
-                    <span className="ml-1 rounded-full border border-sky-200 bg-[#F3F9FF] px-2.5 py-0.5 align-middle font-sans text-xs font-bold text-sky-900">
+                    <span className="ml-1 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 align-middle font-sans text-xs font-bold text-slate-900">
                       {COMPETITION_STATUS_LABEL[c.status]}
                     </span>
                   </div>
@@ -62,10 +62,10 @@ export function CompetitionsSection() {
               </label>
               <div className="flex flex-wrap gap-2">
                 <Link to={`/results/${c.id}`} className="btn-ghost btn-sm">
-                  <ExternalLink className="h-4 w-4 text-[#2563EB]" /> 결과
+                  <ExternalLink className="h-4 w-4 text-brand-600" /> 결과
                 </Link>
                 <a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/projector/competition/${c.id}`} target="_blank" rel="noreferrer" className="btn-ghost btn-sm">
-                  <Monitor className="h-4 w-4 text-teal-600" /> 발표 화면
+                  <Monitor className="h-4 w-4 text-emerald-600" /> 발표 화면
                 </a>
                 {c.status !== 'FINISHED' && (
                   <button className="btn-ghost btn-sm" onClick={() => setFinish(c)}>
@@ -80,7 +80,7 @@ export function CompetitionsSection() {
             {c.sessions.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {c.sessions.map((s) => (
-                  <span key={s.id} className="flex items-center gap-1.5 rounded-xl border border-sky-100 bg-[#F3F9FF] px-2.5 py-1 text-xs font-semibold text-slate-700">
+                  <span key={s.id} className="flex items-center gap-1.5 rounded-xl border border-slate-100 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700">
                     {s.className.replace('2학년 ', '')} <StatusBadge status={s.status as never} /> {s.participantCount}명
                     {!s.isCurrent && <span className="text-slate-400">(이전 세션)</span>}
                   </span>
@@ -186,7 +186,7 @@ function CreateCompetition({ onClose, onDone }: { onClose: () => void; onDone: (
                   key={id}
                   className={`cursor-pointer rounded-xl border px-2 py-2 text-center text-sm font-bold transition ${
                     classIds.includes(id)
-                      ? 'border-[#2563EB] bg-blue-50 text-[#1D4ED8]'
+                      ? 'border-brand-600 bg-brand-50 text-brand-700'
                       : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-white'
                   }`}
                 >
@@ -238,7 +238,7 @@ function CompareModal({ ids, onClose }: { ids: number[]; onClose: () => void }) 
               {data.competitions.map((c) => (
                 <tr key={c.id}>
                   <td className="font-bold text-slate-900">{c.title}</td>
-                  <td className="font-semibold text-teal-700">{num(c.averageScore)}</td>
+                  <td className="font-semibold text-emerald-700">{num(c.averageScore)}</td>
                   <td>{c.participants}명</td>
                   <td>{pct(c.participationRate)}</td>
                 </tr>

@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
-import { Home, KeyRound, LogIn } from 'lucide-react';
+import { Home, LogIn } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ClassroomAccentStrip, Logo } from '../components/common/Logo';
+import { Logo } from '../components/common/Logo';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { errorMessage } from '../services/api';
 
@@ -35,12 +35,8 @@ export default function AdminLoginPage() {
   return (
     <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-8">
       <header className="mb-6 flex flex-col items-center text-center">
-        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-sky-200 bg-[#F3F9FF] px-3.5 py-1 text-xs font-bold text-sky-800 shadow-2xs">
-          <KeyRound className="h-3.5 w-3.5 text-[#2563EB]" />
-          <span>선생님 · 관리자 전용 공간</span>
-        </div>
         <Logo size="lg" />
-        <p className="mt-2 text-sm font-medium text-slate-600">학급별 퀴즈 진행과 문제를 한곳에서 관리하세요.</p>
+        <p className="mt-3 text-sm font-medium text-slate-600">선생님 · 관리자 전용 공간</p>
       </header>
 
       <motion.form
@@ -49,7 +45,6 @@ export default function AdminLoginPage() {
         animate={{ opacity: 1, y: 0 }}
         className="glass-strong w-full overflow-hidden"
       >
-        <ClassroomAccentStrip />
 
         <div className="space-y-5 p-6 sm:p-8">
           <h1 className="text-center font-display text-2xl text-slate-900">관리자 로그인</h1>
@@ -104,7 +99,7 @@ export default function AdminLoginPage() {
           to="/"
           className="inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600 shadow-2xs transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
         >
-          <Home className="h-4 w-4 text-[#2563EB]" /> 홈으로
+          <Home className="h-4 w-4 text-brand-600" /> 홈으로
         </Link>
       </footer>
     </div>

@@ -15,9 +15,9 @@ export function Podium({ entries, large, confetti = true }: { entries: Leaderboa
     return () => clearTimeout(t);
   }, [confetti, entries.length]);
   const cols = [
-    { list: second, place: 2, h: large ? 'h-48' : 'h-28', color: 'from-slate-200 to-slate-300 border-slate-300', delay: 1.0 },
-    { list: first, place: 1, h: large ? 'h-72' : 'h-40', color: 'from-yellow-200 to-amber-400 border-amber-300', delay: 2.0 },
-    { list: third, place: 3, h: large ? 'h-36' : 'h-20', color: 'from-orange-200 to-amber-300 border-orange-300', delay: 0.2 },
+    { list: second, place: 2, h: large ? 'h-48' : 'h-28', color: 'bg-slate-200 border-slate-300', delay: 1.0 },
+    { list: first, place: 1, h: large ? 'h-72' : 'h-40', color: 'bg-amber-300 border-amber-400', delay: 2.0 },
+    { list: third, place: 3, h: large ? 'h-36' : 'h-20', color: 'bg-orange-200 border-orange-300', delay: 0.2 },
   ];
   return (
     <div className="flex items-end justify-center gap-3 md:gap-6">
@@ -35,7 +35,7 @@ export function Podium({ entries, large, confetti = true }: { entries: Leaderboa
               <div className="text-slate-400">-</div>
             )}
           </div>
-          <div className={`flex w-full ${c.h} items-start justify-center rounded-t-2xl border-x border-t bg-gradient-to-b ${c.color} pt-3 shadow-xs`}>
+          <div className={`flex w-full ${c.h} items-start justify-center rounded-t-2xl border-x border-t ${c.color} pt-3`}>
             <span className={`font-display text-slate-900 ${large ? 'text-7xl' : 'text-4xl'}`}>{c.place}</span>
           </div>
         </motion.div>

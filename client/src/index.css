@@ -1,12 +1,31 @@
 @import "tailwindcss";
 
+/*
+ * QUIZUP 디자인 토큰
+ * - 중립(흰색·회색) + 포인트색 1개(brand). 정답/오답/경고 같은 상태색만 별도로 사용한다.
+ * - 포인트색을 바꾸려면 아래 --color-brand-* 만 교체하면 된다.
+ */
 @theme {
   --font-sans: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-  --font-display: "Jua", "Noto Sans KR", system-ui, sans-serif;
+  --font-display: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+
   --color-ink-950: #0f172a;
   --color-ink-900: #f8fafc;
   --color-ink-800: #ffffff;
   --color-ink-700: #e2e8f0;
+
+  /* 퀴즈 보기 4색 (▲ ◆ ● ■) — 보기 구분용 기능 색상이라 유지 */
   --color-opt-red: #ef4444;
   --color-opt-blue: #2563eb;
   --color-opt-yellow: #eab308;
@@ -15,25 +34,25 @@
 
 html, body, #root { min-height: 100%; }
 body {
-  @apply text-slate-900 font-sans antialiased;
-  background-color: #fcfbf6;
-  background-image:
-    radial-gradient(rgba(37, 99, 235, 0.06) 1px, transparent 1px),
-    linear-gradient(180deg, #eff7ff 0%, #fcfbf6 52%, #faf6ec 100%);
-  background-size: 24px 24px, 100% 100%;
-  background-attachment: fixed;
+  @apply bg-[#f6f6f8] text-slate-900 font-sans antialiased;
+}
+
+/* 제목·숫자용 굵은 글씨 (둥근 장식 폰트 대신 같은 고딕의 ExtraBold) */
+.font-display {
+  font-weight: 800;
+  letter-spacing: -0.025em;
 }
 
 @utility glass {
-  @apply rounded-2xl border border-slate-200/90 bg-white shadow-[0_6px_22px_-10px_rgba(15,23,42,0.07),0_1px_4px_rgba(15,23,42,0.03)];
+  @apply rounded-2xl border border-slate-200 bg-white;
 }
 
 @utility glass-strong {
-  @apply rounded-3xl border border-slate-200/90 bg-white shadow-[0_16px_40px_-14px_rgba(15,23,42,0.09),0_2px_10px_-3px_rgba(15,23,42,0.04)];
+  @apply rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)];
 }
 
 @utility input {
-  @apply w-full rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition hover:border-slate-300 hover:bg-white focus:border-[#2563EB] focus:bg-white focus:ring-3 focus:ring-blue-500/15 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400;
+  @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition hover:border-slate-300 focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400;
 }
 
 @utility label {
@@ -45,19 +64,20 @@ body {
 }
 
 @utility btn-primary {
-  @apply btn bg-[#2563EB] text-white shadow-[0_6px_16px_-4px_rgba(37,99,235,0.4)] hover:bg-[#1D4ED8] disabled:shadow-none;
+  @apply btn bg-brand-600 text-white hover:bg-brand-700;
 }
 
+/* 보조 강조(진한 중립): 다운로드·결과 공개 등 */
 @utility btn-cyan {
-  @apply btn bg-[#0D9488] text-white shadow-[0_6px_16px_-4px_rgba(13,148,136,0.35)] hover:bg-[#0F766E] disabled:shadow-none;
+  @apply btn bg-slate-900 text-white hover:bg-slate-700;
 }
 
 @utility btn-ghost {
-  @apply btn border border-slate-200 bg-white text-slate-700 shadow-2xs hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900;
+  @apply btn border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900;
 }
 
 @utility btn-danger {
-  @apply btn bg-rose-500 text-white shadow-[0_6px_16px_-4px_rgba(244,63,94,0.35)] hover:bg-rose-600 disabled:shadow-none;
+  @apply btn bg-rose-600 text-white hover:bg-rose-700;
 }
 
 @utility btn-sm {
@@ -67,7 +87,7 @@ body {
 @utility table-base {
   @apply w-full text-left text-sm;
   & th {
-    @apply sticky top-0 border-b border-slate-200 bg-slate-50/95 px-3 py-2.5 text-xs font-bold text-slate-600;
+    @apply sticky top-0 border-b border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-bold text-slate-600;
   }
   & td {
     @apply border-t border-slate-100 px-3 py-2.5 text-slate-800;

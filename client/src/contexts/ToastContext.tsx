@@ -35,13 +35,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   t.kind === 'error'
                     ? 'border-rose-200 bg-rose-50 text-rose-900'
                     : t.kind === 'success'
-                      ? 'border-teal-200 bg-teal-50 text-teal-900'
-                      : 'border-sky-200 bg-white text-slate-800'
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+                      : 'border-slate-200 bg-white text-slate-800'
                 }`}
               >
                 <I
                   className={`h-5 w-5 shrink-0 ${
-                    t.kind === 'error' ? 'text-rose-500' : t.kind === 'success' ? 'text-teal-600' : 'text-[#2563EB]'
+                    t.kind === 'error' ? 'text-rose-500' : t.kind === 'success' ? 'text-emerald-600' : 'text-brand-600'
                   }`}
                 />
                 <span>{t.text}</span>

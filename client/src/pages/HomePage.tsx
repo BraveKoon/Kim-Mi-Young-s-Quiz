@@ -2,6 +2,7 @@ import { ArrowRight, ChevronDown, Loader2, LogIn, PencilLine, Shield, Users } fr
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CLASS_CAPACITY, CLASS_COUNT, GRADE, classDisplayName, formatStudentNickname, type SessionStatus } from '@shared/types/index';
+import { Logo } from '../components/common/Logo';
 import { useInterval } from '../hooks/useInterval';
 import { credStore } from '../hooks/useStudentQuiz';
 import { errorMessage, studentApi } from '../services/api';
@@ -24,19 +25,19 @@ const CLASSROOM_STATUS_META: Record<
 > = {
   WAITING: {
     label: '입장 가능 · 대기 중',
-    badgeClass: 'border-teal-200 bg-teal-50 text-teal-800',
-    dotClass: 'bg-teal-500',
+    badgeClass: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+    dotClass: 'bg-emerald-500',
   },
   PLAYING: {
     label: '퀴즈 진행 중',
-    badgeClass: 'border-blue-200 bg-blue-50 text-blue-800',
-    dotClass: 'bg-blue-600',
+    badgeClass: 'border-brand-200 bg-brand-50 text-brand-800',
+    dotClass: 'bg-brand-600',
     pulse: true,
   },
   RESULT: {
     label: '결과 확인 중',
-    badgeClass: 'border-sky-200 bg-sky-50 text-sky-800',
-    dotClass: 'bg-sky-500',
+    badgeClass: 'border-slate-200 bg-slate-50 text-slate-800',
+    dotClass: 'bg-brand-500',
   },
   PAUSED: {
     label: '잠시 멈춤',
@@ -83,7 +84,7 @@ export default function HomePage() {
   useEffect(() => {
     const meta = document.querySelector('meta[name="theme-color"]');
     const prev = meta?.getAttribute('content');
-    meta?.setAttribute('content', '#EFF7FF');
+    meta?.setAttribute('content', '#f6f6f8');
     return () => {
       if (prev) meta?.setAttribute('content', prev);
     };
@@ -129,65 +130,27 @@ export default function HomePage() {
   };
 
   return (
-    <div
-      className="min-h-dvh w-full bg-gradient-to-b from-[#EFF7FF] via-[#FCFBF6] to-[#FAF6EC] text-slate-900"
-      style={{
-        backgroundImage:
-          'radial-gradient(rgba(37, 99, 235, 0.065) 1px, transparent 1px), linear-gradient(180deg, #EFF7FF 0%, #FCFBF6 52%, #FAF6EC 100%)',
-        backgroundSize: '24px 24px, 100% 100%',
-      }}
-    >
+    <div className="min-h-dvh w-full bg-[#f6f6f8] text-slate-900">
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
         {/* 상단 브랜드 및 환영 문구 */}
-        <header className="mb-6 flex flex-col items-center text-center sm:mb-7">
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-amber-200/90 bg-[#FEF9C3] px-3.5 py-1 text-xs font-bold text-amber-900 shadow-2xs">
-            <svg className="h-3.5 w-3.5 text-amber-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.18 3.63a1 1 0 00.95.69h3.817c.969 0 1.371 1.24.588 1.81l-3.088 2.244a1 1 0 00-.364 1.118l1.18 3.63c.3.921-.755 1.688-1.54 1.118l-3.088-2.244a1 1 0 00-1.175 0l-3.088 2.244c-.784.57-1.838-.197-1.539-1.118l1.18-3.63a1 1 0 00-.364-1.118L2.5 9.057c-.783-.57-.38-1.81.588-1.81h3.817a1 1 0 00.95-.69l1.194-3.63z" />
-            </svg>
-            <span>신나는 우리 반 실시간 퀴즈</span>
-          </div>
-
-          <Link to="/" className="group inline-flex items-center gap-3 focus:outline-none">
-            <span className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB] text-white shadow-[0_6px_16px_-4px_rgba(37,99,235,0.45)] transition-transform group-hover:-translate-y-0.5">
-              {/* 말풍선 아이콘 */}
-              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M6.5 5.5h11A3.5 3.5 0 0121 9v6a3.5 3.5 0 01-3.5 3.5H12l-4.2 2.8c-.66.44-1.55-.03-1.55-.83V18.5A3.5 3.5 0 013 15V9a3.5 3.5 0 013.5-3.5z"
-                  fill="currentColor"
-                />
-                <circle cx="9" cy="12" r="1.35" fill="#EFF7FF" />
-                <circle cx="12.5" cy="12" r="1.35" fill="#FACC15" />
-                <circle cx="16" cy="12" r="1.35" fill="#EFF7FF" />
-              </svg>
-              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full border-2 border-[#EFF7FF] bg-[#FB7185]" />
-            </span>
-            <span className="font-display text-4xl tracking-tight text-slate-900 sm:text-[2.75rem]">ClassQuiz</span>
-          </Link>
-
-          <p className="mt-2.5 text-[15px] leading-relaxed font-medium text-slate-600 sm:text-base">
-            반가워요! 학번과 이름을 입력하면 우리 반 퀴즈 교실로 바로 들어가요.
+        <header className="mb-7 flex flex-col items-center text-center sm:mb-8">
+          <Logo size="lg" />
+          <p className="mt-3 text-[15px] leading-relaxed font-medium text-slate-600 sm:text-base">
+            학번과 이름을 입력하고 우리 반 퀴즈에 참여하세요.
           </p>
         </header>
 
         {/* 메인 입장 카드 */}
         <form
           onSubmit={submit}
-          className="w-full overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_16px_40px_-14px_rgba(15,23,42,0.09),0_2px_10px_-3px_rgba(15,23,42,0.04)]"
+          className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white"
         >
-          {/* 상단 산뜻한 컬러 포인트 바 */}
-          <div className="grid h-1.5 w-full grid-cols-4" aria-hidden="true">
-            <div className="bg-[#2563EB]" />
-            <div className="bg-[#14B8A6]" />
-            <div className="bg-[#FACC15]" />
-            <div className="bg-[#FB7185]" />
-          </div>
-
           <div className="space-y-6 p-5 sm:p-7">
             {/* 현재 학급 · 퀴즈 상태 · 참가 인원 패널 */}
-            <div className="rounded-2xl border border-sky-100 bg-[#F3F9FF] px-4 py-3.5">
+            <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3.5">
               <div className="flex flex-wrap items-center justify-between gap-2.5">
                 <div>
-                  <span className="block text-[11px] font-bold tracking-wide text-sky-700">현재 선택한 학급</span>
+                  <span className="block text-[11px] font-bold tracking-wide text-slate-700">현재 선택한 학급</span>
                   <div className="mt-0.5 font-display text-2xl text-slate-900">{classDisplayName(classId)}</div>
                 </div>
 
@@ -207,26 +170,26 @@ export default function HomePage() {
                       교실 연결 확인 중
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800">
-                      <span className="h-2 w-2 rounded-full bg-teal-500" />
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
                       입장 가능 · 대기 중
                     </span>
                   )}
 
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-200/90 bg-white px-3 py-1 text-xs font-bold text-slate-700">
-                    <Users className="h-3.5 w-3.5 text-teal-600" />
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-3 py-1 text-xs font-bold text-slate-700">
+                    <Users className="h-3.5 w-3.5 text-emerald-600" />
                     <span>참가</span>
-                    <b className={full ? 'text-rose-600' : 'text-blue-700'}>
+                    <b className={full ? 'text-rose-600' : 'text-brand-700'}>
                       {participantCount}/{capacity}명
                     </b>
                   </span>
                 </div>
               </div>
 
-              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-sky-200/60" aria-hidden="true">
+              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200/60" aria-hidden="true">
                 <div
                   className={`h-full rounded-full transition-[width] duration-300 ${
-                    full ? 'bg-[#FB7185]' : 'bg-gradient-to-r from-[#2563EB] to-[#14B8A6]'
+                    full ? 'bg-rose-400' : 'bg-brand-600'
                   }`}
                   style={{ width: `${Math.min(100, Math.round((participantCount / Math.max(1, capacity)) * 100))}%` }}
                 />
@@ -237,12 +200,12 @@ export default function HomePage() {
             {savedCreds && (
               <Link
                 to={`/${classId}`}
-                className="flex items-center justify-between gap-3 rounded-2xl border border-teal-200 bg-teal-50/80 px-4 py-3 text-sm font-semibold text-teal-900 transition hover:bg-teal-100/70"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm font-semibold text-emerald-900 transition hover:bg-emerald-100/70"
               >
                 <span>
-                  방금 입장한 기록이 있어요 (<b className="font-extrabold text-teal-800">{savedCreds.nickname}</b>)
+                  방금 입장한 기록이 있어요 (<b className="font-extrabold text-emerald-800">{savedCreds.nickname}</b>)
                 </span>
-                <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-teal-700">
+                <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-emerald-700">
                   이어하기 <ArrowRight className="h-4 w-4" />
                 </span>
               </Link>
@@ -251,7 +214,7 @@ export default function HomePage() {
             {/* 1단계: 학년 · 반 · 번호 선택 */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-xs font-extrabold text-blue-700">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 text-xs font-extrabold text-brand-700">
                   1
                 </span>
                 <span className="text-sm font-bold text-slate-800">우리 반과 번호를 골라 주세요</span>
@@ -265,7 +228,7 @@ export default function HomePage() {
                   <div className="relative">
                     <select
                       id="grade"
-                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-[#2563EB] focus:bg-white focus:ring-3 focus:ring-blue-500/15"
+                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15"
                       value={grade}
                       onChange={(e) => {
                         setGrade(Number(e.target.value));
@@ -290,7 +253,7 @@ export default function HomePage() {
                   <div className="relative">
                     <select
                       id="classNum"
-                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-[#2563EB] focus:bg-white focus:ring-3 focus:ring-blue-500/15"
+                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15"
                       value={classNum}
                       onChange={(e) => {
                         setClassNum(Number(e.target.value));
@@ -330,7 +293,7 @@ export default function HomePage() {
                   <div className="relative">
                     <select
                       id="studentNum"
-                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-[#2563EB] focus:bg-white focus:ring-3 focus:ring-blue-500/15"
+                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15"
                       value={studentNum}
                       onChange={(e) => {
                         setStudentNum(Number(e.target.value));
@@ -356,7 +319,7 @@ export default function HomePage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-100 text-xs font-extrabold text-rose-600">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 text-xs font-extrabold text-brand-700">
                     2
                   </span>
                   <label className="text-sm font-bold text-slate-800" htmlFor="studentName">
@@ -368,12 +331,12 @@ export default function HomePage() {
 
               <div className="relative">
                 <PencilLine
-                  className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#FB7185]"
+                  className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-slate-400"
                   aria-hidden="true"
                 />
                 <input
                   id="studentName"
-                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 pr-4 pl-10 text-base font-bold text-slate-900 placeholder-slate-400 outline-none transition hover:border-slate-300 hover:bg-white focus:border-[#2563EB] focus:bg-white focus:ring-3 focus:ring-blue-500/15 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 pr-4 pl-10 text-base font-bold text-slate-900 placeholder-slate-400 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
                   placeholder="이름을 입력해 주세요 (예: 홍길동)"
                   value={studentName}
                   maxLength={14}
@@ -390,7 +353,7 @@ export default function HomePage() {
               <div
                 className={`flex flex-wrap items-center justify-between gap-2 rounded-2xl border px-4 py-3 transition ${
                   generatedNickname
-                    ? 'border-amber-200 bg-[#FFFDF2]'
+                    ? 'border-amber-200 bg-amber-50'
                     : 'border-slate-200/90 bg-slate-50/90'
                 }`}
               >
@@ -402,7 +365,7 @@ export default function HomePage() {
                   data-testid="generated-nickname"
                   className={`inline-flex items-center rounded-xl border px-3 py-1.5 font-mono text-sm font-extrabold tracking-tight sm:text-base ${
                     generatedNickname
-                      ? 'border-blue-200 bg-white text-[#1D4ED8] shadow-2xs'
+                      ? 'border-brand-200 bg-white text-brand-700 shadow-2xs'
                       : 'border-slate-200 bg-white text-slate-400'
                   }`}
                 >
@@ -423,7 +386,7 @@ export default function HomePage() {
             {/* 퀴즈 입장 버튼 */}
             <button
               type="submit"
-              className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#2563EB] px-5 text-lg font-extrabold text-white shadow-[0_10px_22px_-6px_rgba(37,99,235,0.45)] transition hover:bg-[#1D4ED8] active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none"
+              className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-5 text-lg font-extrabold text-white transition hover:bg-brand-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
               disabled={busy || closed || full}
             >
               {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <LogIn className="h-5 w-5" />}
@@ -446,7 +409,7 @@ export default function HomePage() {
             to="/admin"
             className="inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600 shadow-2xs transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
           >
-            <Shield className="h-4 w-4 text-[#2563EB]" />
+            <Shield className="h-4 w-4 text-brand-600" />
             <span>선생님(관리자) 로그인</span>
           </Link>
         </footer>
