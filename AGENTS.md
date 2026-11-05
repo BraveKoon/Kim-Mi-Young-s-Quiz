@@ -9,7 +9,7 @@
 - **프로젝트**: 중학교 **2학년 1반 ~ 12반(학급당 정원 35명, 최대 동시 420명)** 실시간 학급별 독립 진행 인터랙티브 퀴즈 플랫폼
 - **저장소**: `https://github.com/BraveKoon/Kim-Mi-Young-s-Quiz`
   - 기본(운영) 브랜치: `arena/c5bccda0-kim-mi-young-s-quiz`
-  - 현재 최신 릴리즈: **`v1.5.0`** (`CHANGELOG.md` 및 GitHub Releases 참조)
+  - 현재 최신 릴리즈: **`v1.7.0`** (`CHANGELOG.md` 및 GitHub Releases 참조)
 - **프론트엔드 운영 배포 (Cloudflare Workers Static Assets)**
   - 주소: `https://classquiz.bravekoon.workers.dev`
   - 설정 파일: `wrangler.jsonc` (`name: "classquiz"`, `assets.directory: "./client/dist"`, `not_found_handling: "single-page-application"`)
@@ -42,10 +42,11 @@
 1. **번지는 빛 효과 금지 ("깔끔·심플하게")**
    - 네온 글로우(neon glow), 번지는 블러 광원(blurry light blobs / glowing halos) 절대 사용 금지.
    - 선명한 테두리, 담백한 그림자, 높은 텍스트 대비 중심의 깔끔한 카드 디자인을 유지하세요.
-2. **밝은 교실(Daylight Classroom) 테마 전 화면 통일**
-   - 배경 톤: 파스텔 하늘빛·아이보리 도트 그리드(`#EFF7FF` → `#FCFBF6` → `#FAF6EC`)
-   - 포인트 컬러: 블루(`#2563EB`), 틸(`#14B8A6`), 코랄(`#FB7185`), 레몬(`#FACC15`)
-   - 공통 브랜드 요소: 말풍선 `<Logo />` (`client/src/components/common/Logo.tsx`) 및 상단 4색 스트립 `<ClassroomAccentStrip />`
+2. **QUIZUP 미니멀 디자인 시스템 전 화면 통일** (`v1.7.0`~, 이전 "밝은 교실" 테마 대체)
+   - 중립(흰색·회색) 바탕 + **포인트색 1개**(`brand`, 인디고). 색은 `client/src/index.css`의 `--color-brand-*` 토큰으로만 바꾸고, 화면 코드에 색 코드(`#xxxxxx`)를 직접 쓰지 마세요. 정답/오답/경고 같은 상태색(emerald·rose·amber)과 보기 4색(▲◆●■), 타이머 색(lime→yellow→rose)은 기능 색상이라 유지합니다.
+   - 4색 장식 띠, 그라데이션 배경, 색 그림자, 오버레이 블러, 둥근 장식 폰트는 쓰지 않습니다. 제목은 `font-display`(Noto Sans KR ExtraBold).
+   - 공통 브랜드 요소: `<Logo />` / `<LogoMark />` (`client/src/components/common/Logo.tsx`) — `QUIZ` + `UP`(포인트색) 워드마크.
+   - 교실 프로젝터는 먼 거리에서 읽히도록 글자를 크게 유지하고, 세로 820px 이하(1280×720, 1366×768, 1024×768)에서도 **스크롤 없이 한 화면에** 들어와야 합니다(`[@media(max-height:820px)]:` 변형 사용).
    - 모바일·태블릿 터치 친화 크기 유지 및 가로 스크롤 넘침(horizontal overflow, `min-w-0` / `break-words`) 방지.
 3. **반드시 유지해야 할 사용자 흐름**
    - **학생 초기 화면 (`/`, `HomePage.tsx`)**: **학년 · 반 · 번호 · 이름** 선택/입력 시 `formatStudentNickname`으로 `20101 홍길동` 형식의 닉네임을 자동 생성해 해당 학급 방으로 즉시 입장. 하단 `선생님(관리자) 로그인` 링크 유지.
@@ -57,7 +58,7 @@
 
 ---
 
-## 4. 현재 구현 완료 기능 요약 (`v1.0.0` ~ `v1.5.0`)
+## 4. 현재 구현 완료 기능 요약 (`v1.0.0` ~ `v1.7.0`)
 
 - **3종 문제 유형**: 4지선다(`MULTIPLE_CHOICE`), O/X(`OX`), 단답형(`SHORT_ANSWER` — 최대 5개 복수 인정 답안, NFC·공백·영문 대소문자 정규화 채점, 결과 공개 전 정답 비노출)
 - **문제 일괄 등록 & 기본 프리셋**: `POST /api/questions/bulk` 단일 트랜잭션 일괄 등록 API + 중학교 2학년 고사성어·사자성어 30문항 검수 프리셋(`IDIOM_QUIZ_30`, 원본 `shared/data/idiomQuiz30.ts`) — 서버 최초 실행 시 **기본 문제·문제 세트로 시드**됨(샘플 5문항은 제거, 기존 DB는 시작 시 1회 자동 전환)
@@ -96,7 +97,7 @@ npm run build
 - 서버 동작 변경 시 `server/tests/`, 주요 프론트 동작 변경 시 `client/tests/`에 테스트를 함께 추가하세요.
 - 기능 변경 시 `README.md`의 기능 설명 및 `남은 작업 / 알려진 한계` 섹션을 실제 상태에 맞게 업데이트하세요.
 
-### 버전 관리 및 GitHub Release 규칙 (현재 최신: `v1.5.0`)
+### 버전 관리 및 GitHub Release 규칙 (현재 최신: `v1.7.0`)
 기능을 추가하거나 수정해 배포할 때마다 아래 **시맨틱 버저닝(SemVer)** 기준에 맞춰 **`CHANGELOG.md` 업데이트 + GitHub Release(`gh release create`)** 를 함께 발행합니다.
 
 - **패치 (`x.x.n` — 예: `v1.5.1`, `v1.5.2`)**: 자잘한 기능 보완, UI/문구 다듬기, 버그 수정
