@@ -54,7 +54,7 @@ export function StudentsSection() {
         </button>
       </SectionTitle>
       <div className="mb-3 text-sm font-semibold text-slate-600">
-        참가 <b className="text-slate-900">{list.length}</b>/35명 · 접속 <b className="text-teal-700">{list.filter((p) => p.connected).length}</b>명 · 미접속 {list.filter((p) => !p.connected).length}명
+        참가 <b className="text-slate-900">{list.length}</b>/35명 · 접속 <b className="text-emerald-700">{list.filter((p) => p.connected).length}</b>명 · 미접속 {list.filter((p) => !p.connected).length}명
       </div>
       <div className="glass overflow-x-auto p-2">
         <table className="table-base">
@@ -75,7 +75,7 @@ export function StudentsSection() {
               <tr key={p.id}>
                 <td className="text-slate-400">{i + 1}</td>
                 <td className="font-bold text-slate-900">{p.nickname}</td>
-                <td>{p.connected ? <Wifi className="h-4 w-4 text-teal-600" /> : <WifiOff className="h-4 w-4 text-slate-300" />}</td>
+                <td>{p.connected ? <Wifi className="h-4 w-4 text-emerald-600" /> : <WifiOff className="h-4 w-4 text-slate-300" />}</td>
                 <td className="font-semibold">{num(p.totalScore)}</td>
                 <td>
                   {p.correctCount}/{p.answerCount}

@@ -69,7 +69,7 @@ describe('Leaderboard', () => {
 
     // highlightId가 지정된 참가자 행은 네온 테두리 강조가 적용된다
     const highlightedRow = screen.getByText('박서연').closest('li')!;
-    expect(highlightedRow.className).toContain('border-sky-500');
+    expect(highlightedRow.className).toContain('border-brand-500');
   });
 
   it('showLast=false 이면 직전 획득 점수를 숨기고 max 개수만큼만 표시한다', () => {

@@ -24,8 +24,8 @@ const EMPTY: Omit<Question, 'id'> = {
 };
 
 const TYPE_BADGE: Record<QuestionType, string> = {
-  MULTIPLE_CHOICE: 'border border-blue-200 bg-blue-50 text-blue-800',
-  OX: 'border border-teal-200 bg-teal-50 text-teal-800',
+  MULTIPLE_CHOICE: 'border border-brand-200 bg-brand-50 text-brand-800',
+  OX: 'border border-emerald-200 bg-emerald-50 text-emerald-800',
   SHORT_ANSWER: 'border border-amber-200 bg-amber-50 text-amber-800',
 };
 
@@ -62,7 +62,7 @@ export function QuestionsSection() {
         </select>
         <input className="input w-56" placeholder="검색 (문제/분류)" value={filter} onChange={(e) => setFilter(e.target.value)} />
         <button className="btn-ghost" onClick={() => setBulkOpen(true)}>
-          <FileUp className="h-4 w-4 text-[#2563EB]" /> JSON 일괄 등록
+          <FileUp className="h-4 w-4 text-brand-600" /> JSON 일괄 등록
         </button>
         <button
           className="btn-primary"
@@ -80,10 +80,10 @@ export function QuestionsSection() {
                 <span className={`rounded-full px-2.5 py-0.5 font-bold ${TYPE_BADGE[q.questionType] ?? 'bg-slate-100 text-slate-700'}`}>
                   {QUESTION_TYPE_LABEL[q.questionType] ?? q.questionType}
                 </span>
-                {q.category && <span className="rounded-full border border-sky-200 bg-[#F3F9FF] px-2.5 py-0.5 font-semibold text-sky-800">{q.category}</span>}
+                {q.category && <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 font-semibold text-slate-800">{q.category}</span>}
                 <span>{q.timeLimit}초</span>
                 {q.isDoublePoints && (
-                  <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-300 bg-[#FEF9C3] px-2.5 py-0.5 font-extrabold text-amber-900">
+                  <span className="inline-flex items-center gap-0.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 font-extrabold text-amber-900">
                     <Zap className="h-3 w-3" /> 2배
                   </span>
                 )}
@@ -94,7 +94,7 @@ export function QuestionsSection() {
                   <>
                     <span className="self-center text-xs font-semibold text-slate-500">인정 답안:</span>
                     {q.options.map((ans, i) => (
-                      <span key={i} className="rounded-lg border border-teal-300 bg-teal-50 px-2.5 py-0.5 font-bold text-teal-900">
+                      <span key={i} className="rounded-lg border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 font-bold text-emerald-900">
                         {ans}
                       </span>
                     ))}
@@ -105,7 +105,7 @@ export function QuestionsSection() {
                       key={i}
                       className={`rounded-lg border px-2.5 py-0.5 font-semibold ${
                         i === q.correctIndex
-                          ? 'border-teal-300 bg-teal-50 font-bold text-teal-900'
+                          ? 'border-emerald-300 bg-emerald-50 font-bold text-emerald-900'
                           : 'border-slate-200 bg-slate-50 text-slate-600'
                       }`}
                     >
@@ -257,11 +257,11 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                   onClick={() => switchType(t.type)}
                   className={`rounded-xl border px-3 py-2.5 text-left transition ${
                     active
-                      ? 'border-[#2563EB] bg-blue-50 text-slate-900 ring-1 ring-blue-300'
+                      ? 'border-brand-600 bg-brand-50 text-slate-900 ring-1 ring-brand-300'
                       : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-white'
                   }`}
                 >
-                  <div className={`text-sm font-bold ${active ? 'text-[#1D4ED8]' : 'text-slate-800'}`}>{t.label}</div>
+                  <div className={`text-sm font-bold ${active ? 'text-brand-700' : 'text-slate-800'}`}>{t.label}</div>
                   <div className="text-xs text-slate-500">{t.desc}</div>
                 </button>
               );
@@ -317,7 +317,7 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                   <div
                     key={i}
                     className={`rounded-2xl border p-3 transition ${
-                      selected ? 'border-teal-400 bg-teal-50/70 ring-2 ring-teal-300/60' : 'border-slate-200 bg-slate-50/60'
+                      selected ? 'border-emerald-400 bg-emerald-50/70 ring-2 ring-emerald-300/60' : 'border-slate-200 bg-slate-50/60'
                     }`}
                   >
                     <div className="mb-2 flex items-center justify-between">
@@ -510,7 +510,7 @@ function BulkQuestionModal({ onClose, onSaved }: { onClose: () => void; onSaved:
   return (
     <Modal open title="JSON 문제 일괄 등록" onClose={onClose} wide>
       <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-sky-200 bg-[#F3F9FF] px-4 py-3 text-sm">
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
           <div className="text-slate-700">
             검수 완료된 <b className="text-slate-900">중2 고사성어·사자성어 30문제</b>를 바로 불러오거나 ChatGPT JSON을 붙여넣으세요.
           </div>

@@ -29,7 +29,7 @@ import { Link, useParams } from 'react-router-dom';
 import type { Socket } from 'socket.io-client';
 import { EVENTS, classDisplayName, isValidClassId, type ClassState, type ParticipantSummary } from '@shared/types/index';
 import { DistributionChart } from '../components/charts/DistributionChart';
-import { ClassroomAccentStrip, Logo } from '../components/common/Logo';
+import { Logo } from '../components/common/Logo';
 import { ConfirmDialog, Modal } from '../components/common/Modal';
 import { JoinQrModal, QrCode } from '../components/common/QrCode';
 import { FullScreenSpinner } from '../components/common/Spinner';
@@ -50,6 +50,21 @@ import { celebrate } from '../utils/confetti';
 import { num, pct } from '../utils/format';
 import NotFoundPage from './NotFoundPage';
 
+/** 세로 820px 이하(1280x720, 1366x768 등) 프로젝터 여부 — CSS 로 표현할 수 없는 숫자 값(차트 높이)에 사용 */
+function useShortScreen() {
+  const query = '(max-height: 820px)';
+  const [short, setShort] = useState(() => typeof window !== 'undefined' && window.matchMedia?.(query).matches === true);
+  useEffect(() => {
+    const mq = window.matchMedia?.(query);
+    if (!mq) return;
+    const h = () => setShort(mq.matches);
+    h();
+    mq.addEventListener('change', h);
+    return () => mq.removeEventListener('change', h);
+  }, []);
+  return short;
+}
+
 function useFullscreen() {
   const [fs, setFs] = useState(!!document.fullscreenElement);
   useEffect(() => {
@@ -64,8 +79,8 @@ function useFullscreen() {
 function FullscreenButton() {
   const { fs, toggle } = useFullscreen();
   return (
-    <button className="btn-ghost btn-sm" onClick={toggle} title="전체 화면">
-      {fs ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />} {fs ? '전체 화면 종료' : '전체 화면'}
+    <button className="btn-ghost" onClick={toggle} title="전체 화면">
+      {fs ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />} {fs ? '전체 화면 종료' : '전체 화면'}
     </button>
   );
 }
@@ -165,6 +180,7 @@ function ClassProjector({ classId }: { classId: string }) {
   const [copied, setCopied] = useState(false);
 
   // 대시보드에서 프로젝터를 열면 주소에 학급 전용 컨트롤 키가 실려 와서, 비밀번호 없이 진행 컨트롤이 열린다.
+  const shortScreen = useShortScreen();
   const [controlKey] = useState(() => captureProjectorKey(classId));
   const [viewSocket, setViewSocket] = useState<Socket | null>(null);
   const [keyControl, setKeyControl] = useState(false);
@@ -218,35 +234,35 @@ function ClassProjector({ classId }: { classId: string }) {
 
   return (
     <div className="flex min-h-screen flex-col p-4 md:p-8">
-      <header className="glass mb-6 flex flex-wrap items-center justify-between gap-4 px-5 py-3">
+      <header className="glass mb-6 flex flex-wrap items-center justify-between gap-4 px-6 py-4 [@media(max-height:820px)]:mb-3 [@media(max-height:820px)]:py-2">
         <div className="flex flex-wrap items-center gap-4">
-          <Logo size="sm" />
-          <span className="h-5 w-px bg-slate-200" aria-hidden="true" />
-          <span className="font-display text-3xl text-slate-900 md:text-4xl">{state.className}</span>
-          <StatusBadge status={state.status} className="text-base" />
+          <Logo size="md" />
+          <span className="h-7 w-px bg-slate-200" aria-hidden="true" />
+          <span className="font-display text-4xl text-slate-900 md:text-5xl [@media(max-height:820px)]:text-3xl">{state.className}</span>
+          <StatusBadge status={state.status} className="text-lg! px-4! py-1!" />
         </div>
         <div className="flex flex-wrap items-center gap-2.5 text-slate-600">
-          {connected ? <Wifi className="h-5 w-5 text-teal-600" /> : <WifiOff className="h-5 w-5 text-rose-500" />}
-          <span className="flex items-center gap-1 text-lg font-bold text-slate-800">
-            <Users className="h-5 w-5 text-teal-600" /> {state.connectedCount || participants.filter((p) => p.connected).length}/{state.participantCount || participants.length}
+          {connected ? <Wifi className="h-6 w-6 text-emerald-600" /> : <WifiOff className="h-6 w-6 text-rose-500" />}
+          <span className="flex items-center gap-1.5 text-2xl font-bold text-slate-800">
+            <Users className="h-6 w-6 text-slate-600" /> {state.connectedCount || participants.filter((p) => p.connected).length}/{state.participantCount || participants.length}
           </span>
-          <button type="button" className="btn-ghost btn-sm" onClick={() => setQrOpen(true)}>
-            <QrCodeIcon className="h-4 w-4 text-[#2563EB]" /> 참가 QR
+          <button type="button" className="btn-ghost" onClick={() => setQrOpen(true)}>
+            <QrCodeIcon className="h-5 w-5 text-brand-600" /> 참가 QR
           </button>
           {auth &&
             (canControl ? (
               <button
                 type="button"
-                className="btn-ghost btn-sm border-blue-200 bg-blue-50/70 text-[#1D4ED8]"
+                className="btn-ghost border-brand-200 bg-brand-50 text-brand-700"
                 onClick={() => setDockVisible((v) => !v)}
               >
-                <ShieldCheck className="h-4 w-4 text-[#2563EB]" />
+                <ShieldCheck className="h-5 w-5 text-brand-600" />
                 {dockVisible ? '진행 바 접기' : '진행 바 펼치기'}
                 {dockVisible ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
               </button>
             ) : (
-              <button type="button" className="btn-ghost btn-sm" onClick={() => setAuthModalOpen(true)}>
-                <KeyRound className="h-4 w-4 text-[#2563EB]" /> 선생님 진행 모드
+              <button type="button" className="btn-ghost" onClick={() => setAuthModalOpen(true)}>
+                <KeyRound className="h-5 w-5 text-brand-600" /> 선생님 진행 모드
               </button>
             ))}
           <FullscreenButton />
@@ -255,24 +271,23 @@ function ClassProjector({ classId }: { classId: string }) {
 
       <main className="flex flex-1 flex-col">
         {state.status === 'WAITING' && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-[#FEF9C3] px-5 py-1.5 text-base font-bold text-amber-900 md:text-lg">
-              <span>★ 스마트폰 카메라로 QR 코드를 스캔하거나 아래 주소로 접속하세요</span>
+          <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center [@media(max-height:820px)]:gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-2 text-xl font-bold text-slate-800 md:text-2xl">
+              <span>스마트폰 카메라로 QR 코드를 스캔하거나 아래 주소로 접속하세요</span>
             </div>
 
-            <div className="glass-strong w-full max-w-4xl overflow-hidden text-left">
-              <ClassroomAccentStrip />
-              <div className="grid items-center gap-6 p-6 md:grid-cols-[auto_1fr] md:gap-8 md:p-8">
+            <div className="glass-strong w-full max-w-5xl overflow-hidden text-left">
+              <div className="grid items-center gap-6 p-6 md:grid-cols-[auto_1fr] md:gap-8 md:p-8 [@media(max-height:820px)]:p-4 [@media(max-height:820px)]:gap-4">
                 {/* QR 코드 영역 */}
                 <div className="flex flex-col items-center gap-2.5">
                   <button
                     type="button"
                     onClick={() => setQrOpen(true)}
-                    className="group relative rounded-2xl border-2 border-sky-200 bg-white p-3 shadow-[0_10px_28px_-10px_rgba(37,99,235,0.2)] transition hover:-translate-y-0.5 hover:border-[#2563EB]"
+                    className="group relative rounded-2xl border-2 border-slate-200 bg-white p-3 transition hover:-translate-y-0.5 hover:border-brand-600"
                     title="QR 코드 크게 보기"
                   >
-                    <QrCode value={joinUrl} size={216} label={`${state.className} 참가 QR 코드`} />
-                    <span className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-xl bg-[#F3F9FF] py-1.5 text-xs font-bold text-[#1D4ED8] transition group-hover:bg-blue-100/80">
+                    <QrCode value={joinUrl} size={shortScreen ? 220 : 288} label={`${state.className} 참가 QR 코드`} />
+                    <span className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-xl bg-slate-50 py-2 text-sm font-bold text-brand-700 transition group-hover:bg-brand-100/80">
                       <ZoomIn className="h-3.5 w-3.5" /> 클릭해서 크게 보기
                     </span>
                   </button>
@@ -280,29 +295,29 @@ function ClassProjector({ classId }: { classId: string }) {
 
                 {/* 접속 안내 영역 */}
                 <div className="min-w-0 space-y-4 text-center md:text-left">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-[#F3F9FF] px-3.5 py-1 text-xs font-extrabold text-[#1D4ED8]">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 text-sm font-extrabold text-brand-700">
                     <QrCodeIcon className="h-3.5 w-3.5" />
                     <span>{state.className} 바로 입장 링크</span>
                   </div>
 
                   <div>
-                    <div className="text-xs font-bold text-slate-500">접속 주소</div>
-                    <div className="mt-1 break-all font-display text-3xl tracking-wide text-[#2563EB] md:text-5xl">
+                    <div className="text-base font-bold text-slate-500">접속 주소</div>
+                    <div className="mt-1 break-all font-display text-3xl tracking-wide text-brand-600 md:text-5xl">
                       {joinUrl.replace(/^https?:\/\//, '')}
                     </div>
                   </div>
 
-                  <div className="space-y-1.5 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 text-sm font-semibold text-slate-700 md:text-base">
+                  <div className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-lg font-semibold text-slate-700 md:text-xl">
                     <div>1. 카메라로 <b>QR 코드 스캔</b> 또는 위 주소 접속</div>
                     <div>2. <b>번호 · 이름</b>을 입력하고 바로 입장해요!</div>
                   </div>
 
                   <div className="flex flex-wrap justify-center gap-2 md:justify-start">
-                    <button type="button" className="btn-primary btn-sm" onClick={() => setQrOpen(true)}>
-                      <ZoomIn className="h-4 w-4" /> QR 크게 보기
+                    <button type="button" className="btn-primary" onClick={() => setQrOpen(true)}>
+                      <ZoomIn className="h-5 w-5" /> QR 크게 보기
                     </button>
-                    <button type="button" className="btn-ghost btn-sm" onClick={copyJoinUrl}>
-                      {copied ? <Check className="h-4 w-4 text-teal-600" /> : <Copy className="h-4 w-4 text-[#2563EB]" />}
+                    <button type="button" className="btn-ghost" onClick={copyJoinUrl}>
+                      {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4 text-brand-600" />}
                       {copied ? '주소 복사됨!' : '접속 주소 복사'}
                     </button>
                   </div>
@@ -310,7 +325,7 @@ function ClassProjector({ classId }: { classId: string }) {
               </div>
             </div>
 
-            <div className="font-display text-3xl text-slate-900 md:text-5xl">번호와 이름을 입력하고 입장하세요!</div>
+            <div className="font-display text-3xl text-slate-900 md:text-5xl [@media(max-height:820px)]:text-3xl">번호와 이름을 입력하고 입장하세요!</div>
 
             <div className="flex max-w-6xl flex-wrap justify-center gap-3">
               <AnimatePresence>
@@ -321,7 +336,7 @@ function ClassProjector({ classId }: { classId: string }) {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     exit={{ scale: 0 }}
-                    className={`rounded-full border border-sky-200 bg-white px-5 py-2 text-2xl font-bold text-slate-800 shadow-2xs ${p.connected ? '' : 'opacity-40'}`}
+                    className={`rounded-full border border-slate-200 bg-white px-6 py-2.5 text-3xl font-bold text-slate-800 ${p.connected ? '' : 'opacity-40'}`}
                   >
                     {p.nickname}
                   </motion.span>
@@ -329,7 +344,7 @@ function ClassProjector({ classId }: { classId: string }) {
               </AnimatePresence>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <div className="rounded-full border border-teal-200 bg-teal-50 px-6 py-2 text-2xl font-extrabold text-teal-900 md:text-3xl">
+              <div className="rounded-full border border-emerald-200 bg-emerald-50 px-6 py-2 text-2xl font-extrabold text-emerald-900 md:text-3xl">
                 현재 {participants.length || state.participantCount}명 입장 완료
               </div>
               {canControl && (
@@ -348,16 +363,17 @@ function ClassProjector({ classId }: { classId: string }) {
         {(state.status === 'PLAYING' || state.status === 'PAUSED') && state.question && <ProjectorQuestion state={state} answered={answered} timerSync={timerSync} />}
         {state.status === 'RESULT' && state.results && state.question && (
           <div className="grid flex-1 gap-6 lg:grid-cols-2">
-            <div className="glass-strong flex flex-col gap-4 p-6">
-              <h2 className="text-center text-3xl font-black text-slate-900">{state.question.text}</h2>
+            <div className="glass-strong flex flex-col gap-4 p-6 [@media(max-height:820px)]:gap-2 [@media(max-height:820px)]:p-4">
+              <h2 className="text-center text-3xl font-black text-slate-900 [@media(max-height:820px)]:text-2xl">{state.question.text}</h2>
               <DistributionChart
                 options={state.question.questionType === 'SHORT_ANSWER' ? ['정답', '오답'] : state.question.options}
                 distribution={state.results.distribution}
                 correctIndex={state.question.questionType === 'SHORT_ANSWER' ? 0 : state.results.correctIndex}
-                height={300}
+                height={shortScreen ? 150 : 300}
+                large
               />
               {state.question.questionType === 'SHORT_ANSWER' ? (
-                <div className="rounded-2xl border-2 border-teal-300 bg-teal-50 px-6 py-4 text-center text-2xl font-black text-teal-900">
+                <div className="rounded-2xl border-2 border-emerald-300 bg-emerald-50 px-6 py-4 text-center text-2xl font-black text-emerald-900">
                   정답: {(state.results.acceptedAnswers ?? []).join(' / ')}
                 </div>
               ) : (
@@ -371,7 +387,7 @@ function ClassProjector({ classId }: { classId: string }) {
                 정답률 {state.results.answeredCount ? pct(state.results.correctCount / state.results.answeredCount) : '0%'} ({state.results.correctCount}/{state.results.answeredCount}명)
               </div>
               {state.results.explanation && (
-                <p className="rounded-2xl border border-amber-200 bg-[#FFFDF2] p-4 text-xl font-medium text-slate-800">💡 {state.results.explanation}</p>
+                <p className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-2xl leading-relaxed font-medium text-slate-800 [@media(max-height:820px)]:p-3 [@media(max-height:820px)]:text-lg">💡 {state.results.explanation}</p>
               )}
             </div>
             <div className="glass-strong p-6">
@@ -480,11 +496,10 @@ function ProjectorControlDock({
       role="region"
       aria-label="프로젝터 퀴즈 진행 컨트롤"
     >
-      <ClassroomAccentStrip />
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5">
         <div className="flex flex-wrap items-center gap-2.5 text-sm">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-extrabold text-[#1D4ED8]">
-            <span className={`h-2 w-2 rounded-full ${adminConnected ? 'bg-teal-500' : 'bg-amber-400'}`} />
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-extrabold text-brand-700">
+            <span className={`h-2 w-2 rounded-full ${adminConnected ? 'bg-emerald-500' : 'bg-amber-400'}`} />
             선생님 진행 모드 ({username})
           </span>
           <span className="font-semibold text-slate-600">{summary}</span>
@@ -539,7 +554,7 @@ function ProjectorControlDock({
                 disabled={disabled}
                 onClick={() => sendCommand(EVENTS.ADMIN_SKIP, { classId }, isLast ? '마지막 문제를 건너뛰고 종료했습니다.' : '다음 문제로 건너뛰었습니다.')}
               >
-                <FastForward className="h-4 w-4 text-[#2563EB]" /> 건너뛰기
+                <FastForward className="h-4 w-4 text-brand-600" /> 건너뛰기
               </button>
               <button type="button" className="btn-ghost" disabled={disabled} onClick={() => setConfirm('finish')}>
                 <Flag className="h-4 w-4" /> 종료
@@ -571,7 +586,7 @@ function ProjectorControlDock({
                 disabled={disabled}
                 onClick={() => sendCommand(EVENTS.ADMIN_SKIP, { classId }, isLast ? '마지막 문제를 건너뛰고 종료했습니다.' : '다음 문제로 건너뛰었습니다.')}
               >
-                <FastForward className="h-4 w-4 text-[#2563EB]" /> 건너뛰기
+                <FastForward className="h-4 w-4 text-brand-600" /> 건너뛰기
               </button>
               <button type="button" className="btn-ghost" disabled={disabled} onClick={() => setConfirm('finish')}>
                 <Flag className="h-4 w-4" /> 종료
@@ -758,7 +773,7 @@ function ProjectorAdminAuthModal({
         </form>
       ) : (
         <form onSubmit={submitLogin} className="space-y-3.5">
-          <p className="rounded-xl border border-sky-100 bg-[#F3F9FF] px-3.5 py-2.5 text-sm font-medium text-slate-700">
+          <p className="rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-700">
             선생님 계정으로 인증하면 이 프로젝터 화면에서 <b>시작 · 일시정지 · 결과 발표 · 건너뛰기 · 다음 문제</b>를 바로 조작할 수 있습니다.
           </p>
           <div>
@@ -805,21 +820,20 @@ function ProjectorQuestion({ state, answered, timerSync }: { state: ClassState; 
   const paused = state.status === 'PAUSED';
   const { remainingMs, beforeStartMs } = useCountdown({ endTime: state.endTime, startTime: state.startTime, running: !paused, frozenMs: state.remainingMs, serverNow: timerSync ?? state.serverNow });
   return (
-    <div className="flex flex-1 flex-col gap-6">
+    <div className="flex flex-1 flex-col gap-6 [@media(max-height:820px)]:gap-3">
       <DoublePointsBanner show={q.isDoublePoints && beforeStartMs > 0} />
-      <div className="flex items-center justify-between text-2xl text-slate-800">
+      <div className="flex items-center justify-between text-3xl text-slate-800 md:text-4xl [@media(max-height:820px)]:text-2xl">
         <span className="font-display">
           문제 {q.index + 1} / {state.totalQuestions}
         </span>
-        {q.isDoublePoints && <span className="rounded-full border border-amber-300 bg-[#FEF9C3] px-4 py-1 font-bold text-amber-900">⚡ 2배 점수</span>}
+        {q.isDoublePoints && <span className="rounded-full border border-amber-300 bg-amber-50 px-4 py-1 font-bold text-amber-900">⚡ 2배 점수</span>}
         <span className="font-bold">
           제출 {answered ?? state.answeredCount}/{state.participantCount}명
         </span>
       </div>
       <motion.div key={q.id} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="glass-strong overflow-hidden text-center">
-        <ClassroomAccentStrip />
-        <div className="p-8">
-          <h2 className="break-keep text-4xl font-black leading-tight text-slate-900 md:text-6xl">{q.text}</h2>
+        <div className="p-8 [@media(max-height:820px)]:p-4">
+          <h2 className="break-keep text-4xl font-black leading-tight text-slate-900 md:text-6xl [@media(max-height:820px)]:text-4xl">{q.text}</h2>
         </div>
       </motion.div>
       <TimerBar remainingMs={beforeStartMs > 0 ? q.timeLimit * 1000 : remainingMs} totalMs={q.timeLimit * 1000} large />
@@ -830,11 +844,11 @@ function ProjectorQuestion({ state, answered, timerSync }: { state: ClassState; 
       )}
       {q.questionType === 'SHORT_ANSWER' ? (
         <div className="glass flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-          <div className="font-display text-3xl text-[#2563EB] md:text-5xl">단답형 문제</div>
+          <div className="font-display text-3xl text-brand-600 md:text-5xl">단답형 문제</div>
           <p className="text-xl font-medium text-slate-600 md:text-2xl">각자 화면에 정답을 직접 입력해 제출하세요!</p>
         </div>
       ) : (
-        <div className="grid flex-1 grid-cols-2 gap-4">
+        <div className="grid flex-1 grid-cols-2 gap-4 [@media(max-height:820px)]:gap-3">
           {q.options.map((o, i) => (
             <AnswerButton key={i} index={i} text={o} disabled large mode="idle" />
           ))}
@@ -879,13 +893,13 @@ export function CompetitionProjectorPage() {
   return (
     <div className="flex min-h-screen flex-col gap-6 p-6 md:p-10">
       <header className="glass flex flex-wrap items-center justify-between gap-3 px-5 py-3">
-        <Logo size="sm" />
+        <Logo size="md" />
         <h1 className="font-display text-3xl text-slate-900 md:text-5xl">{data.competition.title}</h1>
         <div className="flex flex-wrap gap-2">
-          <button type="button" className="btn-ghost btn-sm" onClick={() => setQrOpen(true)}>
-            <QrCodeIcon className="h-4 w-4 text-[#2563EB]" /> 결과 QR
+          <button type="button" className="btn-ghost" onClick={() => setQrOpen(true)}>
+            <QrCodeIcon className="h-4 w-4 text-brand-600" /> 결과 QR
           </button>
-          <button className="btn-ghost btn-sm" onClick={() => setView(view === 'class' ? 'individual' : 'class')}>
+          <button className="btn-ghost" onClick={() => setView(view === 'class' ? 'individual' : 'class')}>
             {view === 'class' ? '개인 순위 보기' : '학급 순위 보기'}
           </button>
           <FullscreenButton />
@@ -903,10 +917,10 @@ export function CompetitionProjectorPage() {
                 const max = Math.max(1, ...data.classRanking.map((x) => x.averageScore));
                 return (
                   <motion.div key={c.classId} initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }} className="flex items-center gap-4 text-2xl text-slate-900">
-                    <span className="w-14 font-display text-3xl text-[#2563EB]">{c.rank}위</span>
+                    <span className="w-14 font-display text-3xl text-brand-600">{c.rank}위</span>
                     <span className="w-36 font-bold">{classDisplayName(c.classId)}</span>
-                    <div className="h-10 flex-1 overflow-hidden rounded-full bg-sky-100">
-                      <motion.div initial={{ width: 0 }} animate={{ width: `${(c.averageScore / max) * 100}%` }} transition={{ duration: 1, delay: i * 0.08 }} className="h-full rounded-full bg-gradient-to-r from-[#2563EB] to-[#14B8A6]" />
+                    <div className="h-10 flex-1 overflow-hidden rounded-full bg-slate-100">
+                      <motion.div initial={{ width: 0 }} animate={{ width: `${(c.averageScore / max) * 100}%` }} transition={{ duration: 1, delay: i * 0.08 }} className="h-full rounded-full bg-brand-600" />
                     </div>
                     <span className="w-32 text-right font-display">{num(Math.round(c.averageScore))}점</span>
                     <span className="w-20 text-right text-lg text-slate-500">{c.participantCount}명</span>

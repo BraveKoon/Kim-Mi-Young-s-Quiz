@@ -83,7 +83,7 @@ export function AdminAccountsCard() {
     <div className="glass space-y-4 p-5 lg:col-span-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="flex items-center gap-2 font-display text-xl text-slate-900">
-          <ShieldCheck className="h-5 w-5 text-[#2563EB]" /> 관리자 계정 관리
+          <ShieldCheck className="h-5 w-5 text-brand-600" /> 관리자 계정 관리
         </h3>
         <span className="text-xs font-medium text-slate-500">총 {admins.length}명 · 마지막 관리자 계정은 삭제할 수 없습니다.</span>
       </div>
@@ -115,13 +115,13 @@ export function AdminAccountsCard() {
                   <tr key={a.id}>
                     <td className="font-bold text-slate-900">
                       {a.username}
-                      {isSelf && <span className="ml-2 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-bold text-[#1D4ED8]">본인</span>}
+                      {isSelf && <span className="ml-2 rounded-full border border-brand-200 bg-brand-50 px-2 py-0.5 text-xs font-bold text-brand-700">본인</span>}
                     </td>
                     <td>
                       {a.mustChangePassword ? (
-                        <span className="rounded-full border border-amber-300 bg-[#FEF9C3] px-2.5 py-0.5 text-xs font-bold text-amber-900">초기 비밀번호 변경 대기</span>
+                        <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-900">초기 비밀번호 변경 대기</span>
                       ) : (
-                        <span className="rounded-full border border-teal-200 bg-teal-50 px-2.5 py-0.5 text-xs font-bold text-teal-800">사용 중</span>
+                        <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-800">사용 중</span>
                       )}
                     </td>
                     <td className="text-slate-500">{dateOnly(a.createdAt)}</td>
@@ -145,7 +145,7 @@ export function AdminAccountsCard() {
         </div>
       )}
 
-      <form onSubmit={addAdmin} className="space-y-3 rounded-2xl border border-sky-100 bg-[#F3F9FF]/70 p-4">
+      <form onSubmit={addAdmin} className="space-y-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
         <div className="text-sm font-bold text-slate-900">새 관리자 추가</div>
         <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
           <input

@@ -13,7 +13,7 @@ import { CompetitionSelect, SectionTitle } from '../CompetitionSelect';
 
 function FairnessNote({ warning }: { warning: string | null | undefined }) {
   if (!warning) return null;
-  return <div className="mb-4 rounded-2xl border border-amber-300 bg-[#FEF9C3]/80 p-3 text-sm font-semibold text-amber-950">⚠️ {warning}</div>;
+  return <div className="mb-4 rounded-2xl border border-amber-300 bg-amber-50/80 p-3 text-sm font-semibold text-amber-950">⚠️ {warning}</div>;
 }
 
 export function IndividualRankingSection() {
@@ -37,7 +37,7 @@ export function IndividualRankingSection() {
         </select>
         {cid && (
           <Link to={`/results/${cid}`} className="btn-ghost">
-            <ExternalLink className="h-4 w-4 text-[#2563EB]" /> 결과 페이지
+            <ExternalLink className="h-4 w-4 text-brand-600" /> 결과 페이지
           </Link>
         )}
       </SectionTitle>
@@ -95,13 +95,13 @@ export function ClassRankingSection() {
               <tbody>
                 {data.classes.map((c) => (
                   <tr key={c.sessionId}>
-                    <td className="font-display text-lg text-[#2563EB]">{c.rank}</td>
+                    <td className="font-display text-lg text-brand-600">{c.rank}</td>
                     <td className="font-bold text-slate-900">{classDisplayName(c.classId)}</td>
                     <td>
                       <StatusBadge status={c.status as never} />
                     </td>
                     <td>{c.participantCount}</td>
-                    <td className="font-semibold text-teal-700">{num(Math.round(c.averageScore))}</td>
+                    <td className="font-semibold text-emerald-700">{num(Math.round(c.averageScore))}</td>
                     <td>{num(c.maxScore)}</td>
                     <td>{pct(c.accuracy)}</td>
                   </tr>

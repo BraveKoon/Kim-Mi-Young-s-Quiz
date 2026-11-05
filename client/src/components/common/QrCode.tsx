@@ -88,26 +88,26 @@ export function JoinQrModal({
     <Modal open={open} onClose={onClose} title={title} wide>
       <div className="flex flex-col items-center gap-5 py-2 text-center">
         {subtitle && (
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-[#FEF9C3] px-4 py-1 text-sm font-bold text-amber-900">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-4 py-1 text-sm font-bold text-amber-900">
             <QrCodeIcon className="h-4 w-4 text-amber-700" />
             <span>{subtitle}</span>
           </div>
         )}
 
-        <div className="rounded-3xl border-2 border-sky-200 bg-white p-4 shadow-[0_14px_34px_-12px_rgba(37,99,235,0.2)]">
+        <div className="rounded-2xl border-2 border-slate-200 bg-white p-4">
           <QrCode value={url} size={340} label={`${title} QR 코드`} className="max-w-[72vw] h-auto" />
         </div>
 
-        <div className="w-full rounded-2xl border border-sky-100 bg-[#F3F9FF] px-5 py-3.5">
-          <div className="text-xs font-bold text-sky-700">접속 주소</div>
-          <div className="mt-1 break-all font-display text-2xl text-[#2563EB] sm:text-3xl">
+        <div className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-5 py-3.5">
+          <div className="text-xs font-bold text-slate-700">접속 주소</div>
+          <div className="mt-1 break-all font-display text-2xl text-brand-600 sm:text-3xl">
             {url.replace(/^https?:\/\//, '')}
           </div>
         </div>
 
         <div className="flex flex-wrap justify-center gap-2">
           <button type="button" className="btn-ghost" onClick={copyUrl}>
-            {copied ? <Check className="h-4 w-4 text-teal-600" /> : <Copy className="h-4 w-4 text-[#2563EB]" />}
+            {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4 text-brand-600" />}
             {copied ? '주소 복사됨!' : '접속 주소 복사'}
           </button>
           <button type="button" className="btn-primary" onClick={onClose}>

@@ -10,8 +10,8 @@ export const STATUS_LABEL: Record<SessionStatus | 'NO_SESSION', string> = {
 };
 
 export const STATUS_COLOR: Record<SessionStatus | 'NO_SESSION', string> = {
-  WAITING: 'bg-teal-50 text-teal-800 border-teal-200',
-  PLAYING: 'bg-blue-50 text-blue-800 border-blue-200',
+  WAITING: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  PLAYING: 'bg-brand-50 text-brand-800 border-brand-200',
   RESULT: 'bg-indigo-50 text-indigo-800 border-indigo-200',
   PAUSED: 'bg-amber-50 text-amber-800 border-amber-200',
   FINISHED: 'bg-slate-100 text-slate-600 border-slate-200',
@@ -35,7 +35,7 @@ export const seconds = (ms: number | null | undefined) => (ms == null ? '-' : `$
 
 export const OPTION_STYLES = [
   { shape: '▲', name: '빨강', bg: 'bg-opt-red', ring: 'ring-rose-300', hex: '#e5304d' },
-  { shape: '◆', name: '파랑', bg: 'bg-opt-blue', ring: 'ring-sky-300', hex: '#2d6cf0' },
+  { shape: '◆', name: '파랑', bg: 'bg-opt-blue', ring: 'ring-brand-300', hex: '#2d6cf0' },
   { shape: '●', name: '노랑', bg: 'bg-opt-yellow', ring: 'ring-amber-200', hex: '#f2b705' },
   { shape: '■', name: '초록', bg: 'bg-opt-green', ring: 'ring-emerald-300', hex: '#1fa45a' },
 ];
