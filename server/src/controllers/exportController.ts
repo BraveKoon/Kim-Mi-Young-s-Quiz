@@ -52,6 +52,24 @@ export function exportController(ctx: AppContext) {
       ctx.logger.log('DATA_EXPORTED', { details: { competitionId: id, format, fileName, by: req.admin!.username, saved: true } });
       res.status(201).json({ export: { id: exportId, fileName, downloadUrl: `/api/exports/files/${exportId}` } });
     },
+    /** 내보내기 기록 전체 초기화: 기록과 서버에 저장된 내보내기 파일(exports 폴더 안)을 함께 삭제한다. */
+    reset(req: Request, res: Response) {
+      const { count, filePaths } = ctx.repos.exports.deleteAll();
+      const root = path.resolve(exportDir) + path.sep;
+      let filesDeleted = 0;
+      for (const f of filePaths) {
+        const resolved = path.resolve(f);
+        if (!resolved.startsWith(root)) continue; // 내보내기 폴더 밖의 파일은 건드리지 않는다
+        try {
+          fs.rmSync(resolved, { force: true });
+          filesDeleted++;
+        } catch {
+          /* 이미 없거나 삭제 불가한 파일은 건너뜀 */
+        }
+      }
+      ctx.logger.log('EXPORTS_RESET', { severity: 'warning', details: { by: req.admin!.username, deleted: count, filesDeleted } });
+      res.json({ ok: true, deleted: count, filesDeleted });
+    },
     list(req: Request, res: Response) {
       const cid = req.query.competitionId ? Number(req.query.competitionId) : undefined;
       res.json({

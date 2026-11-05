@@ -45,6 +45,7 @@ import { useCountdown } from '../hooks/useCountdown';
 import { useInterval } from '../hooks/useInterval';
 import { errorMessage, studentApi } from '../services/api';
 import { createSocket, emitAck } from '../socket';
+import { captureProjectorKey, forgetProjectorKey } from '../utils/projector';
 import { celebrate } from '../utils/confetti';
 import { num, pct } from '../utils/format';
 import NotFoundPage from './NotFoundPage';
@@ -69,15 +70,36 @@ function FullscreenButton() {
   );
 }
 
-/** 프로젝터 전용 관리자 제어 소켓 (인증된 교사 토큰이 있을 때만 연결) */
-function useProjectorAdminControls(token: string | null, enabled: boolean) {
+/**
+ * 프로젝터 진행 명령 전송.
+ * - keySocket: 대시보드에서 발급한 컨트롤 키로 연결된 프로젝터 소켓(비밀번호 입력 불필요) — 있으면 이 소켓으로 명령을 보낸다.
+ * - 그 외에는 로그인한 교사 토큰으로 별도 관리자 소켓을 연결한다.
+ */
+function useProjectorAdminControls(token: string | null, enabled: boolean, keySocket: Socket | null) {
   const toast = useToast();
   const socketRef = useRef<Socket | null>(null);
   const [adminConnected, setAdminConnected] = useState(false);
+  const [keyConnected, setKeyConnected] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!token || !enabled) {
+    if (!keySocket) {
+      setKeyConnected(false);
+      return;
+    }
+    setKeyConnected(keySocket.connected);
+    const on = () => setKeyConnected(true);
+    const off = () => setKeyConnected(false);
+    keySocket.on('connect', on);
+    keySocket.on('disconnect', off);
+    return () => {
+      keySocket.off('connect', on);
+      keySocket.off('disconnect', off);
+    };
+  }, [keySocket]);
+
+  useEffect(() => {
+    if (!token || !enabled || keySocket) {
       setAdminConnected(false);
       return;
     }
@@ -95,13 +117,13 @@ function useProjectorAdminControls(token: string | null, enabled: boolean) {
       socketRef.current = null;
       setAdminConnected(false);
     };
-  }, [token, enabled]);
+  }, [token, enabled, keySocket]);
 
   const sendCommand = useCallback(
     async (event: string, payload: Record<string, unknown>, successMsg?: string) => {
-      const s = socketRef.current;
+      const s = keySocket ?? socketRef.current;
       if (!s?.connected) {
-        toast('관리자 제어 연결 중입니다. 잠시 후 다시 눌러 주세요.', 'error');
+        toast('진행 제어 연결 중입니다. 잠시 후 다시 눌러 주세요.', 'error');
         return { ok: false };
       }
       setBusy(true);
@@ -117,10 +139,10 @@ function useProjectorAdminControls(token: string | null, enabled: boolean) {
         setBusy(false);
       }
     },
-    [toast],
+    [toast, keySocket],
   );
 
-  return { adminConnected, busy, sendCommand };
+  return { adminConnected: keySocket ? keyConnected : adminConnected, busy, sendCommand };
 }
 
 /** 학급 프로젝터: 공개 가능한 데이터만 수신하며, 교사 로그인 시 화면에서 바로 진행 제어 가능 */
@@ -142,11 +164,22 @@ function ClassProjector({ classId }: { classId: string }) {
   const [dockVisible, setDockVisible] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  const canControl = Boolean(auth?.admin && auth?.token && !auth.admin.mustChangePassword);
-  const { adminConnected, busy, sendCommand } = useProjectorAdminControls(auth?.token ?? null, canControl);
+  // 대시보드에서 프로젝터를 열면 주소에 학급 전용 컨트롤 키가 실려 와서, 비밀번호 없이 진행 컨트롤이 열린다.
+  const [controlKey] = useState(() => captureProjectorKey(classId));
+  const [viewSocket, setViewSocket] = useState<Socket | null>(null);
+  const [keyControl, setKeyControl] = useState(false);
+
+  const adminLogin = Boolean(auth?.admin && auth?.token && !auth.admin.mustChangePassword);
+  const canControl = adminLogin || keyControl;
+  const { adminConnected, busy, sendCommand } = useProjectorAdminControls(auth?.token ?? null, adminLogin, keyControl ? viewSocket : null);
 
   useEffect(() => {
-    const s = createSocket({ role: 'projector', classId });
+    const s = createSocket({ role: 'projector', classId, controlKey: controlKey ?? undefined });
+    setViewSocket(s);
+    s.on(EVENTS.PROJECTOR_CONTROL, (p: { enabled: boolean }) => {
+      setKeyControl(p.enabled);
+      if (!p.enabled && controlKey) forgetProjectorKey(classId); // 만료·무효 키는 버린다(보기 전용으로 전환)
+    });
     const apply = (p: { state: ClassState }) => {
       setState(p.state);
       setAnswered(p.state.answeredCount);
@@ -161,8 +194,10 @@ function ClassProjector({ classId }: { classId: string }) {
     return () => {
       s.removeAllListeners();
       s.disconnect();
+      setViewSocket(null);
+      setKeyControl(false);
     };
-  }, [classId]);
+  }, [classId, controlKey]);
 
   useEffect(() => {
     if (state?.status === 'FINISHED') celebrate(true);
@@ -375,7 +410,7 @@ function ClassProjector({ classId }: { classId: string }) {
           classId={classId}
           state={state}
           answered={answered}
-          username={auth!.admin!.username}
+          username={auth?.admin?.username ?? '선생님'}
           adminConnected={adminConnected}
           busy={busy}
           sendCommand={sendCommand}

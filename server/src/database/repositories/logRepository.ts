@@ -52,6 +52,10 @@ export class LogRepository {
       )
       .iterate(params) as IterableIterator<LogRow & { nickname: string | null }>;
   }
+  /** 활동 로그 전체 삭제. 삭제한 건수를 반환한다. */
+  deleteAll(): number {
+    return this.db.prepare('DELETE FROM activity_logs').run().changes;
+  }
   bySessions(sessionIds: number[]) {
     if (!sessionIds.length) return [];
     return this.db

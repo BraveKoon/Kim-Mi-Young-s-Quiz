@@ -116,6 +116,37 @@ export class AuthService {
     return { admin, payload };
   }
 
+  /**
+   * 프로젝터 진행 컨트롤 키: 로그인한 관리자가 대시보드에서 프로젝터를 열 때 발급하는 학급 전용 임시 키.
+   * 관리자 토큰(role: 'admin')으로는 쓸 수 없고, 해당 학급의 진행 명령 몇 가지만 허용한다.
+   */
+  issueProjectorKey(admin: AdminRow, classId: string) {
+    const expiresInSec = 12 * 3600;
+    const key = jwt.sign({ role: 'projector-control', classId }, this.config.jwtSecret, {
+      subject: String(admin.id),
+      jwtid: crypto.randomUUID(),
+      algorithm: 'HS256',
+      expiresIn: expiresInSec,
+    });
+    return { key, expiresInSec };
+  }
+
+  /** 키가 유효하고 해당 학급용이며 발급한 관리자 계정이 아직 유효하면 관리자 ID를 돌려준다. */
+  verifyProjectorKey(key: unknown, classId: string): number | null {
+    if (typeof key !== 'string' || key.length === 0 || key.length > 2000) return null;
+    try {
+      const payload = jwt.verify(key, this.config.jwtSecret, { algorithms: ['HS256'] }) as { role?: string; classId?: string; sub?: string; iat?: number };
+      if (payload.role !== 'projector-control' || payload.classId !== classId) return null;
+      const admin = this.repos.admins.findById(Number(payload.sub));
+      if (!admin || admin.must_change_password) return null;
+      const iatMs = (payload.iat ?? 0) * 1000;
+      if (admin.password_changed_at && iatMs < admin.password_changed_at - 1000) return null;
+      return admin.id;
+    } catch {
+      return null;
+    }
+  }
+
   logout(payload: AdminTokenPayload) {
     this.repos.admins.revokeToken(payload.jti, payload.exp * 1000);
     this.repos.admins.purgeExpiredRevocations(this.clock());

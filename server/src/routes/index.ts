@@ -61,6 +61,7 @@ export function createApiRouter(ctx: AppContext) {
   const c = classController(ctx);
   r.get('/classes', c.list);
   r.get('/classes/:classId/session', validate({ params: classParam }), c.session);
+  r.post('/classes/:classId/projector-key', admin, validate({ params: classParam }), c.projectorKey);
   r.post('/classes/:classId/session', admin, validate({ params: classParam, body: S.createSessionSchema }), c.createSession);
   r.post('/classes/:classId/join', limit.join, validate({ params: classParam, body: S.joinSchema }), c.join);
   r.get('/classes/:classId/me', validate({ params: classParam }), c.me);
@@ -97,6 +98,7 @@ export function createApiRouter(ctx: AppContext) {
   // ── 내보내기
   const ex = exportController(ctx);
   r.get('/exports', admin, ex.list);
+  r.delete('/exports', admin, validate({ body: S.resetHistorySchema }), ex.reset);
   r.get('/exports/files/:id', admin, validate({ params: idParam }), ex.download);
   r.get('/exports/:id/csv', admin, validate({ params: idParam }), ex.csv);
   r.get('/exports/:id/excel', admin, validate({ params: idParam }), ex.excel);
@@ -105,6 +107,7 @@ export function createApiRouter(ctx: AppContext) {
   // ── 활동 로그
   const lg = logController(ctx);
   r.get('/logs', admin, validate({ query: S.logQuery }), lg.list);
+  r.delete('/logs', admin, validate({ body: S.resetHistorySchema }), lg.reset);
   r.get('/logs/csv', admin, validate({ query: S.logQuery }), ex.logsCsv);
 
   // ── 공개(프로젝터/결과 발표) — 민감 정보 없음

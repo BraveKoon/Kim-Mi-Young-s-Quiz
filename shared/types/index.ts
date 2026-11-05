@@ -51,6 +51,9 @@ export const LOG_EVENT_TYPES = [
   'ADMIN_LOGIN_FAILED',
   'ADMIN_PASSWORD_CHANGED',
   'ADMIN_CREATED',
+  'PROJECTOR_KEY_ISSUED',
+  'LOGS_RESET',
+  'EXPORTS_RESET',
   'ADMIN_DELETED',
   'QUIZ_STARTED',
   'QUIZ_PAUSED',
@@ -196,6 +199,8 @@ export const EVENTS = {
   STUDENT_REQUEST_STATE: 'student:request_state',
   // projector → server
   PROJECTOR_REQUEST_STATE: 'projector:request_state',
+  /** 서버 → 프로젝터: 진행 컨트롤 사용 가능 여부 ({ enabled }) */
+  PROJECTOR_CONTROL: 'projector:control',
   // server → clients
   STATE: 'quiz:state',
   STARTED: 'quiz:started',

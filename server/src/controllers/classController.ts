@@ -45,6 +45,13 @@ export function classController(ctx: AppContext) {
       const sessionId = ctx.sessions.createSession(classId, competitionId, quizSetId);
       res.status(201).json({ sessionId, state: ctx.sessions.getClassState(classId, 'admin') });
     },
+    /** 관리자 전용: 해당 학급 프로젝터의 진행 컨트롤 키 발급 */
+    projectorKey(req: Request, res: Response) {
+      const { classId } = req.valid!.params;
+      const issued = ctx.auth.issueProjectorKey(req.admin!, classId);
+      ctx.logger.log('PROJECTOR_KEY_ISSUED', { classId, details: { by: req.admin!.username } });
+      res.json(issued);
+    },
     join(req: Request, res: Response) {
       const { classId } = req.valid!.params;
       const result = ctx.participants.join(classId, req.valid!.body.nickname);

@@ -117,3 +117,8 @@ export const settingsSchema = z.object({
   projectorNameMode: z.enum(['FULL', 'MASKED', 'HIDDEN']).optional(),
   leaderboardSize: z.number().int().min(3).max(35).optional(),
 });
+
+/** 활동 로그·내보내기 기록 초기화: 확인 문구 필수 */
+export const resetHistorySchema = z.object({
+  confirm: z.literal('RESET', { message: '확인 문구 RESET 을 정확히 입력해야 합니다.' }),
+});

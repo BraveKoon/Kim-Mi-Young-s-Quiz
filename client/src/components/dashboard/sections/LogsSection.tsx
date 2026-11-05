@@ -1,11 +1,12 @@
-import { Download, RefreshCw } from 'lucide-react';
+import { Download, RefreshCw, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { CLASS_IDS, LOG_EVENT_TYPES, classDisplayName } from '@shared/types/index';
 import { useAdminSocket } from '../../../contexts/AdminSocketContext';
 import { useToast } from '../../../contexts/ToastContext';
 import { useApi } from '../../../hooks/useApi';
-import { downloadFile, errorMessage } from '../../../services/api';
+import { api, downloadFile, errorMessage } from '../../../services/api';
 import { dateTime } from '../../../utils/format';
+import { ConfirmDialog } from '../../common/Modal';
 import { SectionTitle } from '../CompetitionSelect';
 
 interface Log {
@@ -39,6 +40,9 @@ export const EVENT_LABEL: Record<string, string> = {
   ADMIN_PASSWORD_CHANGED: '비밀번호 변경',
   ADMIN_CREATED: '관리자 계정 추가',
   ADMIN_DELETED: '관리자 계정 삭제',
+  PROJECTOR_KEY_ISSUED: '프로젝터 진행 컨트롤 열기',
+  LOGS_RESET: '활동 로그 초기화',
+  EXPORTS_RESET: '내보내기 기록 초기화',
   QUIZ_STARTED: '퀴즈 시작',
   QUIZ_PAUSED: '일시정지',
   QUIZ_RESUMED: '재개',
@@ -78,6 +82,7 @@ export function LogsSection() {
   listQuery.set('offset', String(page * 100));
   const { data, reload } = useApi<{ total: number; logs: Log[] }>(`/logs?${listQuery}`);
   const [live, setLive] = useState(true);
+  const [resetOpen, setResetOpen] = useState(false);
 
   useEffect(() => {
     if (!live) return;
@@ -109,6 +114,9 @@ export function LogsSection() {
           onClick={() => downloadFile(`/logs/csv?${query}`, 'activity_logs.csv').catch((e) => toast(errorMessage(e), 'error'))}
         >
           <Download className="h-4 w-4" /> CSV
+        </button>
+        <button className="btn-ghost text-rose-700" onClick={() => setResetOpen(true)}>
+          <Trash2 className="h-4 w-4" /> 로그 초기화
         </button>
       </SectionTitle>
       <div className="glass mb-3 grid gap-2 p-3 md:grid-cols-6">
@@ -178,6 +186,25 @@ export function LogsSection() {
           </button>
         </div>
       </div>
+      <ConfirmDialog
+        open={resetOpen}
+        danger
+        title="활동 로그 초기화"
+        requireTyping="RESET"
+        confirmText="전체 삭제"
+        message="저장된 활동 로그를 모두 삭제합니다. 되돌릴 수 없으니 필요하면 먼저 CSV로 내려받으세요. 초기화한 사실은 새 로그 1건으로 남습니다."
+        onClose={() => setResetOpen(false)}
+        onConfirm={async () => {
+          try {
+            const r = await api.delete('/logs', { data: { confirm: 'RESET' } });
+            toast(`활동 로그 ${r.data.deleted}건을 삭제했습니다.`, 'success');
+            setPage(0);
+            reload();
+          } catch (e) {
+            toast(errorMessage(e), 'error');
+          }
+        }}
+      />
     </div>
   );
 }

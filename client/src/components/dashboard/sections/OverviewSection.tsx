@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Activity, CheckCircle2, Monitor, PlayCircle, Users, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { openProjector } from '../../../utils/projector';
 import { useAdminSocket } from '../../../contexts/AdminSocketContext';
 import { num } from '../../../utils/format';
 import { Spinner } from '../../common/Spinner';
@@ -65,9 +66,9 @@ export function OverviewSection() {
               <Link to={`/admin/dashboard/control?class=${c.classId}`} className="inline-flex items-center gap-1 text-[#2563EB] hover:underline">
                 <CheckCircle2 className="h-3.5 w-3.5" /> 상세 진행
               </Link>
-              <a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/projector/${c.classId}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-teal-700 hover:underline">
+              <button type="button" onClick={() => openProjector(c.classId)} className="inline-flex items-center gap-1 text-teal-700 hover:underline">
                 <Monitor className="h-3.5 w-3.5" /> 프로젝터 열기
-              </a>
+              </button>
             </div>
           </motion.div>
         ))}
