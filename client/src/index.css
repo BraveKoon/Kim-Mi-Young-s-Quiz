@@ -70,6 +70,12 @@ a, button, select, input, textarea, label, summary { touch-action: manipulation;
 
 h1, h2, h3 { text-wrap: balance; }
 
+/* 브라우저 기본 표면도 팔레트로: 선택 영역·캐럿·체크박스·스크롤바 */
+::selection { background: var(--color-brand-200); color: var(--color-slate-900); }
+input, textarea, select { caret-color: var(--color-brand-600); }
+input[type='checkbox'], input[type='radio'] { accent-color: var(--color-brand-600); }
+html { scrollbar-color: var(--color-scroll) transparent; }
+
 /* 키보드 포커스: 불투명 링, 즉시 표시(전환 없음) */
 :where(a, button, select, input, textarea, summary, [tabindex]):focus-visible {
   outline: 3px solid var(--color-brand-600);
@@ -99,7 +105,7 @@ body {
 }
 
 @utility label {
-  @apply mb-1.5 block text-xs font-bold text-slate-600;
+  @apply mb-1.5 block text-sm font-bold text-slate-700;
 }
 
 @utility btn {

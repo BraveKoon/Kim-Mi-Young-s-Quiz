@@ -30,11 +30,11 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
           친구들과 함께 풀고, 순위로 확인해요
         </motion.p>
 
-        <motion.ol {...fade(0.12)} className="mt-9 grid w-full gap-2.5 text-left" aria-label="참여 방법">
+        <motion.ol {...fade(0.12)} className="mt-9 w-full divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white text-left" aria-label="참여 방법">
           {STEPS.map((s) => (
-            <li key={s.title} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
-              <span className="block text-sm font-extrabold text-slate-900">{s.title}</span>
-              <span className="block text-sm font-medium text-slate-600">{s.desc}</span>
+            <li key={s.title} className="px-4 py-3.5">
+              <span className="block text-base text-slate-900">{s.title}</span>
+              <span className="block text-sm text-slate-600">{s.desc}</span>
             </li>
           ))}
         </motion.ol>

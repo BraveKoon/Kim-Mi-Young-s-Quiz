@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "accessibility": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/accessibility/SKILL.md",
+      "computedHash": "e671c9f1bda721f4818ed62984d8471aab33263ed3fc8331c42d51f4b070e407"
+    },
     "animate": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
@@ -49,6 +55,12 @@
       "skillPath": "skills/choreograph/SKILL.md",
       "computedHash": "4c0615e0cd41ffbca0c7912dba1f1dd1d84b8a3499a5c393be53df9d1b9dec16"
     },
+    "e2e-testing": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/e2e-testing/SKILL.md",
+      "computedHash": "ae1a9cb885532edccb80682df28f269ada8bda86deedd00b282a82b03e011b2e"
+    },
     "emil-design-eng": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
@@ -60,6 +72,12 @@
       "sourceType": "github",
       "skillPath": "skills/find-animation-opportunities/SKILL.md",
       "computedHash": "465d087c41768e4f14ed640dd049036009f613feb55baaa5831b68b33178f9d2"
+    },
+    "frontend-a11y": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-a11y/SKILL.md",
+      "computedHash": "da9365797c4e5668a8384e271f0398e8241f66c9c18389af11f87890a49c630f"
     },
     "hallmark": {
       "source": "nutlope/hallmark",
@@ -73,11 +91,29 @@
       "skillPath": "skills/improve-animations/SKILL.md",
       "computedHash": "f6652a3bb94950baa33c684cc0966c838eb65cf22ebb5769a4f51ea205c254fe"
     },
+    "make-interfaces-feel-better": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/make-interfaces-feel-better/SKILL.md",
+      "computedHash": "bd14931fa4a2739cc81633027dfc829d10034c81a6d63ebd4baa39512df28cfb"
+    },
     "mobile-native": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
       "skillPath": "skills/mobile-native/SKILL.md",
       "computedHash": "f221cea36642168df6d3d6d7f236237cbf1ae669138ff7df07775674223d49ad"
+    },
+    "motion-foundations": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/motion-foundations/SKILL.md",
+      "computedHash": "f76298f3fcc5f20001c8e78cfa36384469c5a583cb25e8ce60a76d3912608d99"
+    },
+    "motion-patterns": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/motion-patterns/SKILL.md",
+      "computedHash": "71d7279a0651e6cb95a0fe804c77cb7bfa88befba1cbd1c60c05d23feada4dcc"
     },
     "pick-ui-library": {
       "source": "emilkowalski/skills",
@@ -91,6 +127,24 @@
       "skillPath": "skills/prototype/SKILL.md",
       "computedHash": "77be567d8c946608fdd15e61b62ab383cdf289a194dce2479828b7eda860d3ba"
     },
+    "react-patterns": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/react-patterns/SKILL.md",
+      "computedHash": "44d2c6304ff7ea20643a0203b74de9c7a42e1f70a2b73a5762500dea385dfc44"
+    },
+    "react-performance": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/react-performance/SKILL.md",
+      "computedHash": "7b5b19e9c15a6b442fa0e7a0a1cb7ced951ab5872a96ff876b099b6bdfc9ae86"
+    },
+    "react-testing": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/react-testing/SKILL.md",
+      "computedHash": "59bd15f26f018d6629557108f936ab691af887508ae71b9d339855e49e337012"
+    },
     "remove-animations": {
       "source": "emilkowalski/skills",
       "sourceType": "github",
@@ -102,6 +156,18 @@
       "sourceType": "github",
       "skillPath": "skills/review-animations/SKILL.md",
       "computedHash": "b1aca2c16876b8f00e2a1eb161714e63ec41099269d5f95c2f307230749b9dcd"
+    },
+    "security-review": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/security-review/SKILL.md",
+      "computedHash": "90f2b514aa106496fd0911d2a0e0ef5aac28515ce218a82574984ad7d9d6b4d2"
+    },
+    "tdd-workflow": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/tdd-workflow/SKILL.md",
+      "computedHash": "4d9e47fbc0bdf548061d221de67af81eedeb78a206b8fc8ff0a48e69649d9e28"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",

@@ -213,12 +213,12 @@ export default function HomePage() {
             {/* 1단계: 학년 · 반 · 번호 선택 */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-slate-800">우리 반과 번호를 골라 주세요</span>
+                <span className="text-base text-slate-900">우리 반과 번호를 골라 주세요</span>
               </div>
 
               <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
                 <div>
-                  <label className="mb-1.5 block text-xs font-bold text-slate-600" htmlFor="grade">
+                  <label className="mb-1.5 block text-sm text-slate-700" htmlFor="grade">
                     학년
                   </label>
                   <div className="relative">
@@ -244,7 +244,7 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-bold text-slate-600" htmlFor="classNum">
+                  <label className="mb-1.5 block text-sm text-slate-700" htmlFor="classNum">
                     반
                   </label>
                   <div className="relative">
@@ -285,7 +285,7 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-xs font-bold text-slate-600" htmlFor="studentNum">
+                  <label className="mb-1.5 block text-sm text-slate-700" htmlFor="studentNum">
                     번호
                   </label>
                   <div className="relative">
@@ -316,7 +316,7 @@ export default function HomePage() {
 
             {/* 2단계: 이름 입력 및 자동 생성 닉네임 미리보기 */}
             <div className="space-y-3">
-              <label className="block text-sm font-bold text-slate-800" htmlFor="studentName">
+              <label className="block text-base text-slate-900" htmlFor="studentName">
                 이름
               </label>
 
