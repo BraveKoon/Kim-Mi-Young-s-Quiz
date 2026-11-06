@@ -1,3 +1,4 @@
+import { Lightbulb as TipIcon, School as SchoolIcon, Trophy as CupIcon, TriangleAlert as WarnIcon, Zap as BoltIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Check,
@@ -388,7 +389,7 @@ function ClassProjector({ classId }: { classId: string }) {
                 정답률 {state.results.answeredCount ? pct(state.results.correctCount / state.results.answeredCount) : '0%'} ({state.results.correctCount}/{state.results.answeredCount}명)
               </div>
               {state.results.explanation && (
-                <p className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-2xl leading-relaxed font-medium text-slate-800 [@media(max-height:820px)]:p-3 [@media(max-height:820px)]:text-lg">💡 {state.results.explanation}</p>
+                <p className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-2xl leading-relaxed font-medium text-slate-800 [@media(max-height:820px)]:p-3 [@media(max-height:820px)]:text-lg"><TipIcon className="mr-2 inline h-7 w-7 text-amber-600" aria-hidden="true" />{state.results.explanation}</p>
               )}
             </div>
             <div className="glass-strong p-6">
@@ -401,7 +402,7 @@ function ClassProjector({ classId }: { classId: string }) {
         )}
         {state.status === 'FINISHED' && (
           <div className="flex flex-1 flex-col gap-8">
-            <h2 className="text-center font-display text-5xl text-slate-900 md:text-6xl">🏆 최종 순위 발표</h2>
+            <h2 className="text-center font-display text-5xl text-slate-900 md:text-6xl"><CupIcon className="mr-3 inline h-12 w-12 text-amber-500" aria-hidden="true" />최종 순위 발표</h2>
             <Podium entries={state.leaderboard} large confetti={false} />
             {state.leaderboard.some((e) => e.rank > 3) && (
               <div className="glass mx-auto w-full max-w-4xl p-4">
@@ -775,7 +776,7 @@ function ProjectorAdminAuthModal({
       ) : (
         <form onSubmit={submitLogin} className="space-y-3.5">
           <p className="rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-700">
-            선생님 계정으로 인증하면 이 프로젝터 화면에서 <b>시작 · 일시정지 · 결과 발표 · 건너뛰기 · 다음 문제</b>를 바로 조작할 수 있습니다.
+            선생님 계정으로 인증하면 이 프로젝터 화면에서 <b>시작, 일시정지, 결과 발표, 건너뛰기, 다음 문제</b>를 바로 조작할 수 있습니다.
           </p>
           <div>
             <label className="label" htmlFor="proj-admin-id">관리자 아이디</label>
@@ -827,7 +828,7 @@ function ProjectorQuestion({ state, answered, timerSync }: { state: ClassState; 
         <span className="font-display">
           문제 {q.index + 1} / {state.totalQuestions}
         </span>
-        {q.isDoublePoints && <span className="rounded-full border border-amber-300 bg-amber-50 px-4 py-1 font-bold text-amber-900">⚡ 2배 점수</span>}
+        {q.isDoublePoints && <span className="rounded-full border border-amber-300 bg-amber-50 px-4 py-1 font-bold text-amber-900"><BoltIcon className="mr-1 inline h-5 w-5" aria-hidden="true" />2배 점수</span>}
         <span className="font-bold">
           제출 {answered ?? state.answeredCount}/{state.participantCount}명
         </span>
@@ -907,12 +908,12 @@ export function CompetitionProjectorPage() {
         </div>
       </header>
       {data.fairnessWarning && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-center text-lg font-semibold text-amber-900">⚠️ {data.fairnessWarning}</div>
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-center text-lg font-semibold text-amber-900"><WarnIcon className="mr-1.5 inline h-6 w-6 align-[-4px]" aria-hidden="true" />{data.fairnessWarning}</div>
       )}
       <AnimatePresence mode="wait">
         {view === 'class' ? (
           <motion.div key="class" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24, transition: { duration: 0.15 } }} transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }} className="glass-strong flex-1 p-6">
-            <h2 className="mb-4 font-display text-4xl text-slate-900">🏫 학급 순위 (평균 점수)</h2>
+            <h2 className="mb-4 font-display text-4xl text-slate-900"><SchoolIcon className="mr-2 inline h-9 w-9 text-brand-600" aria-hidden="true" />학급 순위 (평균 점수)</h2>
             <div className="space-y-3">
               {data.classRanking.map((c, i) => {
                 const max = Math.max(1, ...data.classRanking.map((x) => x.averageScore));
@@ -932,7 +933,7 @@ export function CompetitionProjectorPage() {
           </motion.div>
         ) : (
           <motion.div key="ind" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24, transition: { duration: 0.15 } }} transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }} className="flex flex-1 flex-col gap-6">
-            <h2 className="text-center font-display text-4xl text-slate-900">🏆 전체 개인 순위</h2>
+            <h2 className="text-center font-display text-4xl text-slate-900"><CupIcon className="mr-2 inline h-9 w-9 text-amber-500" aria-hidden="true" />전체 개인 순위</h2>
             <Podium entries={podium} large confetti={false} />
             <div className="glass mx-auto w-full max-w-4xl p-4">
               <Leaderboard entries={podium.concat(data.top.slice(5).map((t, i) => ({ ...t, participantId: 100 + i, prevRank: null, correctCount: 0, lastAwarded: 0, lastCorrect: null }))).filter((e) => e.rank > 3)} large showClass showLast={false} />

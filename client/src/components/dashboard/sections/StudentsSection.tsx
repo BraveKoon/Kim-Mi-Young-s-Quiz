@@ -54,7 +54,9 @@ export function StudentsSection() {
         </button>
       </SectionTitle>
       <div className="mb-3 text-sm font-semibold text-slate-600">
-        참가 <b className="text-slate-900">{list.length}</b>/35명 · 접속 <b className="text-emerald-700">{list.filter((p) => p.connected).length}</b>명 · 미접속 {list.filter((p) => !p.connected).length}명
+        <span>참가 <b className="text-slate-900">{list.length}</b>/35명</span>
+        <span className="ml-3">접속 <b className="text-emerald-700">{list.filter((p) => p.connected).length}</b>명</span>
+        <span className="ml-3">미접속 {list.filter((p) => !p.connected).length}명</span>
       </div>
       <div className="glass overflow-x-auto p-2">
         <table className="table-base">

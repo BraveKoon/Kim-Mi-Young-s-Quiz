@@ -1,3 +1,4 @@
+import { Lightbulb as TipIcon, Zap as BoltIcon } from 'lucide-react';
 import { Monitor, QrCode as QrCodeIcon, Users, Wifi } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -152,7 +153,7 @@ function AdminQuestion({ state, answered, sync }: { state: ClassState; answered:
             문제 {q.index + 1}/{state.totalQuestions}
           </span>
           <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-bold text-slate-900">{QUESTION_TYPE_LABEL[q.questionType] ?? q.questionType}</span>
-          {q.isDoublePoints && <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-extrabold text-amber-950">⚡ 2배</span>}
+          {q.isDoublePoints && <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-extrabold text-amber-950"><BoltIcon className="mr-0.5 inline h-3.5 w-3.5" aria-hidden="true" />2배</span>}
         </div>
         <span className="font-semibold">
           제출 {state.status === 'RESULT' ? state.results?.answeredCount : answered}/{state.participantCount}명
@@ -202,7 +203,8 @@ function AdminQuestion({ state, answered, sync }: { state: ClassState; answered:
       )}
       {(state.answerKey?.explanation || state.results?.explanation) && (
         <p className="rounded-xl border border-amber-200 bg-amber-50/80 p-3 text-sm font-medium text-slate-800">
-          💡 {state.answerKey?.explanation ?? state.results?.explanation}
+          <TipIcon className="mr-1.5 inline h-4 w-4 text-amber-600" aria-hidden="true" />
+          {state.answerKey?.explanation ?? state.results?.explanation}
         </p>
       )}
     </div>

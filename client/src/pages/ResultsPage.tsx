@@ -1,3 +1,4 @@
+import { TriangleAlert as WarnIcon } from 'lucide-react';
 import { ArrowLeft, Monitor, Trophy } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -90,7 +91,7 @@ export default function ResultsPage() {
         </p>
       </div>
       {data.fairnessWarning && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-center text-sm font-semibold text-amber-900">⚠️ {data.fairnessWarning}</div>
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-center text-sm font-semibold text-amber-900"><WarnIcon className="mr-1 inline h-4 w-4 align-[-2px]" aria-hidden="true" />{data.fairnessWarning}</div>
       )}
       <section className="glass-strong p-6">
         <h2 className="mb-6 flex items-center gap-2 font-display text-2xl text-slate-900">
@@ -104,10 +105,10 @@ export default function ResultsPage() {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.classes.map((c) => ({ name: classDisplayName(c.classId).replace('2학년 ', ''), avg: Math.round(c.averageScore) }))}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="name" tick={{ fill: '#334155', fontSize: 12, fontWeight: 600 }} />
+              <XAxis dataKey="name" tick={{ fill: 'var(--color-slate-700)', fontSize: 12, fontWeight: 600 }} />
               <YAxis tick={{ fill: '#64748b', fontSize: 12 }} />
               <Tooltip
-                contentStyle={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 12, color: '#0f172a' }}
+                contentStyle={{ background: 'var(--color-white)', border: '1px solid var(--color-slate-300)', borderRadius: 12, color: 'var(--color-slate-900)' }}
                 formatter={(v) => [`${v}점`, '평균']}
               />
               <Bar dataKey="avg" fill="#2563eb" radius={[6, 6, 0, 0]} />

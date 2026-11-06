@@ -28,7 +28,7 @@ const CLASSROOM_STATUS_META: Record<
   { label: string; badgeClass: string; dotClass: string; pulse?: boolean }
 > = {
   WAITING: {
-    label: '입장 가능 · 대기 중',
+    label: '입장할 수 있어요',
     badgeClass: 'border-emerald-200 bg-emerald-50 text-emerald-800',
     dotClass: 'bg-emerald-500',
   },

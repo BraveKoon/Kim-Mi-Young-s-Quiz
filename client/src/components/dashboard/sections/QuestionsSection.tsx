@@ -427,7 +427,7 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
             />
           </div>
           <label className="mt-6 flex items-center gap-2 text-sm font-bold text-slate-700">
-            <input type="checkbox" checked={!!q.isDoublePoints} onChange={(e) => set('isDoublePoints', e.target.checked)} /> ⚡ 2배 점수
+            <input type="checkbox" checked={!!q.isDoublePoints} onChange={(e) => set('isDoublePoints', e.target.checked)} /> 2배 점수
           </label>
         </div>
         <div>

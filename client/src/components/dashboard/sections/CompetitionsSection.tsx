@@ -1,3 +1,4 @@
+import { TriangleAlert as WarnIcon } from 'lucide-react';
 import { BarChart3, ExternalLink, Flag, Monitor, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -54,10 +55,12 @@ export function CompetitionsSection() {
                     </span>
                   </div>
                   <div className="mt-0.5 text-sm font-medium text-slate-500">
-                    생성 {dateOnly(c.createdAt)} · 시작 {dateTime(c.startedAt)} · 종료 {dateTime(c.finishedAt)}
+                    <span>생성 {dateOnly(c.createdAt)}</span>
+                    <span className="ml-3">시작 {dateTime(c.startedAt)}</span>
+                    <span className="ml-3">종료 {dateTime(c.finishedAt)}</span>
                   </div>
                   <div className="text-sm font-medium text-slate-600">문제 세트: {c.quizSets.join(', ') || '-'}</div>
-                  {c.fairnessWarning && <div className="mt-1 text-xs font-bold text-amber-800">⚠️ 학급별로 다른 문제 세트 사용 — 전교 순위 비교 주의</div>}
+                  {c.fairnessWarning && <div className="mt-1 text-xs font-bold text-amber-800"><WarnIcon className="mr-1 inline h-4 w-4 align-[-2px]" aria-hidden="true" />학급별로 다른 문제 세트 사용: 전교 순위 비교 주의</div>}
                 </div>
               </label>
               <div className="flex flex-wrap gap-2">
@@ -250,14 +253,14 @@ function CompareModal({ ids, onClose }: { ids: number[]; onClose: () => void }) 
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={CLASS_IDS.map((cid) => ({ name: cid.replace('2-', '') + '반', ...Object.fromEntries(data.competitions.map((c) => [c.title, c.classes[cid]?.averageScore ?? 0])) }))}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                <XAxis dataKey="name" tick={{ fill: '#334155', fontSize: 12, fontWeight: 600 }} stroke="#94a3b8" />
+                <XAxis dataKey="name" tick={{ fill: 'var(--color-slate-700)', fontSize: 12, fontWeight: 600 }} stroke="#94a3b8" />
                 <YAxis tick={{ fill: '#64748b', fontSize: 12 }} stroke="#94a3b8" />
                 <Tooltip
                   contentStyle={{
-                    background: '#ffffff',
-                    border: '1px solid #cbd5e1',
+                    background: 'var(--color-white)',
+                    border: '1px solid var(--color-slate-300)',
                     borderRadius: 12,
-                    color: '#0f172a',
+                    color: 'var(--color-slate-900)',
                     boxShadow: '0 8px 20px rgba(15, 23, 42, 0.08)',
                   }}
                 />
