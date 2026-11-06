@@ -44,7 +44,7 @@ export function ExportsSection() {
             </h3>
             <p className="text-sm font-medium text-slate-600">대회 정보, 개인 순위, 학급 순위, 문항별 통계, 접속 기록이 시트별로 포함됩니다.</p>
             <div className="flex flex-wrap gap-2">
-              <button className="btn-primary" disabled={!!busy} onClick={() => run('xlsx', () => downloadFile(`/exports/${cid}/excel`, `quizup_${cid}.xlsx`))}>
+              <button className="btn-primary" disabled={!!busy} onClick={() => run('xlsx', () => downloadFile(`/exports/${cid}/excel`, `quizbeat_${cid}.xlsx`))}>
                 <Download className="h-4 w-4" /> {busy === 'xlsx' ? '생성 중…' : 'Excel 다운로드'}
               </button>
               <button
@@ -69,7 +69,7 @@ export function ExportsSection() {
               {DATASETS.map((d) => (
                 <div key={d.key} className="flex items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3.5 py-2.5 text-sm font-medium text-slate-800">
                   <span>{d.label}</span>
-                  <button className="btn-cyan btn-sm" disabled={!!busy} onClick={() => run(d.key, () => downloadFile(`/exports/${cid}/csv?type=${d.key}`, `quizup_${cid}_${d.key}.csv`))}>
+                  <button className="btn-cyan btn-sm" disabled={!!busy} onClick={() => run(d.key, () => downloadFile(`/exports/${cid}/csv?type=${d.key}`, `quizbeat_${cid}_${d.key}.csv`))}>
                     <Download className="h-4 w-4" /> CSV
                   </button>
                 </div>

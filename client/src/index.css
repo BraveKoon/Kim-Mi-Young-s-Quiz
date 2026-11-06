@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * QUIZUP 디자인 토큰
+ * QuizBeat 디자인 토큰
  * - 중립(흰색·회색) + 포인트색 1개(brand). 정답/오답/경고 같은 상태색만 별도로 사용한다.
  * - 포인트색을 바꾸려면 아래 --color-brand-* 만 교체하면 된다.
  */

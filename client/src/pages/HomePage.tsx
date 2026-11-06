@@ -19,7 +19,7 @@ interface LobbyClass {
 }
 
 /** 같은 탭에서는 시작 화면을 한 번만 보여 주기 위한 표시 (새 탭·새 방문에서는 다시 보임) */
-const START_KEY = 'quizup.started';
+const START_KEY = 'quizbeat.started';
 
 const NAME_PATTERN = /^[0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ _.\-]+$/;
 

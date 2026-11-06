@@ -42,14 +42,14 @@
 1. **번지는 빛 효과 금지 ("깔끔·심플하게")**
    - 네온 글로우(neon glow), 번지는 블러 광원(blurry light blobs / glowing halos) 절대 사용 금지.
    - 선명한 테두리, 담백한 그림자, 높은 텍스트 대비 중심의 깔끔한 카드 디자인을 유지하세요.
-2. **QUIZUP 미니멀 디자인 시스템 전 화면 통일** (`v1.7.0`~, 이전 "밝은 교실" 테마 대체)
+2. **QuizBeat 미니멀 디자인 시스템 전 화면 통일** (`v1.7.0`~ 도입, `v1.8.0`에서 이름 QUIZUP→QuizBeat 변경; 이전 "밝은 교실" 테마 대체)
    - 중립(흰색·회색) 바탕 + **포인트색 1개**(`brand`, 인디고). 색은 `client/src/index.css`의 `--color-brand-*` 토큰으로만 바꾸고, 화면 코드에 색 코드(`#xxxxxx`)를 직접 쓰지 마세요. 정답/오답/경고 같은 상태색(emerald·rose·amber)과 보기 4색(▲◆●■), 타이머 색(lime→yellow→rose)은 기능 색상이라 유지합니다.
    - 4색 장식 띠, 그라데이션 배경, 색 그림자, 오버레이 블러, 둥근 장식 폰트는 쓰지 않습니다. 제목은 `font-display`(Noto Sans KR ExtraBold).
-   - 공통 브랜드 요소: `<Logo />` / `<LogoMark />` (`client/src/components/common/Logo.tsx`) — `QUIZ` + `UP`(포인트색) 워드마크.
+   - 공통 브랜드 요소: `<Logo />` / `<LogoMark />` (`client/src/components/common/Logo.tsx`) — `Quiz`(진한 글자) + `Beat`(포인트색) 워드마크와 비트 막대 3개 마크(시상대 2·1·3위 높이). 시작 화면에서는 `animated`로 막대가 움직입니다.
    - 교실 프로젝터는 먼 거리에서 읽히도록 글자를 크게 유지하고, 세로 820px 이하(1280×720, 1366×768, 1024×768)에서도 **스크롤 없이 한 화면에** 들어와야 합니다(`[@media(max-height:820px)]:` 변형 사용).
    - 모바일·태블릿 터치 친화 크기 유지 및 가로 스크롤 넘침(horizontal overflow, `min-w-0` / `break-words`) 방지.
 3. **반드시 유지해야 할 사용자 흐름**
-   - **학생 시작 화면 (`/`, `StartScreen.tsx`)**: 입력 화면 앞에 QUIZUP 시작 화면(`시작하기` 버튼)이 먼저 나오고, 같은 탭에서는 한 번만 보입니다(`sessionStorage` `quizup.started`). 시작 화면에도 `선생님(관리자) 로그인` 링크를 유지하세요.
+   - **학생 시작 화면 (`/`, `StartScreen.tsx`)**: 입력 화면 앞에 QuizBeat 시작 화면(`시작하기` 버튼)이 먼저 나오고, 같은 탭에서는 한 번만 보입니다(`sessionStorage` `quizbeat.started`). 시작 화면에도 `선생님(관리자) 로그인` 링크를 유지하세요.
    - **학생 초기 화면 (`/`, `HomePage.tsx`)**: **학년 · 반 · 번호 · 이름** 선택/입력 시 `formatStudentNickname`으로 `20101 홍길동` 형식의 닉네임을 자동 생성해 해당 학급 방으로 즉시 입장. 하단 `선생님(관리자) 로그인` 링크 유지.
    - **관리자 로그인 (`/admin`, `AdminLoginPage.tsx`)**: 하단 `홈으로`(`/` 이동) 버튼 유지. 초기 계정(`admin` / `1234`) 또는 신규 발급 보조 교사 계정은 첫 로그인 시 비밀번호 변경 강제.
    - **교실 프로젝터 (`/projector/:classId`, `ProjectorPage.tsx`)**:

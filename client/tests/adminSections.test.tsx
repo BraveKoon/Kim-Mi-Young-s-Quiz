@@ -225,7 +225,7 @@ describe('HomePage (학번+이름 자동 닉네임 입장)', () => {
     vi.restoreAllMocks();
     localStorage.clear();
     // 시작 화면은 같은 탭에서 한 번만 보이므로, 이 테스트는 시작 화면을 이미 지난 상태(입력 화면)에서 시작한다.
-    sessionStorage.setItem('quizup.started', '1');
+    sessionStorage.setItem('quizbeat.started', '1');
   });
 
   it('학년·반·번호·이름 선택 시 닉네임(예: 20307 홍길동)을 자동 생성해 바로 학급으로 입장하고 하단 관리자 로그인 링크를 유지한다', async () => {

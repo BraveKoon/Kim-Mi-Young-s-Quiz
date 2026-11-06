@@ -9,7 +9,7 @@ const STEPS = [
   { icon: Trophy, title: '퀴즈 · 순위', desc: '빠르고 정확하게 풀고 순위를 확인해요' },
 ];
 
-/** 학생 입장 화면(학년·반·번호·이름) 앞에 보이는 QUIZUP 시작 화면 */
+/** 학생 입장 화면(학년·반·번호·이름) 앞에 보이는 QuizBeat 시작 화면 */
 export function StartScreen({ onStart }: { onStart: () => void }) {
   const reduce = useReducedMotion();
   const fade = (delay: number) =>
@@ -19,7 +19,7 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
     <div className="min-h-dvh w-full bg-[#f6f6f8] text-slate-900">
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center px-5 py-10 text-center">
         <motion.div {...fade(0)}>
-          <Logo size="lg" />
+          <Logo size="lg" animated />
         </motion.div>
 
         <motion.h1 {...fade(0.1)} className="mt-6 font-display text-3xl text-slate-900 sm:text-4xl">
