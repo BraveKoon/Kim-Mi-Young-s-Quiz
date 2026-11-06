@@ -106,8 +106,8 @@ export function LogsSection() {
         <label className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
           <input type="checkbox" checked={live} onChange={(e) => setLive(e.target.checked)} /> 실시간 갱신
         </label>
-        <button className="btn-ghost" onClick={reload}>
-          <RefreshCw className="h-4 w-4" />
+        <button className="btn-ghost" onClick={reload} aria-label="새로고침">
+          <RefreshCw className="h-4 w-4" aria-hidden="true" />
         </button>
         <button
           className="btn-cyan"
@@ -122,7 +122,7 @@ export function LogsSection() {
       <div className="glass mb-3 grid gap-2 p-3 md:grid-cols-6">
         <input type="date" className="input" value={f.from} onChange={(e) => set('from', e.target.value)} aria-label="시작 날짜" />
         <input type="date" className="input" value={f.to} onChange={(e) => set('to', e.target.value)} aria-label="종료 날짜" />
-        <select className="input" value={f.classId} onChange={(e) => set('classId', e.target.value)}>
+        <select className="input" aria-label="학급" value={f.classId} onChange={(e) => set('classId', e.target.value)}>
           <option value="" className="bg-white text-slate-900">전체 학급</option>
           {CLASS_IDS.map((id) => (
             <option key={id} value={id} className="bg-white text-slate-900">
@@ -130,7 +130,7 @@ export function LogsSection() {
             </option>
           ))}
         </select>
-        <select className="input" value={f.eventType} onChange={(e) => set('eventType', e.target.value)}>
+        <select className="input" aria-label="이벤트 종류" value={f.eventType} onChange={(e) => set('eventType', e.target.value)}>
           <option value="" className="bg-white text-slate-900">전체 이벤트</option>
           {LOG_EVENT_TYPES.map((t) => (
             <option key={t} value={t} className="bg-white text-slate-900">
@@ -138,8 +138,8 @@ export function LogsSection() {
             </option>
           ))}
         </select>
-        <input className="input" placeholder="참가자 ID" inputMode="numeric" value={f.participantId} onChange={(e) => set('participantId', e.target.value.replace(/\D/g, ''))} />
-        <select className="input" value={f.severity} onChange={(e) => set('severity', e.target.value)}>
+        <input className="input" aria-label="참가자 ID" placeholder="참가자 ID" inputMode="numeric" value={f.participantId} onChange={(e) => set('participantId', e.target.value.replace(/\D/g, ''))} />
+        <select className="input" aria-label="심각도" value={f.severity} onChange={(e) => set('severity', e.target.value)}>
           <option value="" className="bg-white text-slate-900">전체 수준</option>
           <option value="info" className="bg-white text-slate-900">정보</option>
           <option value="warning" className="bg-white text-slate-900">주의</option>

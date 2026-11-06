@@ -1,3 +1,4 @@
+import { TriangleAlert as WarnIcon } from 'lucide-react';
 import { ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -13,7 +14,7 @@ import { CompetitionSelect, SectionTitle } from '../CompetitionSelect';
 
 function FairnessNote({ warning }: { warning: string | null | undefined }) {
   if (!warning) return null;
-  return <div className="mb-4 rounded-2xl border border-amber-300 bg-amber-50/80 p-3 text-sm font-semibold text-amber-950">⚠️ {warning}</div>;
+  return <div className="mb-4 rounded-2xl border border-amber-300 bg-amber-50/80 p-3 text-sm font-semibold text-amber-950"><WarnIcon className="mr-1 inline h-4 w-4 align-[-2px]" aria-hidden="true" />{warning}</div>;
 }
 
 export function IndividualRankingSection() {
@@ -25,7 +26,7 @@ export function IndividualRankingSection() {
     <div>
       <SectionTitle title="개인 순위" desc="대회 전체(전교) 개인 순위 또는 학급의 현재 세션 순위를 확인합니다.">
         <CompetitionSelect value={cid} onChange={setCid} />
-        <select className="input w-44 font-semibold" value={classId} onChange={(e) => setClassId(e.target.value)}>
+        <select className="input w-44 font-semibold" aria-label="학급 선택" value={classId} onChange={(e) => setClassId(e.target.value)}>
           <option value="" className="bg-white text-slate-900">
             전체(대회 기준)
           </option>
@@ -64,14 +65,14 @@ export function ClassRankingSection() {
             <ResponsiveContainer width="100%" height={340}>
               <BarChart data={data.classes.map((c) => ({ name: c.classId.replace('2-', '') + '반', avg: Math.round(c.averageScore), acc: Math.round(c.accuracy * 100) }))}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                <XAxis dataKey="name" tick={{ fill: '#334155', fontSize: 12, fontWeight: 600 }} stroke="#94a3b8" />
+                <XAxis dataKey="name" tick={{ fill: 'var(--color-slate-700)', fontSize: 12, fontWeight: 600 }} stroke="#94a3b8" />
                 <YAxis tick={{ fill: '#64748b', fontSize: 12 }} stroke="#94a3b8" />
                 <Tooltip
                   contentStyle={{
-                    background: '#ffffff',
-                    border: '1px solid #cbd5e1',
+                    background: 'var(--color-white)',
+                    border: '1px solid var(--color-slate-300)',
                     borderRadius: 12,
-                    color: '#0f172a',
+                    color: 'var(--color-slate-900)',
                     boxShadow: '0 8px 20px rgba(15, 23, 42, 0.08)',
                   }}
                 />

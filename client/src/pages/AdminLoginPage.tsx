@@ -1,3 +1,4 @@
+import { autoFocusOnDesktop } from '../utils/pointer';
 import { motion } from 'framer-motion';
 import { Home, LogIn } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
@@ -41,8 +42,9 @@ export default function AdminLoginPage() {
 
       <motion.form
         onSubmit={submit}
-        initial={{ opacity: 0, y: 14 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
         className="glass-strong w-full overflow-hidden"
       >
 
@@ -58,6 +60,8 @@ export default function AdminLoginPage() {
               className="input h-12 font-semibold"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              name="username"
+              spellCheck={false}
               autoComplete="username"
               required
               maxLength={50}
@@ -76,7 +80,7 @@ export default function AdminLoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
               required
-              autoFocus
+              autoFocus={autoFocusOnDesktop}
             />
           </div>
 

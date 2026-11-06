@@ -21,16 +21,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={push}>
       {children}
-      <div className="pointer-events-none fixed inset-x-0 bottom-4 z-[100] flex flex-col items-center gap-2 px-4">
+      <div className="pointer-events-none fixed inset-x-0 bottom-4 z-[100] flex flex-col items-center gap-2 px-4" aria-live="polite" role="status">
         <AnimatePresence>
           {toasts.map((t) => {
             const I = Icon[t.kind];
             return (
               <motion.div
                 key={t.id}
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                initial={{ opacity: 0, y: 12, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10 }}
+                exit={{ opacity: 0, y: 6, transition: { duration: 0.15 } }}
+                transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
                 className={`pointer-events-auto flex max-w-md items-center gap-2.5 rounded-2xl border px-4 py-3 text-sm font-semibold shadow-lg ${
                   t.kind === 'error'
                     ? 'border-rose-200 bg-rose-50 text-rose-900'
@@ -43,6 +44,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   className={`h-5 w-5 shrink-0 ${
                     t.kind === 'error' ? 'text-rose-500' : t.kind === 'success' ? 'text-emerald-600' : 'text-brand-600'
                   }`}
+                  aria-hidden="true"
                 />
                 <span>{t.text}</span>
               </motion.div>

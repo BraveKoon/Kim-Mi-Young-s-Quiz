@@ -267,7 +267,7 @@ describe('HomePage (학번+이름 자동 닉네임 입장)', () => {
 
     // 기본값: 2학년 1반 1번 -> 학급 상태·참가 인원 표시 및 20101 홍길동 미리보기
     expect(await screen.findByRole('button', { name: /2학년 1반 입장하기/ })).toBeEnabled();
-    expect(screen.getByText('입장 가능 · 대기 중')).toBeInTheDocument();
+    expect(screen.getByText('입장할 수 있어요')).toBeInTheDocument();
     expect(screen.getByText('0/35명')).toBeInTheDocument();
     await user.selectOptions(screen.getByLabelText('학년'), '2');
     await user.selectOptions(screen.getByLabelText('반'), '3');

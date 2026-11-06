@@ -8,8 +8,9 @@ export default function NotFoundPage() {
     <div className="flex min-h-dvh flex-col items-center justify-center gap-6 p-6 text-center">
       <Logo size="lg" />
       <motion.div
-        initial={{ scale: 0.92, opacity: 0 }}
+        initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
         className="glass-strong w-full max-w-md overflow-hidden"
       >
         <div className="space-y-4 p-8">

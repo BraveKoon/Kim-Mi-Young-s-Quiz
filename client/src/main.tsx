@@ -1,3 +1,4 @@
+import { MotionConfig } from 'framer-motion';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -9,11 +10,13 @@ import './index.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || '/'}>
-      <ToastProvider>
-        <AdminAuthProvider>
-          <App />
-        </AdminAuthProvider>
-      </ToastProvider>
+      <MotionConfig reducedMotion="user">
+        <ToastProvider>
+          <AdminAuthProvider>
+            <App />
+          </AdminAuthProvider>
+        </ToastProvider>
+      </MotionConfig>
     </BrowserRouter>
   </StrictMode>,
 );

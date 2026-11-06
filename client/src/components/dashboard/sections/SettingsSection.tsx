@@ -36,9 +36,9 @@ export function ChangePasswordForm() {
   };
   return (
     <form onSubmit={submit} className="space-y-3">
-      <input type="password" className="input" placeholder="현재 비밀번호" value={cur} onChange={(e) => setCur(e.target.value)} autoComplete="current-password" required />
-      <input type="password" className="input" placeholder="새 비밀번호 (8자 이상)" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" required />
-      <input type="password" className="input" placeholder="새 비밀번호 확인" value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" required />
+      <input type="password" name="current-password" aria-label="현재 비밀번호" className="input" placeholder="현재 비밀번호" value={cur} onChange={(e) => setCur(e.target.value)} autoComplete="current-password" required />
+      <input type="password" name="new-password" aria-label="새 비밀번호" className="input" placeholder="새 비밀번호 (8자 이상)" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" required />
+      <input type="password" name="confirm-password" aria-label="새 비밀번호 확인" className="input" placeholder="새 비밀번호 확인" value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" required />
       {error && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{error}</p>}
       <button className="btn-primary w-full">
         <KeyRound className="h-4 w-4" /> 비밀번호 변경

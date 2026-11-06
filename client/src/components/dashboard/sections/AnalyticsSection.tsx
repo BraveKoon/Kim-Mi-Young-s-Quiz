@@ -1,3 +1,4 @@
+import { TriangleAlert as WarnIcon, Zap as BoltIcon } from 'lucide-react';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -32,7 +33,7 @@ export function AnalyticsSection() {
         <Spinner />
       ) : (
         <div className="space-y-4">
-          {data.classRanking.fairnessWarning && <div className="rounded-2xl border border-amber-300 bg-amber-50/80 p-3 text-sm font-semibold text-amber-950">⚠️ {data.classRanking.fairnessWarning}</div>}
+          {data.classRanking.fairnessWarning && <div className="rounded-2xl border border-amber-300 bg-amber-50/80 p-3 text-sm font-semibold text-amber-950"><WarnIcon className="mr-1 inline h-4 w-4 align-[-2px]" aria-hidden="true" />{data.classRanking.fairnessWarning}</div>}
           <div className="grid gap-3 md:grid-cols-4">
             <Card label="참가 학급" value={`${data.totals.classes}개`} />
             <Card label="참가 학생" value={`${data.totals.participants}명`} />
@@ -81,10 +82,21 @@ export function AnalyticsSection() {
                   </thead>
                   <tbody>
                     {data.questions.map((q) => (
-                      <tr key={q.questionId} className="cursor-pointer hover:bg-slate-50/70" onClick={() => setDetail(q)}>
+                      <tr
+                        key={q.questionId}
+                        className="cursor-pointer hover:bg-slate-50/70"
+                        tabIndex={0}
+                        onClick={() => setDetail(q)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setDetail(q);
+                          }
+                        }}
+                      >
                         <td className="font-bold text-brand-600">{q.order}</td>
                         <td className="max-w-md truncate font-bold text-slate-900">
-                          {q.isDoublePoints && '⚡ '}
+                          {q.isDoublePoints && <BoltIcon className="mr-1 inline h-4 w-4 text-amber-600" aria-label="2배 점수" />}
                           {q.text}
                         </td>
                         <td>
@@ -144,14 +156,14 @@ export function AnalyticsSection() {
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={detail.byClass.map((c) => ({ name: classDisplayName(c.classId).replace('2학년 ', ''), rate: Math.round(c.correctRateAll * 100) }))}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fill: '#334155', fontSize: 12, fontWeight: 600 }} stroke="#94a3b8" />
+                  <XAxis dataKey="name" tick={{ fill: 'var(--color-slate-700)', fontSize: 12, fontWeight: 600 }} stroke="#94a3b8" />
                   <YAxis domain={[0, 100]} unit="%" tick={{ fill: '#64748b', fontSize: 12 }} stroke="#94a3b8" />
                   <Tooltip
                     contentStyle={{
-                      background: '#ffffff',
-                      border: '1px solid #cbd5e1',
+                      background: 'var(--color-white)',
+                      border: '1px solid var(--color-slate-300)',
                       borderRadius: 12,
-                      color: '#0f172a',
+                      color: 'var(--color-slate-900)',
                       boxShadow: '0 8px 20px rgba(15, 23, 42, 0.08)',
                     }}
                     formatter={(v) => `${v}%`}

@@ -28,7 +28,7 @@ const CLASSROOM_STATUS_META: Record<
   { label: string; badgeClass: string; dotClass: string; pulse?: boolean }
 > = {
   WAITING: {
-    label: '입장 가능 · 대기 중',
+    label: '입장할 수 있어요',
     badgeClass: 'border-emerald-200 bg-emerald-50 text-emerald-800',
     dotClass: 'bg-emerald-500',
   },
@@ -103,7 +103,7 @@ export default function HomePage() {
   useEffect(() => {
     const meta = document.querySelector('meta[name="theme-color"]');
     const prev = meta?.getAttribute('content');
-    meta?.setAttribute('content', '#f6f4ff');
+    meta?.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--color-paper').trim() || '#f6f4ff');
     return () => {
       if (prev) meta?.setAttribute('content', prev);
     };
@@ -151,11 +151,12 @@ export default function HomePage() {
   if (!started) return <StartScreen onStart={start} />;
 
   return (
-    <div className="min-h-dvh w-full bg-[#f6f4ff] text-slate-900">
+    <main className="min-h-dvh w-full bg-paper text-slate-900">
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
         {/* 상단 브랜드 및 환영 문구 */}
         <header className="mb-7 flex flex-col items-center text-center sm:mb-8">
           <Logo size="lg" />
+          <h1 className="sr-only">퀴즈 입장</h1>
           <p className="mt-3 text-[15px] leading-relaxed font-medium text-slate-600 sm:text-base">
             학번과 이름을 입력하고 우리 반 퀴즈에 참여하세요.
           </p>
@@ -167,52 +168,29 @@ export default function HomePage() {
           className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white"
         >
           <div className="space-y-6 p-5 sm:p-7">
-            {/* 현재 학급 · 퀴즈 상태 · 참가 인원 패널 */}
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3.5">
+            {/* 퀴즈 상태 · 참가 인원 (겉 카드 하나만 두고 안쪽은 간격과 가는 선으로 구분) */}
+            <div className="border-b border-slate-100 pb-5">
               <div className="flex flex-wrap items-center justify-between gap-2.5">
-                <div>
-                  <span className="block text-[11px] font-bold tracking-wide text-slate-700">현재 선택한 학급</span>
-                  <div className="mt-0.5 font-display text-2xl text-slate-900">{classDisplayName(classId)}</div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {selectedClass ? (
-                    <span
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${statusMeta.badgeClass}`}
-                    >
-                      <span
-                        className={`h-2 w-2 rounded-full ${statusMeta.dotClass} ${statusMeta.pulse ? 'animate-pulse' : ''}`}
-                      />
-                      {statusMeta.label}
-                    </span>
-                  ) : serverError ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">
-                      <span className="h-2 w-2 rounded-full bg-amber-400" />
-                      교실 연결 확인 중
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                      입장 가능 · 대기 중
-                    </span>
-                  )}
-
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-3 py-1 text-xs font-bold text-slate-700">
-                    <Users className="h-3.5 w-3.5 text-emerald-600" />
-                    <span>참가</span>
-                    <b className={full ? 'text-rose-600' : 'text-brand-700'}>
-                      {participantCount}/{capacity}명
-                    </b>
+                {selectedClass ? (
+                  <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${statusMeta.badgeClass}`}>
+                    {statusMeta.pulse && <span className={`h-2 w-2 rounded-full ${statusMeta.dotClass} motion-safe:animate-pulse`} aria-hidden="true" />}
+                    {statusMeta.label}
                   </span>
-                </div>
+                ) : serverError ? (
+                  <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">교실 연결 확인 중…</span>
+                ) : (
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-bold text-slate-600">교실 정보를 불러오는 중…</span>
+                )}
+                <span className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-700">
+                  <Users className="h-4 w-4 text-emerald-600" aria-hidden="true" />
+                  참가 <b className={`tabular-nums ${full ? 'text-rose-600' : 'text-brand-700'}`}>{participantCount}/{capacity}명</b>
+                </span>
               </div>
 
               <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200/60" aria-hidden="true">
                 <div
-                  className={`h-full rounded-full transition-[width] duration-300 ${
-                    full ? 'bg-rose-400' : 'bg-brand-600'
-                  }`}
-                  style={{ width: `${Math.min(100, Math.round((participantCount / Math.max(1, capacity)) * 100))}%` }}
+                  className={`h-full origin-left rounded-full transition-transform duration-200 ${full ? 'bg-rose-400' : 'bg-brand-600'}`}
+                  style={{ transform: `scaleX(${Math.min(1, participantCount / Math.max(1, capacity))})` }}
                 />
               </div>
             </div>
@@ -221,7 +199,7 @@ export default function HomePage() {
             {savedCreds && (
               <Link
                 to={`/${classId}`}
-                className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm font-semibold text-emerald-900 transition hover:bg-emerald-100/70"
+                className="flex items-center justify-between gap-3 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900 transition hover:bg-emerald-100/70"
               >
                 <span>
                   방금 입장한 기록이 있어요 (<b className="font-extrabold text-emerald-800">{savedCreds.nickname}</b>)
@@ -235,9 +213,6 @@ export default function HomePage() {
             {/* 1단계: 학년 · 반 · 번호 선택 */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 text-xs font-extrabold text-brand-700">
-                  1
-                </span>
                 <span className="text-sm font-bold text-slate-800">우리 반과 번호를 골라 주세요</span>
               </div>
 
@@ -249,7 +224,8 @@ export default function HomePage() {
                   <div className="relative">
                     <select
                       id="grade"
-                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15"
+                      name="grade"
+                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white"
                       value={grade}
                       onChange={(e) => {
                         setGrade(Number(e.target.value));
@@ -274,7 +250,8 @@ export default function HomePage() {
                   <div className="relative">
                     <select
                       id="classNum"
-                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15"
+                      name="classNum"
+                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white"
                       value={classNum}
                       onChange={(e) => {
                         setClassNum(Number(e.target.value));
@@ -314,7 +291,8 @@ export default function HomePage() {
                   <div className="relative">
                     <select
                       id="studentNum"
-                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15"
+                      name="studentNum"
+                      className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white"
                       value={studentNum}
                       onChange={(e) => {
                         setStudentNum(Number(e.target.value));
@@ -338,17 +316,9 @@ export default function HomePage() {
 
             {/* 2단계: 이름 입력 및 자동 생성 닉네임 미리보기 */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-100 text-xs font-extrabold text-brand-700">
-                    2
-                  </span>
-                  <label className="text-sm font-bold text-slate-800" htmlFor="studentName">
-                    이름
-                  </label>
-                </div>
-                <span className="text-xs font-medium text-slate-500">실명으로 입력해 주세요</span>
-              </div>
+              <label className="block text-sm font-bold text-slate-800" htmlFor="studentName">
+                이름
+              </label>
 
               <div className="relative">
                 <PencilLine
@@ -357,7 +327,8 @@ export default function HomePage() {
                 />
                 <input
                   id="studentName"
-                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 pr-4 pl-10 text-base font-bold text-slate-900 placeholder-slate-400 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+                  name="studentName"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 pr-4 pl-10 text-base font-bold text-slate-900 placeholder-slate-500 transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
                   placeholder="이름을 입력해 주세요 (예: 홍길동)"
                   value={studentName}
                   maxLength={14}
@@ -371,23 +342,12 @@ export default function HomePage() {
               </div>
 
               {/* 자동 생성 닉네임 이름표 */}
-              <div
-                className={`flex flex-wrap items-center justify-between gap-2 rounded-2xl border px-4 py-3 transition ${
-                  generatedNickname
-                    ? 'border-amber-200 bg-amber-50'
-                    : 'border-slate-200/90 bg-slate-50/90'
-                }`}
-              >
-                <div>
-                  <span className="block text-xs font-bold text-slate-700">내 퀴즈 이름표 (자동 생성)</span>
-                  <span className="block text-[11px] text-slate-500">퀴즈 화면에 이 닉네임으로 표시돼요</span>
-                </div>
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1 py-1">
+                <span className="text-xs text-slate-600">퀴즈 화면에는 이 이름표로 표시돼요</span>
                 <span
                   data-testid="generated-nickname"
-                  className={`inline-flex items-center rounded-xl border px-3 py-1.5 font-mono text-sm font-extrabold tracking-tight sm:text-base ${
-                    generatedNickname
-                      ? 'border-brand-200 bg-white text-brand-700 shadow-2xs'
-                      : 'border-slate-200 bg-white text-slate-400'
+                  className={`inline-flex items-center rounded-xl border px-3 py-1.5 text-sm font-extrabold tabular-nums sm:text-base ${
+                    generatedNickname ? 'border-brand-200 bg-brand-50 text-brand-700' : 'border-slate-200 bg-white text-slate-500'
                   }`}
                 >
                   {generatedNickname || `${studentIdPrefix} 홍길동`}
@@ -407,10 +367,10 @@ export default function HomePage() {
             {/* 퀴즈 입장 버튼 */}
             <button
               type="submit"
-              className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-5 text-lg font-extrabold text-white transition hover:bg-brand-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+              className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-5 text-lg font-extrabold text-white transition hover:bg-brand-700 active:scale-[0.97] disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
               disabled={busy || closed || full}
             >
-              {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <LogIn className="h-5 w-5" />}
+              {busy ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <LogIn className="h-5 w-5" />}
               <span>
                 {closed
                   ? selectedClass?.status === 'FINISHED'
@@ -428,13 +388,13 @@ export default function HomePage() {
         <footer className="mt-6 flex justify-center">
           <Link
             to="/admin"
-            className="inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600 shadow-2xs transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
           >
             <Shield className="h-4 w-4 text-brand-600" />
             <span>선생님(관리자) 로그인</span>
           </Link>
         </footer>
       </div>
-    </div>
+    </main>
   );
 }

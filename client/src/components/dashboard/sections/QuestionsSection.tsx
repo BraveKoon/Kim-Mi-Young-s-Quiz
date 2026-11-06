@@ -60,7 +60,7 @@ export function QuestionsSection() {
           <option value="OX" className="bg-white text-slate-900">O/X</option>
           <option value="SHORT_ANSWER" className="bg-white text-slate-900">단답형</option>
         </select>
-        <input className="input w-56" placeholder="검색 (문제/분류)" value={filter} onChange={(e) => setFilter(e.target.value)} />
+        <input className="input w-56" aria-label="문제 검색" placeholder="검색 (문제/분류)" value={filter} onChange={(e) => setFilter(e.target.value)} />
         <button className="btn-ghost" onClick={() => setBulkOpen(true)}>
           <FileUp className="h-4 w-4 text-brand-600" /> JSON 일괄 등록
         </button>
@@ -292,6 +292,7 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                   </label>
                   <input
                     className="input"
+                    aria-label={`보기 ${i + 1}`}
                     placeholder={`보기 ${i + 1}`}
                     value={o}
                     maxLength={120}
@@ -426,7 +427,7 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
             />
           </div>
           <label className="mt-6 flex items-center gap-2 text-sm font-bold text-slate-700">
-            <input type="checkbox" checked={!!q.isDoublePoints} onChange={(e) => set('isDoublePoints', e.target.checked)} /> ⚡ 2배 점수
+            <input type="checkbox" checked={!!q.isDoublePoints} onChange={(e) => set('isDoublePoints', e.target.checked)} /> 2배 점수
           </label>
         </div>
         <div>

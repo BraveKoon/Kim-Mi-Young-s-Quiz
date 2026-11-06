@@ -1,8 +1,10 @@
+import { autoFocusOnDesktop } from '../utils/pointer';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeft,
   CheckCircle2,
   ChevronDown,
+  Lightbulb,
   Loader2,
   LogIn,
   PartyPopper,
@@ -135,8 +137,9 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
 
       <motion.form
         onSubmit={submit}
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
         className="glass-strong w-full overflow-hidden"
       >
 
@@ -162,10 +165,10 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
             {info?.competitionTitle && <p className="mt-1.5 text-xs font-medium text-slate-600">{info.competitionTitle}</p>}
             <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-slate-200/60" aria-hidden="true">
               <div
-                className={`h-full rounded-full transition-[width] duration-300 ${
+                className={`h-full origin-left rounded-full transition-transform duration-200 ${
                   full ? 'bg-rose-400' : 'bg-brand-600'
                 }`}
-                style={{ width: `${Math.min(100, Math.round((participantCount / Math.max(1, capacity)) * 100))}%` }}
+                style={{ transform: `scaleX(${Math.min(1, participantCount / Math.max(1, capacity))})` }}
               />
             </div>
           </div>
@@ -184,7 +187,7 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
               <div className="relative">
                 <select
                   id="join-studentNum"
-                  className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15 disabled:cursor-not-allowed disabled:bg-slate-100"
+                  className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/80 pl-3.5 pr-8 text-base font-bold text-slate-900 transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white disabled:cursor-not-allowed disabled:bg-slate-100"
                   value={studentNum}
                   onChange={(e) => {
                     setStudentNum(Number(e.target.value));
@@ -209,7 +212,7 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
                 <PencilLine className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-rose-400" />
                 <input
                   id="join-studentName"
-                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 pr-4 pl-10 text-base font-bold text-slate-900 placeholder-slate-400 outline-none transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-3 focus:ring-brand-500/15 disabled:cursor-not-allowed disabled:bg-slate-100"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/80 pr-4 pl-10 text-base font-bold text-slate-900 placeholder-slate-400 transition hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white disabled:cursor-not-allowed disabled:bg-slate-100"
                   placeholder="예) 홍길동"
                   value={studentName}
                   maxLength={14}
@@ -217,7 +220,8 @@ function JoinForm({ classId, notice, onJoined }: { classId: string; notice: stri
                     setStudentName(e.target.value);
                     if (error) setError('');
                   }}
-                  autoFocus
+                  autoFocus={autoFocusOnDesktop}
+                  name="studentName"
                   autoComplete="name"
                   disabled={closed || full}
                 />
@@ -310,9 +314,11 @@ function QuizRoom({ classId, creds, onInvalid }: { classId: string; creds: Stude
       <AnimatePresence>
         {conn === 'reconnecting' && (
           <motion.div
-            initial={{ y: -16, opacity: 0 }}
+            initial={{ y: -8, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, transition: { duration: 0.15 } }}
+            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+            role="status"
             className="mb-3 flex items-center justify-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-900"
           >
             <Loader2 className="h-4 w-4 animate-spin text-amber-600" /> 연결이 잠깐 끊어졌어요. 자동으로 다시 연결 중… (점수는 안전하게 저장돼요!)
@@ -366,9 +372,10 @@ function WaitingRoom({ state, participants, me }: { state: ClassState; participa
                 <motion.span
                   key={p.id}
                   layout
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
+                  initial={{ scale: 0.85, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0, transition: { duration: 0.12 } }}
+                  transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
                   className={`rounded-full border px-3.5 py-1.5 text-sm font-bold transition ${
                     p.id === me
                       ? 'border-brand-600 bg-brand-600 text-white shadow-xs'
@@ -457,7 +464,7 @@ function QuestionScreen({
         <div className="flex items-center gap-2">
           {question.isDoublePoints && (
             <span className="rounded-full border border-amber-300 bg-amber-50 px-3 py-0.5 text-xs font-extrabold text-amber-900">
-              ⚡ 2배 점수 찬스
+              2배 점수 찬스
             </span>
           )}
           {question.category && (
@@ -470,8 +477,9 @@ function QuestionScreen({
 
       <motion.div
         key={question.id}
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
         className="glass-strong overflow-hidden text-center"
       >
         <div className="p-5 md:p-8">
@@ -491,8 +499,9 @@ function QuestionScreen({
         {submitted ? (
           <motion.div
             key="done"
-            initial={{ scale: 0.94, opacity: 0 }}
+            initial={{ scale: 0.96, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="glass-strong flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center"
           >
             <CheckCircle2 className="h-20 w-20 text-emerald-500" />
@@ -539,8 +548,9 @@ function QuestionScreen({
               value={shortText}
               maxLength={120}
               onChange={(e) => setShortText(e.target.value)}
-              autoFocus
+              autoFocus={autoFocusOnDesktop}
               autoComplete="off"
+              spellCheck={false}
               disabled={sending || paused || notStarted || timeUp}
             />
             <button
@@ -592,9 +602,9 @@ function ResultScreen({ state, myResult, mySubmit, me }: { state: ClassState; my
   return (
     <div className="flex flex-1 flex-col gap-4">
       <motion.div
-        initial={{ scale: 0.94, opacity: 0 }}
+        initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.25 }}
+        transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
         className={`flex flex-col items-center gap-2 rounded-2xl border p-6 text-center shadow-xs ${
           correct ? 'border-emerald-200 bg-emerald-50/90 text-emerald-950' : 'border-rose-200 bg-rose-50/90 text-rose-950'
         }`}
@@ -603,7 +613,9 @@ function ResultScreen({ state, myResult, mySubmit, me }: { state: ClassState; my
         <div className="font-display text-4xl">{correct ? '정답이에요!' : submitted ? '아쉬워요!' : '시간이 지났어요'}</div>
         {mine && (
           <div className="text-lg font-semibold text-slate-800 sm:text-xl">
-            <b className="text-brand-700">+{num(mine.awardedScore ?? 0)}점</b> · 총 {num(mine.totalScore)}점 · <b>{mine.rank}위</b>
+            <b className="text-brand-700">+{num(mine.awardedScore ?? 0)}점</b>
+            <span className="ml-3">총 {num(mine.totalScore)}점</span>
+            <b className="ml-3">{mine.rank}위</b>
             {mine.prevRank != null && mine.prevRank !== mine.rank && (
               <span className={mine.prevRank > mine.rank ? 'ml-2 font-extrabold text-emerald-700' : 'ml-2 font-extrabold text-rose-600'}>
                 ({mine.prevRank > mine.rank ? '▲' : '▼'}
@@ -640,7 +652,8 @@ function ResultScreen({ state, myResult, mySubmit, me }: { state: ClassState; my
         )}
         {r.explanation && (
           <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3.5 text-sm leading-relaxed font-medium text-slate-800">
-            💡 {r.explanation}
+            <Lightbulb className="mr-1.5 inline h-4 w-4 text-amber-600" aria-hidden="true" />
+            {r.explanation}
           </p>
         )}
       </div>

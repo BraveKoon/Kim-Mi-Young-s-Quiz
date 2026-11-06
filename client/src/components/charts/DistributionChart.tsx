@@ -9,11 +9,11 @@ export function DistributionChart({ options, distribution, correctIndex, height 
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data} margin={{ top: large ? 32 : 24, right: 8, left: large ? 0 : -16, bottom: 0 }}>
-        <XAxis dataKey="name" tick={{ fill: '#334155', fontSize: tick, fontWeight: 600 }} interval={0} />
+        <XAxis dataKey="name" tick={{ fill: 'var(--color-slate-700)', fontSize: tick, fontWeight: 600 }} interval={0} />
         <YAxis allowDecimals={false} tick={{ fill: '#64748b', fontSize: tick }} />
         <Tooltip
           cursor={{ fill: 'rgba(37, 99, 235, 0.06)' }}
-          contentStyle={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 12, color: '#0f172a', boxShadow: '0 8px 20px -6px rgba(15,23,42,0.12)' }}
+          contentStyle={{ background: 'var(--color-white)', border: '1px solid var(--color-slate-300)', borderRadius: 12, color: 'var(--color-slate-900)', boxShadow: '0 8px 20px -6px rgba(15,23,42,0.12)' }}
           formatter={(v) => [`${v}명`, '선택']}
         />
         <Bar dataKey="value" radius={[8, 8, 0, 0]}>
