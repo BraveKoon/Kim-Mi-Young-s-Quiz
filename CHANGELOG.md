@@ -4,6 +4,12 @@ QuizBeat(구 ClassQuiz·QUIZUP, 중학교 2학년 1~12반 실시간 인터랙티
 
 ---
 
+## [v1.8.3] - 2026-11-06 — Cloudflare Worker 이름을 quizbeat로 변경
+
+### Changed
+- `wrangler.jsonc`의 Worker 이름을 `classquiz`에서 `quizbeat`로 변경. 서비스 주소가 `quizbeat.bravekoon.workers.dev`로 바뀌면서 Cloudflare의 Worker 이름과 맞추기 위함이다(Workers Builds는 두 이름이 같아야 배포된다).
+- 배포 후 백엔드(Render)의 `CLIENT_ORIGIN`에 새 주소(`https://quizbeat.bravekoon.workers.dev`)를 포함해야 한다. 서버 기본 허용 주소와 `AGENTS.md`의 옛 주소는 이번에 바꾸지 않았다.
+
 ## [v1.8.2] - 2026-11-06 — 보기 색 대비, 글자 위계, 시작 화면 정리
 
 ### Fixed
