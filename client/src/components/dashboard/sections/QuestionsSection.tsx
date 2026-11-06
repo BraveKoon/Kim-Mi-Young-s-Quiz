@@ -286,7 +286,7 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
             <div className="grid gap-2 sm:grid-cols-2">
               {options.map((o, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <label className={`flex cursor-pointer items-center gap-1 rounded-xl px-2.5 py-2 text-white ${OPTION_STYLES[i].bg}`} title="정답으로 지정">
+                  <label className={`flex cursor-pointer items-center gap-1 rounded-xl px-2.5 py-2 text-slate-900 ${OPTION_STYLES[i].bg}`} title="정답으로 지정">
                     <input type="radio" name="correct" checked={q.correctIndex === i} onChange={() => set('correctIndex', i)} />
                     <span>{OPTION_STYLES[i].shape}</span>
                   </label>
@@ -325,7 +325,7 @@ function QuestionForm({ initial, onClose, onSaved }: { initial: Partial<Question
                       <button
                         type="button"
                         onClick={() => set('correctIndex', i)}
-                        className={`inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-bold text-white ${OPTION_STYLES[i].bg}`}
+                        className={`inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-bold text-slate-900 ${OPTION_STYLES[i].bg}`}
                       >
                         <input
                           type="radio"

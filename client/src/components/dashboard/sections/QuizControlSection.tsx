@@ -169,7 +169,7 @@ function AdminQuestion({ state, answered, sync }: { state: ClassState; answered:
       ) : (
         <div className="grid gap-2 sm:grid-cols-2">
           {q.options.map((o, i) => (
-            <div key={i} className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-white ${OPTION_STYLES[i].bg} ${i === correct ? 'ring-4 ring-emerald-500 shadow-sm' : 'opacity-80'}`}>
+            <div key={i} className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-slate-900 ${OPTION_STYLES[i].bg} ${i === correct ? 'ring-4 ring-emerald-500 shadow-sm' : 'opacity-80'}`}>
               <span>{OPTION_STYLES[i].shape}</span>
               <span className="flex-1 font-bold">{o}</span>
               {i === correct && <span className="rounded-md bg-white px-2 py-0.5 text-xs font-extrabold text-slate-900">정답</span>}
