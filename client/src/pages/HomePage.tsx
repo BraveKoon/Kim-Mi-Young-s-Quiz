@@ -103,7 +103,7 @@ export default function HomePage() {
   useEffect(() => {
     const meta = document.querySelector('meta[name="theme-color"]');
     const prev = meta?.getAttribute('content');
-    meta?.setAttribute('content', '#f6f6f8');
+    meta?.setAttribute('content', '#f6f4ff');
     return () => {
       if (prev) meta?.setAttribute('content', prev);
     };
@@ -151,7 +151,7 @@ export default function HomePage() {
   if (!started) return <StartScreen onStart={start} />;
 
   return (
-    <div className="min-h-dvh w-full bg-[#f6f6f8] text-slate-900">
+    <div className="min-h-dvh w-full bg-[#f6f4ff] text-slate-900">
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-4 py-8 sm:px-6 sm:py-12">
         {/* 상단 브랜드 및 환영 문구 */}
         <header className="mb-7 flex flex-col items-center text-center sm:mb-8">

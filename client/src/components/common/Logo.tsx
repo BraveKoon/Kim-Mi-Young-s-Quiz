@@ -1,10 +1,10 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-/** 비트 막대 3개: 높이가 시상대(2위·1위·3위) 순서이면서 이퀄라이저 같은 QuizBeat 마크 (가운데 막대만 포인트색) */
+/** 비트 막대 3개: 높이가 시상대(2위·1위·3위) 순서이면서 이퀄라이저 같은 QuizBeat 마크 (가운데 막대만 노란색) */
 const BARS = [
   { x: 6.6, y: 13.5, h: 12, fill: '#ffffff', dur: 0.9, delay: 0.1 },
-  { x: 13.8, y: 6.5, h: 19, fill: '#a5b4fc', dur: 0.7, delay: 0 },
+  { x: 13.8, y: 6.5, h: 19, fill: '#fde68a', dur: 0.7, delay: 0 },
   { x: 21, y: 17.5, h: 8, fill: '#ffffff', dur: 1.1, delay: 0.2 },
 ];
 
@@ -14,7 +14,7 @@ export function LogoMark({ className = 'h-9 w-9', animated = false }: { classNam
   const move = animated && !reduce;
   return (
     <svg className={className} viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <rect width="32" height="32" rx="8" fill="#0F172A" />
+      <rect width="32" height="32" rx="8" fill="#7059EE" />
       {BARS.map((b, i) =>
         move ? (
           <motion.rect

@@ -34,8 +34,8 @@ export const dateOnly = (ms: number | null | undefined) => (ms ? new Date(ms).to
 export const seconds = (ms: number | null | undefined) => (ms == null ? '-' : `${(ms / 1000).toFixed(1)}초`);
 
 export const OPTION_STYLES = [
-  { shape: '▲', name: '빨강', bg: 'bg-opt-red', ring: 'ring-rose-300', hex: '#e5304d' },
-  { shape: '◆', name: '파랑', bg: 'bg-opt-blue', ring: 'ring-brand-300', hex: '#2d6cf0' },
-  { shape: '●', name: '노랑', bg: 'bg-opt-yellow', ring: 'ring-amber-200', hex: '#f2b705' },
-  { shape: '■', name: '초록', bg: 'bg-opt-green', ring: 'ring-emerald-300', hex: '#1fa45a' },
+  { shape: '▲', name: '빨강', bg: 'bg-opt-red', ring: 'ring-rose-300', hex: '#f4577a' },
+  { shape: '◆', name: '파랑', bg: 'bg-opt-blue', ring: 'ring-brand-300', hex: '#5b8def' },
+  { shape: '●', name: '노랑', bg: 'bg-opt-yellow', ring: 'ring-amber-200', hex: '#f6b83a' },
+  { shape: '■', name: '초록', bg: 'bg-opt-green', ring: 'ring-emerald-300', hex: '#2fbf8a' },
 ];

@@ -2,23 +2,23 @@
 
 /*
  * QuizBeat 디자인 토큰
- * - 중립(흰색·회색) + 포인트색 1개(brand). 정답/오답/경고 같은 상태색만 별도로 사용한다.
+ * - 연한 라벤더 배경 + 선명한 파스텔 포인트색 1개(brand). 정답/오답/경고 같은 상태색만 별도로 사용한다.
  * - 포인트색을 바꾸려면 아래 --color-brand-* 만 교체하면 된다.
  */
 @theme {
-  --font-sans: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-  --font-display: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-sans: "Gowun Dodum", "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-display: "Jua", "Gowun Dodum", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-300: #a5b4fc;
-  --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
-  --color-brand-900: #312e81;
+  --color-brand-50: #f4f2ff;
+  --color-brand-100: #e9e5ff;
+  --color-brand-200: #d6ceff;
+  --color-brand-300: #bbaeff;
+  --color-brand-400: #9d8cfb;
+  --color-brand-500: #8671f6;
+  --color-brand-600: #7059ee;
+  --color-brand-700: #5d47d8;
+  --color-brand-800: #4b3aae;
+  --color-brand-900: #3c3088;
 
   --color-ink-950: #0f172a;
   --color-ink-900: #f8fafc;
@@ -26,21 +26,21 @@
   --color-ink-700: #e2e8f0;
 
   /* 퀴즈 보기 4색 (▲ ◆ ● ■) — 보기 구분용 기능 색상이라 유지 */
-  --color-opt-red: #ef4444;
-  --color-opt-blue: #2563eb;
-  --color-opt-yellow: #eab308;
-  --color-opt-green: #16a34a;
+  --color-opt-red: #f4577a;
+  --color-opt-blue: #5b8def;
+  --color-opt-yellow: #f6b83a;
+  --color-opt-green: #2fbf8a;
 }
 
 html, body, #root { min-height: 100%; }
 body {
-  @apply bg-[#f6f6f8] text-slate-900 font-sans antialiased;
+  @apply bg-[#f6f4ff] text-slate-900 font-sans antialiased;
 }
 
-/* 제목·숫자용 굵은 글씨 (둥근 장식 폰트 대신 같은 고딕의 ExtraBold) */
+/* 제목·숫자용 둥글둥글한 글꼴 (Jua는 굵기가 하나뿐이라 400 고정) */
 .font-display {
-  font-weight: 800;
-  letter-spacing: -0.025em;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
 @utility glass {
@@ -69,7 +69,7 @@ body {
 
 /* 보조 강조(진한 중립): 다운로드·결과 공개 등 */
 @utility btn-cyan {
-  @apply btn bg-slate-900 text-white hover:bg-slate-700;
+  @apply btn bg-sky-600 text-white hover:bg-sky-700;
 }
 
 @utility btn-ghost {

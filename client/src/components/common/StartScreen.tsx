@@ -16,7 +16,7 @@ export function StartScreen({ onStart }: { onStart: () => void }) {
     reduce ? {} : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.4, delay } };
 
   return (
-    <div className="min-h-dvh w-full bg-[#f6f6f8] text-slate-900">
+    <div className="min-h-dvh w-full bg-[#f6f4ff] text-slate-900">
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center px-5 py-10 text-center">
         <motion.div {...fade(0)}>
           <Logo size="lg" animated />
