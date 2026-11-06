@@ -117,7 +117,7 @@ function AssignSessionModal({ initial, onClose }: { initial: string[]; onClose: 
               </option>
             ))}
           </select>
-          {competitionId === 'new' && <input className="input mt-2" placeholder="대회명 (예: 11월 상식 퀴즈 대회)" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} maxLength={100} />}
+          {competitionId === 'new' && <input className="input mt-2" aria-label="새 대회 이름" placeholder="대회명 (예: 11월 상식 퀴즈 대회)" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} maxLength={100} />}
         </div>
         <div>
           <label className="label">문제 세트</label>

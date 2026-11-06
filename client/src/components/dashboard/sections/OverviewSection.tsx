@@ -37,7 +37,7 @@ export function OverviewSection() {
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
         {overview.classes.map((c, i) => (
-          <motion.div key={c.classId} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }} className="glass flex min-w-0 flex-col gap-3 p-4">
+          <motion.div key={c.classId} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 12) * 0.02, duration: 0.2, ease: [0.23, 1, 0.32, 1] }} className="glass flex min-w-0 flex-col gap-3 p-4">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="font-display text-2xl text-slate-900">{c.className}</div>

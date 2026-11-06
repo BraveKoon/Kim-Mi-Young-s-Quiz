@@ -11,11 +11,11 @@ export function TimerBar({ remainingMs, totalMs, large }: { remainingMs: number;
           ratio <= 0.25 ? 'text-rose-600 animate-pulse' : 'text-slate-800'
         }`}
       >
-        <Clock className={`${large ? 'h-12 w-12 [@media(max-height:820px)]:h-8 [@media(max-height:820px)]:w-8' : 'h-7 w-7'} ${ratio <= 0.25 ? 'text-rose-500' : 'text-brand-600'}`} />
+        <Clock aria-hidden="true" className={`${large ? 'h-12 w-12 [@media(max-height:820px)]:h-8 [@media(max-height:820px)]:w-8' : 'h-7 w-7'} ${ratio <= 0.25 ? 'text-rose-500' : 'text-brand-600'}`} />
         {sec}
       </div>
       <div className={`relative flex-1 overflow-hidden rounded-full bg-slate-200/85 ${large ? 'h-6' : 'h-4'}`}>
-        <div className={`h-full rounded-full bg-gradient-to-r ${color} transition-[width] duration-100 ease-linear`} style={{ width: `${ratio * 100}%` }} />
+        <div className={`h-full rounded-full bg-gradient-to-r ${color}`} style={{ width: `${ratio * 100}%` }} />
       </div>
     </div>
   );

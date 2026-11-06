@@ -61,7 +61,7 @@ export function QuizControlSection() {
   return (
     <div>
       <SectionTitle title="퀴즈 진행 관리" desc="학급 하나를 선택해 실시간으로 진행합니다. 한 학급의 조작은 다른 학급에 영향을 주지 않습니다.">
-        <select className="input w-40 font-semibold" value={classId} onChange={(e) => setParams({ class: e.target.value })}>
+        <select className="input w-40 font-semibold" aria-label="학급 선택" value={classId} onChange={(e) => setParams({ class: e.target.value })}>
           {CLASS_IDS.map((id) => (
             <option key={id} value={id} className="bg-white text-slate-900">
               {classDisplayName(id)}

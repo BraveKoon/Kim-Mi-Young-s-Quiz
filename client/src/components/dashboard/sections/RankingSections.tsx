@@ -25,7 +25,7 @@ export function IndividualRankingSection() {
     <div>
       <SectionTitle title="개인 순위" desc="대회 전체(전교) 개인 순위 또는 학급의 현재 세션 순위를 확인합니다.">
         <CompetitionSelect value={cid} onChange={setCid} />
-        <select className="input w-44 font-semibold" value={classId} onChange={(e) => setClassId(e.target.value)}>
+        <select className="input w-44 font-semibold" aria-label="학급 선택" value={classId} onChange={(e) => setClassId(e.target.value)}>
           <option value="" className="bg-white text-slate-900">
             전체(대회 기준)
           </option>

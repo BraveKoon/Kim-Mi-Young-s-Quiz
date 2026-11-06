@@ -1,8 +1,17 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { autoFocusOnDesktop } from '../../utils/pointer';
 
 export function Modal({ open, onClose, title, children, wide }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  // 열릴 때 대화상자로 포커스를 옮기고, 닫히면 열기 전 요소로 되돌린다
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.activeElement as HTMLElement | null;
+    dialogRef.current?.focus({ preventScroll: true });
+    return () => prev?.focus?.({ preventScroll: true });
+  }, [open]);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -17,28 +26,32 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
           onMouseDown={onClose}
         >
           <motion.div
+            ref={dialogRef}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className={`glass-strong max-h-[90vh] w-full overflow-hidden ${wide ? 'max-w-3xl' : 'max-w-lg'}`}
-            initial={{ scale: 0.94, y: 16 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.96, opacity: 0 }}
+            className={`glass-strong max-h-[90vh] w-full overflow-hidden overscroll-contain ${wide ? 'max-w-3xl' : 'max-w-lg'}`}
+            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.12 } }}
+            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
             onMouseDown={(e) => e.stopPropagation()}
           >
-            <div className="max-h-[calc(90vh-6px)] overflow-y-auto p-6">
+            <div className="max-h-[calc(90vh-6px)] overflow-y-auto overscroll-contain p-6">
               <div className="mb-4 flex items-center justify-between gap-4">
                 <h3 className="font-display text-2xl text-slate-900">{title}</h3>
                 <button
                   type="button"
-                  className="rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                  className="rounded-full p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
                   onClick={onClose}
                   aria-label="닫기"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
               {children}
@@ -77,7 +90,7 @@ export function ConfirmDialog(props: {
             <label className="label">
               확인을 위해 <b className="rounded bg-amber-100 px-1.5 py-0.5 text-amber-900">{props.requireTyping}</b> 을(를) 입력하세요
             </label>
-            <input className="input" value={typed} onChange={(e) => setTyped(e.target.value)} autoFocus />
+            <input className="input" value={typed} onChange={(e) => setTyped(e.target.value)} autoFocus={autoFocusOnDesktop} autoComplete="off" spellCheck={false} />
           </div>
         )}
         <div className="flex justify-end gap-2">

@@ -1,3 +1,7 @@
+/* Hallmark · checked: 2026-11-06 · genre: playful (inferred)
+ * floor: 0 FAIL · fixed: 7 (10a, 27, 48, 54, 63, 26a, 4) · reflex: 3, 7b, 11, 64, 69, 74, F19 fixed
+ * dismissed 74 · slate는 보라 틴트로 덮어썼고 상태색(emerald/rose/amber)은 의미색이라 유지
+ * built: the project · redesign: polish · v2.0.0 */
 @import "tailwindcss";
 
 /*
@@ -20,10 +24,28 @@
   --color-brand-800: #4b3aae;
   --color-brand-900: #3c3088;
 
-  --color-ink-950: #0f172a;
-  --color-ink-900: #f8fafc;
-  --color-ink-800: #ffffff;
-  --color-ink-700: #e2e8f0;
+  /* 중립색: Tailwind 기본 slate를 포인트색(보라) 쪽으로 살짝 틴트한 값으로 덮어쓴다 */
+  --color-slate-50: #f7f6fb;
+  --color-slate-100: #efedf6;
+  --color-slate-200: #e1deec;
+  --color-slate-300: #c9c5d8;
+  --color-slate-400: #9d98b3;
+  --color-slate-500: #75708f;
+  --color-slate-600: #58536f;
+  --color-slate-700: #433f58;
+  --color-slate-800: #2e2b40;
+  --color-slate-900: #1e1c2e;
+  --color-slate-950: #131120;
+
+  /* 바탕·스크롤바 */
+  --color-paper: #f6f4ff;
+  --color-scroll: #c9c5d8;
+  --color-scroll-hover: #9d98b3;
+
+  /* 모션: 기본 전환은 강한 ease-out 160ms (Tailwind transition 유틸 전체에 적용) */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 
   /* 퀴즈 보기 4색 (▲ ◆ ● ■) — 보기 구분용 기능 색상이라 유지 */
   --color-opt-red: #f4577a;
@@ -33,8 +55,29 @@
 }
 
 html, body, #root { min-height: 100%; }
+html {
+  color-scheme: light;
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+}
+body { overflow-x: clip; }
+
+/* 본문 글꼴(Gowun Dodum)·제목 글꼴(Jua)은 굵기가 하나뿐이라 가짜 굵기(합성)를 쓰지 않는다 */
+html { font-synthesis-weight: none; }
+
+/* 버튼·링크·입력의 터치 지연 제거 */
+a, button, select, input, textarea, label, summary { touch-action: manipulation; }
+
+h1, h2, h3 { text-wrap: balance; }
+
+/* 키보드 포커스: 불투명 링, 즉시 표시(전환 없음) */
+:where(a, button, select, input, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-brand-600);
+  outline-offset: 2px;
+  transition: none;
+}
 body {
-  @apply bg-[#f6f4ff] text-slate-900 font-sans antialiased;
+  @apply bg-paper text-slate-900 font-sans antialiased;
 }
 
 /* 제목·숫자용 둥글둥글한 글꼴 (Jua는 굵기가 하나뿐이라 400 고정) */
@@ -52,7 +95,7 @@ body {
 }
 
 @utility input {
-  @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 placeholder-slate-400 outline-none transition hover:border-slate-300 focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400;
+  @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 placeholder-slate-500 transition hover:border-slate-300 focus:border-brand-600 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400;
 }
 
 @utility label {
@@ -60,7 +103,7 @@ body {
 }
 
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-bold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45;
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 font-bold transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-45;
 }
 
 @utility btn-primary {
@@ -95,5 +138,11 @@ body {
 }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: rgba(15, 23, 42, 0.16); border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(15, 23, 42, 0.28); }
+::-webkit-scrollbar-thumb { background: var(--color-scroll); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-scroll-hover); }
+
+/* 움직임 줄이기: 이동·확대 애니메이션은 끄고, 깜빡임은 멈추며, 로딩 스피너만 느리게 돌린다 */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse { animation: none; }
+  .animate-spin { animation-duration: 2.4s; }
+}

@@ -81,7 +81,18 @@ export function AnalyticsSection() {
                   </thead>
                   <tbody>
                     {data.questions.map((q) => (
-                      <tr key={q.questionId} className="cursor-pointer hover:bg-slate-50/70" onClick={() => setDetail(q)}>
+                      <tr
+                        key={q.questionId}
+                        className="cursor-pointer hover:bg-slate-50/70"
+                        tabIndex={0}
+                        onClick={() => setDetail(q)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setDetail(q);
+                          }
+                        }}
+                      >
                         <td className="font-bold text-brand-600">{q.order}</td>
                         <td className="max-w-md truncate font-bold text-slate-900">
                           {q.isDoublePoints && '⚡ '}

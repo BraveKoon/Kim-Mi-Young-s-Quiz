@@ -9,15 +9,16 @@ export function DoublePointsBanner({ show }: { show: boolean }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
         >
           <motion.div
-            initial={{ scale: 0.85, opacity: 0 }}
+            initial={{ scale: 0.94, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 1.05, opacity: 0 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
+            exit={{ opacity: 0, transition: { duration: 0.15 } }}
+            transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
             className="rounded-2xl border-2 border-amber-300 bg-amber-50 px-8 py-5 text-center font-display text-4xl text-amber-900 shadow-xl md:text-6xl"
           >
-            ⚡ DOUBLE POINTS x2! ⚡
+            DOUBLE POINTS x2!
           </motion.div>
         </motion.div>
       )}

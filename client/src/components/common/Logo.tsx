@@ -27,7 +27,7 @@ export function LogoMark({ className = 'h-9 w-9', animated = false }: { classNam
             fill={b.fill}
             style={{ transformBox: 'fill-box', transformOrigin: 'bottom' }}
             animate={{ scaleY: [1, 0.55, 1] }}
-            transition={{ duration: b.dur, delay: b.delay, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{ duration: b.dur, delay: b.delay, repeat: 5, ease: [0.77, 0, 0.175, 1] }}
           />
         ) : (
           <rect key={i} x={b.x} y={b.y} width="4.4" height={b.h} rx="2.2" fill={b.fill} />
@@ -43,7 +43,7 @@ export function Logo({ size = 'md', to = '/', animated = false }: { size?: 'sm' 
   const markCls = size === 'lg' ? 'h-10 w-10 sm:h-12 sm:w-12' : size === 'sm' ? 'h-7 w-7' : 'h-8 w-8';
 
   return (
-    <Link to={to} aria-label="QuizBeat 홈" className="inline-flex items-center gap-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/40">
+    <Link to={to} aria-label="QuizBeat 홈" className="inline-flex items-center gap-2 rounded-lg">
       <LogoMark className={`shrink-0 ${markCls}`} animated={animated} />
       <span className={`font-display tracking-tight text-slate-900 ${textCls}`}>
         Quiz<span className="text-brand-600">Beat</span>

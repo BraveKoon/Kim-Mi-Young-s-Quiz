@@ -12,15 +12,15 @@ export function AnswerButton(props: { index: number; text: string; mode: Mode; d
       type="button"
       disabled={props.disabled}
       onClick={props.onClick}
-      whileHover={props.disabled ? undefined : { scale: 1.02, y: -2 }}
-      whileTap={props.disabled ? undefined : { scale: 0.95 }}
-      animate={props.mode === 'selected' ? { scale: [1, 1.05, 0.98, 1.01, 1] } : props.mode === 'correct' ? { scale: [1, 1.04, 1] } : { scale: 1 }}
+      whileHover={props.disabled ? undefined : { y: -2 }}
+      whileTap={props.disabled ? undefined : { scale: 0.97 }}
+      animate={props.mode === 'selected' ? { scale: [1, 1.03, 1] } : props.mode === 'correct' ? { scale: [1, 1.03, 1] } : { scale: 1 }}
       transition={
         props.mode === 'selected' || props.mode === 'correct'
-          ? { duration: 0.35, ease: 'easeOut' }
-          : { type: 'spring', stiffness: 400, damping: 14 }
+          ? { duration: 0.22, ease: [0.23, 1, 0.32, 1] }
+          : { type: 'spring', duration: 0.25, bounce: 0 }
       }
-      className={`relative flex w-full items-center gap-3 overflow-hidden rounded-2xl ${s.bg} px-4 text-left font-bold text-white transition
+      className={`relative flex w-full items-center gap-3 overflow-hidden rounded-2xl ${s.bg} px-4 text-left font-bold text-white transition-[opacity,filter] duration-200
         ${props.large ? `min-h-28 py-5 text-2xl md:text-4xl [@media(max-height:820px)]:min-h-16 [@media(max-height:820px)]:py-2.5 [@media(max-height:820px)]:text-2xl` : 'min-h-20 py-4 text-lg md:text-2xl'}
         ${props.mode === 'selected' ? `ring-4 ${s.ring} ring-offset-2 ring-offset-white` : ''}
         ${props.mode === 'correct' ? 'ring-4 ring-lime-300 ring-offset-2 ring-offset-white' : ''}

@@ -42,15 +42,15 @@ export function StudentsSection() {
   return (
     <div>
       <SectionTitle title="학생 관리" desc="학급별 참가 학생과 접속 상태를 확인하고, 필요하면 참가자를 제외합니다. 연결이 끊겨도 기록은 보존되어 재접속할 수 있습니다.">
-        <select className="input w-40 font-semibold" value={classId} onChange={(e) => setClassId(e.target.value)}>
+        <select className="input w-40 font-semibold" aria-label="학급 선택" value={classId} onChange={(e) => setClassId(e.target.value)}>
           {CLASS_IDS.map((id) => (
             <option key={id} value={id} className="bg-white text-slate-900">
               {classDisplayName(id)}
             </option>
           ))}
         </select>
-        <button className="btn-ghost" onClick={reload}>
-          <RefreshCw className="h-4 w-4" />
+        <button className="btn-ghost" onClick={reload} aria-label="새로고침">
+          <RefreshCw className="h-4 w-4" aria-hidden="true" />
         </button>
       </SectionTitle>
       <div className="mb-3 text-sm font-semibold text-slate-600">
