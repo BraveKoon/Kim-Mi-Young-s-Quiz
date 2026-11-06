@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CLASS_CAPACITY, CLASS_COUNT, GRADE, classDisplayName, formatStudentNickname, type SessionStatus } from '@shared/types/index';
 import { Logo } from '../components/common/Logo';
+import { StartScreen } from '../components/common/StartScreen';
 import { useInterval } from '../hooks/useInterval';
 import { credStore } from '../hooks/useStudentQuiz';
 import { errorMessage, studentApi } from '../services/api';
@@ -16,6 +17,9 @@ interface LobbyClass {
   connectedCount: number;
   joinable: boolean;
 }
+
+/** 같은 탭에서는 시작 화면을 한 번만 보여 주기 위한 표시 (새 탭·새 방문에서는 다시 보임) */
+const START_KEY = 'quizup.started';
 
 const NAME_PATTERN = /^[0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ _.\-]+$/;
 
@@ -66,6 +70,21 @@ export default function HomePage() {
   const [serverError, setServerError] = useState(false);
   const [formError, setFormError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [started, setStarted] = useState(() => {
+    try {
+      return sessionStorage.getItem(START_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+  const start = () => {
+    try {
+      sessionStorage.setItem(START_KEY, '1');
+    } catch {
+      /* 저장소를 쓸 수 없어도 시작 화면만 넘어가면 된다 */
+    }
+    setStarted(true);
+  };
 
   const load = () =>
     studentApi
@@ -128,6 +147,8 @@ export default function HomePage() {
       setBusy(false);
     }
   };
+
+  if (!started) return <StartScreen onStart={start} />;
 
   return (
     <div className="min-h-dvh w-full bg-[#f6f6f8] text-slate-900">

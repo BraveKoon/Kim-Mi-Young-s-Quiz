@@ -9,7 +9,7 @@
 - **프로젝트**: 중학교 **2학년 1반 ~ 12반(학급당 정원 35명, 최대 동시 420명)** 실시간 학급별 독립 진행 인터랙티브 퀴즈 플랫폼
 - **저장소**: `https://github.com/BraveKoon/Kim-Mi-Young-s-Quiz`
   - 기본(운영) 브랜치: `arena/c5bccda0-kim-mi-young-s-quiz`
-  - 현재 최신 릴리즈: **`v1.7.0`** (`CHANGELOG.md` 및 GitHub Releases 참조)
+  - 현재 최신 릴리즈: **`v1.8.0`** (`CHANGELOG.md` 및 GitHub Releases 참조)
 - **프론트엔드 운영 배포 (Cloudflare Workers Static Assets)**
   - 주소: `https://classquiz.bravekoon.workers.dev`
   - 설정 파일: `wrangler.jsonc` (`name: "classquiz"`, `assets.directory: "./client/dist"`, `not_found_handling: "single-page-application"`)
@@ -49,6 +49,7 @@
    - 교실 프로젝터는 먼 거리에서 읽히도록 글자를 크게 유지하고, 세로 820px 이하(1280×720, 1366×768, 1024×768)에서도 **스크롤 없이 한 화면에** 들어와야 합니다(`[@media(max-height:820px)]:` 변형 사용).
    - 모바일·태블릿 터치 친화 크기 유지 및 가로 스크롤 넘침(horizontal overflow, `min-w-0` / `break-words`) 방지.
 3. **반드시 유지해야 할 사용자 흐름**
+   - **학생 시작 화면 (`/`, `StartScreen.tsx`)**: 입력 화면 앞에 QUIZUP 시작 화면(`시작하기` 버튼)이 먼저 나오고, 같은 탭에서는 한 번만 보입니다(`sessionStorage` `quizup.started`). 시작 화면에도 `선생님(관리자) 로그인` 링크를 유지하세요.
    - **학생 초기 화면 (`/`, `HomePage.tsx`)**: **학년 · 반 · 번호 · 이름** 선택/입력 시 `formatStudentNickname`으로 `20101 홍길동` 형식의 닉네임을 자동 생성해 해당 학급 방으로 즉시 입장. 하단 `선생님(관리자) 로그인` 링크 유지.
    - **관리자 로그인 (`/admin`, `AdminLoginPage.tsx`)**: 하단 `홈으로`(`/` 이동) 버튼 유지. 초기 계정(`admin` / `1234`) 또는 신규 발급 보조 교사 계정은 첫 로그인 시 비밀번호 변경 강제.
    - **교실 프로젝터 (`/projector/:classId`, `ProjectorPage.tsx`)**:
@@ -58,7 +59,7 @@
 
 ---
 
-## 4. 현재 구현 완료 기능 요약 (`v1.0.0` ~ `v1.7.0`)
+## 4. 현재 구현 완료 기능 요약 (`v1.0.0` ~ `v1.8.0`)
 
 - **3종 문제 유형**: 4지선다(`MULTIPLE_CHOICE`), O/X(`OX`), 단답형(`SHORT_ANSWER` — 최대 5개 복수 인정 답안, NFC·공백·영문 대소문자 정규화 채점, 결과 공개 전 정답 비노출)
 - **문제 일괄 등록 & 기본 프리셋**: `POST /api/questions/bulk` 단일 트랜잭션 일괄 등록 API + 중학교 2학년 고사성어·사자성어 30문항 검수 프리셋(`IDIOM_QUIZ_30`, 원본 `shared/data/idiomQuiz30.ts`) — 서버 최초 실행 시 **기본 문제·문제 세트로 시드**됨(샘플 5문항은 제거, 기존 DB는 시작 시 1회 자동 전환)
@@ -97,7 +98,7 @@ npm run build
 - 서버 동작 변경 시 `server/tests/`, 주요 프론트 동작 변경 시 `client/tests/`에 테스트를 함께 추가하세요.
 - 기능 변경 시 `README.md`의 기능 설명 및 `남은 작업 / 알려진 한계` 섹션을 실제 상태에 맞게 업데이트하세요.
 
-### 버전 관리 및 GitHub Release 규칙 (현재 최신: `v1.7.0`)
+### 버전 관리 및 GitHub Release 규칙 (현재 최신: `v1.8.0`)
 기능을 추가하거나 수정해 배포할 때마다 아래 **시맨틱 버저닝(SemVer)** 기준에 맞춰 **`CHANGELOG.md` 업데이트 + GitHub Release(`gh release create`)** 를 함께 발행합니다.
 
 - **패치 (`x.x.n` — 예: `v1.5.1`, `v1.5.2`)**: 자잘한 기능 보완, UI/문구 다듬기, 버그 수정
