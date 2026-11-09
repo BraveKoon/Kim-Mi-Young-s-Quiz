@@ -10,8 +10,8 @@
  * - 포인트색을 바꾸려면 아래 --color-brand-* 만 교체하면 된다.
  */
 @theme {
-  --font-sans: "Gowun Dodum", "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-  --font-display: "Jua", "Gowun Dodum", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-sans: "Nanum Gothic", "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-display: "Jua", "Nanum Gothic", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 
   --color-brand-50: #f4f2ff;
   --color-brand-100: #e9e5ff;
@@ -62,7 +62,7 @@ html {
 }
 body { overflow-x: clip; }
 
-/* 본문 글꼴(Gowun Dodum)·제목 글꼴(Jua)은 굵기가 하나뿐이라 가짜 굵기(합성)를 쓰지 않는다 */
+/* 본문 Nanum Gothic은 400/700/800이 실제로 있고, 제목 Jua는 굵기가 하나뿐이라 가짜 굵기(합성)는 쓰지 않는다 */
 html { font-synthesis-weight: none; }
 
 /* 버튼·링크·입력의 터치 지연 제거 */
