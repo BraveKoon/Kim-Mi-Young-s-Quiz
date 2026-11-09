@@ -4,6 +4,12 @@ QuizBeat(구 ClassQuiz·QUIZUP, 중학교 2학년 1~12반 실시간 인터랙티
 
 ---
 
+## [v1.8.5] - 2026-11-09 — 옛 주소(classquiz.bravekoon.workers.dev) 정리
+
+### Changed
+- 서비스 주소가 `quizbeat.bravekoon.workers.dev`로 바뀌고 옛 주소는 폐기되어, 서버의 `CLIENT_ORIGIN` 기본 허용 주소와 `AGENTS.md`의 배포 안내(프런트엔드 주소, Worker 이름, 백엔드 필수 환경 변수)를 새 주소로 갱신했다. (QR 테스트의 예시 URL은 QR 크기 검증용 샘플 값이라 그대로 둔다.)
+- 서버 기본값이 바뀌었으므로 Render에서 백엔드를 재배포해야 한다. `CLIENT_ORIGIN` 환경 변수를 직접 지정한 경우에는 그 값에 새 주소가 포함돼 있는지만 확인하면 된다.
+
 ## [v1.8.4] - 2026-11-09 — 본문 글꼴 교체로 굵은 글씨 복원
 
 ### Fixed
