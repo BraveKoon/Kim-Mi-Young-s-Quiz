@@ -9,16 +9,16 @@
 - **프로젝트**: 중학교 **2학년 1반 ~ 12반(학급당 정원 35명, 최대 동시 420명)** 실시간 학급별 독립 진행 인터랙티브 퀴즈 플랫폼
 - **저장소**: `https://github.com/BraveKoon/Kim-Mi-Young-s-Quiz`
   - 기본(운영) 브랜치: `arena/c5bccda0-kim-mi-young-s-quiz`
-  - 현재 최신 릴리즈: **`v1.8.0`** (`CHANGELOG.md` 및 GitHub Releases 참조)
+  - 현재 최신 릴리즈: **`v1.8.5`** (`CHANGELOG.md` 및 GitHub Releases 참조)
 - **프론트엔드 운영 배포 (Cloudflare Workers Static Assets)**
-  - 주소: `https://classquiz.bravekoon.workers.dev`
-  - 설정 파일: `wrangler.jsonc` (`name: "classquiz"`, `assets.directory: "./client/dist"`, `not_found_handling: "single-page-application"`)
+  - 주소: `https://quizbeat.bravekoon.workers.dev`
+  - 설정 파일: `wrangler.jsonc` (`name: "quizbeat"`, `assets.directory: "./client/dist"`, `not_found_handling: "single-page-application"`)
   - 빌드/배포 명령: `npm ci && npm run build -w client` → `npx wrangler deploy`
   - 빌드 환경 변수: `VITE_API_URL=https://quiz-api-yye7.onrender.com`
 - **백엔드 운영 배포 (Render Web Service)**
   - 주소: `https://quiz-api-yye7.onrender.com`
   - 헬스체크 경로: `GET /api/health` 및 `GET /` (UptimeRobot 슬립 방지 연동 가능)
-  - 필수 환경 변수: `CLIENT_ORIGIN=https://classquiz.bravekoon.workers.dev`, `TRUST_PROXY=1`, `JWT_SECRET`, `DATABASE_PATH`
+  - 필수 환경 변수: `CLIENT_ORIGIN=https://quizbeat.bravekoon.workers.dev`, `TRUST_PROXY=1`, `JWT_SECRET`, `DATABASE_PATH`
 - **GitHub Pages 배포 관련 주의**: `.github/workflows/deploy-pages.yml`은 사용자 요청에 따라 푸시 자동 배포를 해제하고 수동(`workflow_dispatch`) 전용으로 두었습니다. 임의로 `push` 트리거를 다시 켜지 마세요.
 
 ---
