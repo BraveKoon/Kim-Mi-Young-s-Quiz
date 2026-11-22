@@ -4,6 +4,12 @@ QuizBeat(구 ClassQuiz·QUIZUP, 중학교 2학년 1~12반 실시간 인터랙티
 
 ---
 
+## [v1.8.6] - 2026-11-22 — uuid 간접 의존성 취약점 패치
+
+### Fixed
+- `exceljs`(엑셀 내보내기 기능)가 내부적으로 쓰는 `uuid@8.3.2`에 범위 검사 누락 취약점(CVE-2026-41907, moderate)이 있어 `package.json`의 `overrides`로 `uuid@^13.0.1`을 강제했다. 우리 코드와 `exceljs`가 해당 취약 API를 쓰지 않아 실제 악용 경로는 없었지만, 간단히 고칠 수 있어 반영했다. `npm audit` 취약점 2건 → 0건.
+- 엑셀 생성·읽기가 `uuid@13`에서도 정상 동작함을 별도로 확인했다(테스트 59개·36개는 변동 없이 모두 통과).
+
 ## [v1.8.5] - 2026-11-09 — 옛 주소(classquiz.bravekoon.workers.dev) 정리
 
 ### Changed
